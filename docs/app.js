@@ -12,7 +12,9 @@ var VT_BOUNDS = L.latLngBounds([42.72, -73.44], [45.02, -71.46]);
 var COLORS = {
   auth: '#2563eb',
   modeled: '#d97706',
-  town: '#475569'
+  town: '#475569',
+  fd: '#9333ea',          // fire district, real boundary
+  fdPlaceholder: '#a1a1aa' // filed under a district name but actually the town
 };
 
 /* ---------- basemaps ---------- */
@@ -42,7 +44,10 @@ var map = L.map('map', {
 L.control.scale({ imperial: true, metric: false }).addTo(map);
 
 // Panes fix the draw order regardless of the sequence layers finish loading in.
+// Fire districts sit between towns and water: they contain the service areas,
+// so the service areas have to stay readable on top of them.
 map.createPane('towns').style.zIndex = 400;
+map.createPane('fire').style.zIndex = 425;
 map.createPane('water').style.zIndex = 450;
 
 /* ---------- layer registry ---------- */
@@ -59,6 +64,20 @@ var LAYERS = {
         pane: 'water',
         style: waterStyle,
         onEachFeature: bindWaterPopup
+      };
+    }
+  },
+  fire: {
+    checkbox: 'lyr-fire',
+    countEl: 'count-fire',
+    url: 'data/fire_districts.geojson',
+    layer: null,
+    features: [],
+    options: function () {
+      return {
+        pane: 'fire',
+        style: fireStyle,
+        onEachFeature: bindFirePopup
       };
     }
   },
@@ -173,6 +192,77 @@ function waterStyle(feature) {
     fillColor: auth ? COLORS.auth : COLORS.modeled,
     fillOpacity: 0.22
   };
+}
+
+function isRealDistrict(props) {
+  return props.geometry_status === 'district';
+}
+
+function fireStyle(feature) {
+  var real = isRealDistrict(feature.properties);
+  return {
+    color: real ? COLORS.fd : COLORS.fdPlaceholder,
+    weight: real ? 2.4 : 1.6,
+    opacity: 0.95,
+    dashArray: real ? null : '2 4',
+    fillColor: real ? COLORS.fd : COLORS.fdPlaceholder,
+    fillOpacity: real ? 0.12 : 0.05
+  };
+}
+
+function bindFirePopup(feature, layer) {
+  layer.bindPopup(firePopupHtml(feature.properties), { maxWidth: 340 });
+  layer.on({
+    mouseover: function () {
+      layer.setStyle({ weight: 4, fillOpacity: 0.22 });
+      layer.bringToFront();
+    },
+    mouseout: function () { LAYERS.fire.layer.resetStyle(layer); }
+  });
+}
+
+function firePopupHtml(p) {
+  var real = isRealDistrict(p);
+
+  var html =
+    '<h3>' + esc(p.district_name) + '</h3>' +
+    '<p class="popup-id">' + esc(p.town) +
+    (p.county ? ', ' + esc(p.county) + ' County' : '') + ' &middot; ' +
+    '<span class="popup-tag ' + (real ? 'district' : 'placeholder') + '">' +
+    (real ? 'District boundary' : 'Town outline — placeholder') + '</span></p>';
+
+  if (!real) {
+    html +=
+      '<p class="popup-warn">This file matches the town boundary at ' +
+      pct(p.town_iou) + ', so it is the town outline rather than the ' +
+      'district\'s political boundary. Not usable for area-difference ' +
+      'metrics.</p>';
+  }
+
+  var rows = [
+    ['Population', num(p.population)],
+    ['Boundary area', p.area_sqkm != null ? fixed(p.area_sqkm, 1) + ' km²' : null],
+    ['Overlap with town', pct(p.town_iou)],
+    ['PWSID', p.pwsid],
+    ['Water system', p.pws_name ? titleCase(p.pws_name) : null],
+    ['Verified', p.verified === 'Y' ? 'Yes' : 'Not yet'],
+    ['Source CRS', p.source_crs + (p.crs_inferred === 'Y' ? ' (inferred)' : '')]
+  ];
+
+  html += '<table class="popup-table">';
+  rows.forEach(function (row) {
+    if (row[1] === null || row[1] === undefined || row[1] === '') return;
+    html += '<tr><th>' + row[0] + '</th><td>' + esc(String(row[1])) + '</td></tr>';
+  });
+  html += '</table>';
+
+  if (p.clerk_email) {
+    html +=
+      '<p class="popup-foot">Town clerk: ' + esc(p.clerk_name || '') +
+      ' &middot; <a href="mailto:' + esc(p.clerk_email) + '">' +
+      esc(p.clerk_email) + '</a></p>';
+  }
+  return html;
 }
 
 function bindWaterPopup(feature, layer) {
@@ -402,6 +492,14 @@ function setCount(id, value) {
 
 function num(v) {
   return v == null ? '' : Number(v).toLocaleString('en-US');
+}
+
+function fixed(v, digits) {
+  return v == null || isNaN(Number(v)) ? '' : Number(v).toFixed(digits);
+}
+
+function pct(v) {
+  return v == null || isNaN(Number(v)) ? '' : (Number(v) * 100).toFixed(1) + '%';
 }
 
 function titleCase(s) {

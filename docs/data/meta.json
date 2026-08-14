@@ -7,5 +7,7 @@
   "population_served": 463847,
   "towns": 256,
   "districts": 80,
-  "clerks_with_email": 247
+  "clerks_with_email": 247,
+  "fd_boundaries": 3,
+  "fd_usable": 1
 }

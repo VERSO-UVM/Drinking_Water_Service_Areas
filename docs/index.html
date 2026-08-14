@@ -76,14 +76,20 @@
         <fieldset class="layer-group">
           <legend>Political boundaries</legend>
           <label class="layer-row">
+            <input type="checkbox" id="lyr-fire" checked>
+            <span class="swatch swatch-fd"></span>
+            <span class="layer-name">Fire districts <em id="count-fire"></em></span>
+          </label>
+          <p class="pending">
+            <strong>3 of 80 districts</strong> have a boundary on file, and only
+            <strong>1</strong> is a real district polygon &mdash; the other two are town
+            outlines, drawn dashed grey. <a href="caveats.html#c10">Why &rarr;</a>
+          </p>
+          <label class="layer-row">
             <input type="checkbox" id="lyr-towns" checked>
             <span class="swatch swatch-town"></span>
             <span class="layer-name">Town boundaries (VCGI) <em id="count-towns"></em></span>
           </label>
-          <p class="pending">
-            Fire district boundaries &mdash; digitized through the pilot &mdash; will be added
-            here as a third toggle.
-          </p>
         </fieldset>
 
         <fieldset class="layer-group">
@@ -102,6 +108,8 @@
           <h3>Boundary source</h3>
           <p><span class="swatch swatch-auth"></span> Authoritative (state / utility supplied)</p>
           <p><span class="swatch swatch-modeled"></span> EPA-modeled (estimated extent)</p>
+          <p><span class="swatch swatch-fd"></span> Fire district (political boundary)</p>
+          <p><span class="swatch swatch-fd-placeholder"></span> Town outline &mdash; placeholder</p>
         </div>
       </div>
     </div>

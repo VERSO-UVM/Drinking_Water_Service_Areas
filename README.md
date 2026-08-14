@@ -10,6 +10,8 @@ This project aims to address this gap by conducting a **pilot mapping project**.
 
 ## Current Status: Inventory, Not Boundaries
 
+The fire-district boundary layer now exists as [`data/vt_fire_districts.gpkg`](data/vt_fire_districts.gpkg) — see [`build_fire_districts.py`](#build_fire_districtspy). It holds **3 of 80 districts, only 1 of which is usable geometry**, so the framing below still stands: the near-term deliverable is the inventory, and this layer is the container that inventory is gradually filled into.
+
 The first deliverable is **a coverage map of the problem, not the boundaries themselves**. Before anyone can quote a digitizing estimate, we need to know how many districts exist, which already have a service-area polygon to start from, and which need boundary work from scratch. That inventory now exists in [`data/vt_district_crosswalk.csv`](data/vt_district_crosswalk.csv).
 
 ### The district roster: 80 districts
@@ -98,7 +100,8 @@ Chapters returning nothing: 505 Williamstown, 509 North Branch, 703 Champlain Wa
 ```bash
 python script/pull_vt_water_boundaries.py   # EPA service areas -> data/vt_water_boundaries.gpkg
 python script/merge_clerk_contacts.py       # SoS clerk xlsx -> data/vt_town_clerk_contacts_filled.csv
-python script/build_site_data.py            # gpkg + towns + clerks -> docs/data/
+python script/build_fire_districts.py       # pilot shapefiles -> data/vt_fire_districts.gpkg
+python script/build_site_data.py            # all of the above -> docs/data/
 python script/build_district_crosswalk.py --epa vt_water_boundaries.csv [--vlct vlct_list.csv]
 python script/spatial_match_districts.py    # repair name-matches spatially
 python script/pull_charter_boundaries.py    # charter Boundaries text -> charter_boundaries.csv
@@ -108,6 +111,40 @@ Run `merge_clerk_contacts.py` before `build_site_data.py`; the latter falls back
 unfilled skeleton and prints a warning if the filled CSV is absent.
 
 > **Working directory:** `spatial_match_districts.py`, `pull_charter_boundaries.py`, and `merge_clerk_contacts.py` reference their inputs as bare filenames (`vt_water_boundaries.gpkg`, `vt_district_crosswalk.csv`, `vt_town_clerk_contacts.csv`), but those files live in `data/`. Run them from inside `data/`, or change the path constants. `pull_charter_boundaries.py` fails *silently* here — it catches the missing crosswalk and skips the join, still writing `charter_boundaries.csv`, so a run can look successful while producing no joined output. `build_site_data.py` uses absolute paths and runs from anywhere.
+
+### `build_fire_districts.py`
+
+Builds **`data/vt_fire_districts.gpkg`** (layer `fire_districts`, EPSG:32145) plus a `vt_fire_districts.csv` attribute sidecar. This is the layer the whole project is trying to produce — the political/taxing boundaries that [caveat 10](docs/caveats.html) says exist nowhere statewide. It currently holds **3 pilot polygons out of 80 districts**. It is the seed, not the deliverable.
+
+**Joining to the water data.** Every row carries `pwsid`, so the layer joins 1:1 to `data/vt_water_boundaries.gpkg` on `PWSID`:
+
+```python
+fd  = gpd.read_file("data/vt_fire_districts.gpkg", layer="fire_districts")
+epa = gpd.read_file("data/vt_water_boundaries.gpkg", layer="all_public_water_systems")
+fd.merge(epa, left_on="pwsid", right_on="PWSID")     # verified: 3 of 3 join
+```
+
+`district_name` + `town` join to `data/vt_district_crosswalk.csv`; `town` joins to the clerk contact sheet. Roster attributes (population, `district_type`, `services`, `districts_in_town`, `single_district_town`, `has_legal_charter`, `match_score`) and the town clerk's name and email are denormalized onto each row, so the file works as a standalone digitizing worklist.
+
+**CRS is inferred, not read.** The pilot shapefiles have no `.prj` ([caveat 11](docs/caveats.html)), so the script reprojects each file under every candidate CRS and keeps whichever lands the polygon on its own town — the town is the ground truth. It independently recovered **EPSG:4326** for Danville and Hardwick and **EPSG:32145** for Peacham, the three CRSs the caveats document noted. Rows record `source_crs` and `crs_inferred = Y` so a guess is never mistaken for a declaration. The same mechanism will handle the next partner submission that arrives without a projection.
+
+#### Two of the three pilot files are not fire districts
+
+The script measures each polygon against its own VCGI town boundary and sets `geometry_status` accordingly. Measured against the **unsimplified** town geometry:
+
+| District | Source CRS | Area | IoU vs town | `geometry_status` |
+| --- | --- | --- | --- | --- |
+| Danville Fire District 1 | EPSG:4326 | 158.03 km² | **99.93%** | `town_outline_not_district` |
+| East Hardwick Fire District 1 | EPSG:4326 | 100.24 km² | **99.80%** | `town_outline_not_district` |
+| Peacham Fire District 1 | EPSG:32145 | 94.72 km² | 76.62% | `district` |
+
+`Danville Fire District.shp` and `HardwickFD.shp` **are the town outlines**, filed under district names. This is not a simplification artifact — the comparison above uses unsimplified VCGI geometry, and the shapefiles carry 852 and 160 vertices respectively, so they are high-resolution town boundaries. The roster corroborates it: East Hardwick Fire District 1 serves **350 people**, and a village district of that size does not span Hardwick's entire 100 km².
+
+**Consequence:** only **1 of 80** districts currently has usable political-boundary geometry. Any area-difference metric computed on the other two would come out at essentially zero and be meaningless. Filter on `geometry_status = 'district'` before computing anything.
+
+The two placeholders are kept in the layer rather than dropped, flagged and styled distinctly on the map, so the pilot's real state stays visible. All three rows are `verified = N` pending partner confirmation.
+
+For context on what the usable one shows: Peacham FD 1's political boundary is 94.72 km² against a 0.69 km² water service area — a 138× gap. That gap is exactly the quantity this project exists to measure, and it is why service area cannot proxy for political boundary in the general case.
 
 ### `build_district_crosswalk.py`
 
@@ -192,7 +229,7 @@ Three pages:
 
 | Page | What it is |
 | --- | --- |
-| `index.html` | Map of the 392 EPA service areas + 256 VCGI town boundaries, with layer toggles, a provenance filter, and system search. Leads with the headline caveat so nobody mistakes service areas for political boundaries. |
+| `index.html` | Map of the 392 EPA service areas, 3 fire district boundaries, and 256 VCGI town boundaries, with layer toggles, a provenance filter, and system search. Leads with the headline caveat so nobody mistakes service areas for political boundaries. |
 | `caveats.html` | The full contents of `District_Boundary_Data_Caveats.docx` as a web page — the at-a-glance matrix, all 12 severity-tagged caveats, and the deliverable framing. |
 | `contacts.html` | Searchable town clerk directory, filterable by county, with an "has an email" filter. |
 
@@ -200,7 +237,7 @@ Three pages:
 
 `build_site_data.py` reprojects to WGS84, simplifies geometry for the browser, and writes `water_service_areas.geojson`, `town_boundaries.geojson`, `town_clerks.json`, and `meta.json` into `docs/data/`. The clerk payload is `{municipalities: [...], byTown: {key: index}}`; `byTown` is resolved at build time against the VCGI town names so the browser only has to recompute a simple key. It currently joins **254 of 256** town polygons — the two misses are Avery's Gore and Lewis, both unincorporated with no clerk.
 
-To add a layer to the viewer (for example the digitized fire district boundaries), write another GeoJSON into `docs/data/` and add one entry to the `LAYERS` registry in `docs/app.js` plus a checkbox in `docs/index.html`.
+The fire district layer draws in its own pane between towns and water, so districts read as containers with their service areas legible on top. Real district geometry is solid purple; town-outline placeholders are dashed grey and their popup says why they cannot be used. To add a further layer, write another GeoJSON into `docs/data/` and add one entry to the `LAYERS` registry in `docs/app.js` plus a checkbox in `docs/index.html`.
 
 > **Corrected on the site:** the earlier text said roughly 60% of the service-area boundaries are authoritative and 40% EPA-modeled. That is the *national* figure. Vermont is **89% authoritative / 11% modeled** (348 of 392), as the caveats document notes. `meta.json` now carries `authoritative_pct` so the page cannot drift from the data again.
 
@@ -259,8 +296,12 @@ This system would also contribute meaningfully to risk management and equity. Ma
 2. Request the VLCT compiled district list as CSV.
 3. Add `Rutland Town`, `Newport Town`, and `Saint Albans Town` to `data/vt_town_clerk_contacts.csv` so the skeleton stops depending on the merge script to append them.
 4. Fill `town_website` for the 35 municipalities missing one.
-5. Pull the cited plats from town land records for the 5 charter districts whose boundary is a record pointer.
+5. **Request the real boundaries for Danville Fire District 1 and East Hardwick Fire District 1** — the files on hand are town outlines. Clerk contacts are on the rows: Michelle Leclerc (<townclerk@danvillevt.gov>) and Tonia Chase (<tonia.chase@hardwickvt.gov>).
+6. Have Peacham confirm its 94.72 km² boundary, then set `verified = Y`.
+7. Fix the partner intake spec ([caveat 11](docs/caveats.html)): require zipped shapefile sets or GeoPackage/GeoJSON with attributes and a defined CRS, so CRS never has to be inferred again.
+8. Pull the cited plats from town land records for the 5 charter districts whose boundary is a record pointer.
 
 ### The actual project
 
-1. Digitize political boundaries for the districts in multi-district towns — the multi-month ORCA-student-scale project. Hand the Bond Bank the inventory first and let it drive the estimate, rather than quoting the digitizing blind. The remaining boundaries are genuine manual GIS work (parcel data, town maps, the charter-cited plats) that no script pulls.
+1. Grow `data/vt_fire_districts.gpkg` from 1 usable boundary toward 80. Add each new district as a row with its `pwsid` so it stays joinable to the water data.
+2. Digitize political boundaries for the districts in multi-district towns — the multi-month ORCA-student-scale project. Hand the Bond Bank the inventory first and let it drive the estimate, rather than quoting the digitizing blind. The remaining boundaries are genuine manual GIS work (parcel data, town maps, the charter-cited plats) that no script pulls.

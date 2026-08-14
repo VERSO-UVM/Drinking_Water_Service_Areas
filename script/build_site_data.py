@@ -28,6 +28,7 @@ import requests
 
 ROOT = Path(__file__).resolve().parent.parent
 GPKG = ROOT / "data" / "vt_water_boundaries.gpkg"
+FIRE_GPKG = ROOT / "data" / "vt_fire_districts.gpkg"
 CLERKS_FILLED = ROOT / "data" / "vt_town_clerk_contacts_filled.csv"
 CLERKS_SKELETON = ROOT / "data" / "vt_town_clerk_contacts.csv"
 OUT_DIR = ROOT / "docs" / "data"
@@ -134,6 +135,35 @@ def build_town_boundaries():
     return gdf
 
 
+FIRE_FIELDS = [
+    "fd_id", "district_name", "town", "county", "population", "pwsid",
+    "pws_name", "area_sqkm", "town_iou", "geometry_status", "verified",
+    "source_file", "source_crs", "crs_inferred", "clerk_name", "clerk_email",
+    "notes",
+]
+
+
+def build_fire_districts():
+    """Fire-district political boundaries -- the layer the project is building."""
+    print("Fire district boundaries:")
+    if not FIRE_GPKG.exists():
+        print("  no vt_fire_districts.gpkg -- run script/build_fire_districts.py")
+        return None
+
+    gdf = gpd.read_file(FIRE_GPKG, layer="fire_districts")
+    gdf["geometry"] = gdf.geometry.simplify(WATER_TOLERANCE_M, preserve_topology=True)
+    gdf = gdf[gdf.geometry.notna() & ~gdf.geometry.is_empty]
+
+    keep = [c for c in FIRE_FIELDS if c in gdf.columns]
+    gdf = gdf[keep + ["geometry"]].sort_values("district_name")
+
+    write_geojson(gdf, OUT_DIR / "fire_districts.geojson")
+    usable = int((gdf["geometry_status"] == "district").sum())
+    print(f"  {usable} usable as district geometry, "
+          f"{len(gdf) - usable} town outlines flagged")
+    return gdf
+
+
 def split_name(name):
     """(base, kind) for a municipality name -- mirrors merge_clerk_contacts.py.
 
@@ -223,6 +253,7 @@ def build_town_clerks(towns):
 def main():
     water = build_water_service_areas()
     towns = build_town_boundaries()
+    fire = build_fire_districts()
     clerks = build_town_clerks(towns)
 
     counts = water["boundary_source"].value_counts().to_dict()
@@ -237,6 +268,9 @@ def main():
         "towns": int(len(towns)),
         "districts": 80,
         "clerks_with_email": sum(1 for r in clerks if r.get("clerk_email")),
+        "fd_boundaries": 0 if fire is None else int(len(fire)),
+        "fd_usable": 0 if fire is None else
+                     int((fire["geometry_status"] == "district").sum()),
     }
     (OUT_DIR / "meta.json").write_text(json.dumps(meta, indent=2), encoding="utf-8")
     print("\nmeta.json:", json.dumps(meta))

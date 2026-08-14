@@ -1,81 +1,81 @@
 district_name,town,district_type,services,population,districts_in_town,single_district_town,has_legal_charter,matched_pwsid,matched_pws_name,match_score,match_status,has_service_polygon,political_bnd_proxy
-Alburgh Fire District 1,Alburgh,Fire District,Water,87.0,2,False,False,VT0005137,ALBURGH FIRE DISTRICT 1,100.0,auto_confident,Y,
-South Alburgh Fire District 2,Alburgh,Fire District,Water,300.0,2,False,False,VT0005137,ALBURGH FIRE DISTRICT 1,73.33333333333334,review,Y,
-Bakersfield Fire District 1,Bakersfield,Fire District,Water,446.0,1,True,False,VT0005114,BAKERSFIELD FIRE DISTRICT 1,100.0,auto_confident,Y,service_area_proxy
-Barnet Fire District 2,Barnet,Fire District,Water,205.0,3,False,False,VT0005029,BARNET FIRE DISTRICT #2,100.0,auto_confident,Y,
-McIndoe Falls Fire District 3,Barnet,Fire District,Water,176.0,3,False,False,VT0005441,MCINDOE FALLS FIRE DISTRICT 3,100.0,auto_confident,Y,
-Passumpsic Fire District 1,Barnet,Fire District,Water,140.0,3,False,False,VT0005031,PASSUMPSIC FIRE DISTRICT 1,100.0,auto_confident,Y,
-Graniteville Fire District 4,Barre Town,Fire District,Water,700.0,1,True,False,VT0005248,GRANITEVILLE FIRE DISTRICT 4,100.0,auto_confident,Y,service_area_proxy
-East Berkshire Fire District 1,Berkshire,Fire District,Water,184.0,1,True,False,VT0005115,EAST BERKSHIRE FIRE DISTRICT 1,100.0,auto_confident,Y,service_area_proxy
-Brandon Fire District 1,Brandon,Fire District,Water,3963.0,1,True,False,VT0005211,BRANDON FIRE DISTRICT 1,100.0,auto_confident,Y,service_area_proxy
-Burke Fire District 1,Burke,Fire District,Water,142.0,1,True,False,VT0005033,BURKE FIRE DISTRICT 1,100.0,auto_confident,Y,service_area_proxy
-East Calais Fire District 1,Calais,Fire District,Water,200.0,1,True,False,VT0005262,EAST CALAIS FIRE DISTRICT 1,100.0,auto_confident,Y,service_area_proxy
-Canaan Fire District 2,Canaan,Fire District,Water,350.0,2,False,False,VT0005107,CANAAN FD #2,100.0,auto_confident,Y,
-Canaan Fire District 1,Canaan,Fire District,Water,970.0,2,False,False,VT0005106,CANAAN FIRE DISTRICT 1,100.0,auto_confident,Y,
-Castleton Fire District 1,Castleton,Fire District,Water,1940.0,2,False,False,VT0005212,CASTLETON FIRE DISTRICT 1,100.0,auto_confident,Y,
-Castleton Fire District 3,Castleton,Fire District,Water,500.0,2,False,False,VT0020889,CASTLETON FIRE DISTRICT 3,100.0,auto_confident,Y,
-Colchester Fire District 2,Colchester,Fire District,Water,8300.0,1,True,False,VT0005059,COLCHESTER FIRE DISTRICT 2,100.0,auto_confident,Y,service_area_proxy
-Coventry Fire District 1,Coventry,Fire District,Water,251.0,1,True,False,VT0005191,COVENTRY FIRE DISTRICT 1,100.0,auto_confident,Y,service_area_proxy
-Craftsbury Fire District 2,Craftsbury,Fire District,Water,420.0,1,True,False,VT0005194,CRAFTSBURY FIRE DISTRICT 2,100.0,auto_confident,Y,service_area_proxy
-Danby Mount Tabor Fire District 1,Danby,Fire District,Water,385.0,1,True,False,VT0005217,DANBY MOUNT TABOR F D 1,93.33333333333333,auto_confident,Y,service_area_proxy
-Danville Fire District 1,Danville,Fire District,Water,500.0,1,True,False,VT0005037,DANVILLE FIRE DISTRICT 1,100.0,auto_confident,Y,service_area_proxy
-Dorset Fire District 1,Dorset,Fire District,Water,530.0,2,False,False,VT0005020,DORSET FIRE DISTRICT 1,100.0,auto_confident,Y,
-East Dorset Fire District 1,Dorset,Fire District,Water,192.0,2,False,False,VT0005021,EAST DORSET FIRE DISTRICT 1,100.0,auto_confident,Y,
-Fairfax Fire District 1,Fairfax,Fire District,Water,80.0,1,True,True,VT0005403,FAIRFAX FIRE DISTRICT 1,100.0,auto_confident,Y,service_area_proxy
-East Fairfield Fire District 1,Fairfield,Fire District,Water,184.0,2,False,False,VT0005119,EAST FAIRFIELD FIRE DISTRICT 1,100.0,auto_confident,Y,
-Fairfield Fire District 2,Fairfield,Fire District,Water,126.0,2,False,False,VT0020415,FAIRFIELD FIRE DISTRICT 2,100.0,auto_confident,Y,
-South Georgia Fire District,Georgia,Fire District,Water,500.0,1,True,False,VT0005121,SOUTH GEORGIA FIRE DISTRICT,100.0,auto_confident,Y,service_area_proxy
-Grand Isle Fire District 4,Grand Isle,Fire District,Water,1078.0,2,False,False,VT0005139,GRAND ISLE FIRE DISTRICT 4,100.0,auto_confident,Y,
-Greensboro Bend Fire District 2,Greensboro,Fire District,Water,71.0,2,False,False,VT0005199,GREENSBORO BEND FIRE DISTRICT #2,100.0,auto_confident,Y,
-Greensboro Fire District 1,Greensboro,Fire District,Water,551.0,2,False,False,VT0005198,GREENSBORO FIRE DISTRICT 1,100.0,auto_confident,Y,
-East Hardwick Fire District 1,Hardwick,Fire District,Water,350.0,1,True,False,VT0005038,EAST HARDWICK FIRE DISTRICT 1,100.0,auto_confident,Y,service_area_proxy
-Highgate Fire District 1,Highgate,Fire District,Water,280.0,1,True,False,VT0005076,HUNTINGTON FIRE DISTRICT 1,64.28571428571428,none,Y,service_area_proxy
-Huntington Fire District 1,Huntington,Fire District,Water,120.0,1,True,False,VT0005076,HUNTINGTON FIRE DISTRICT 1,100.0,auto_confident,Y,service_area_proxy
-Hyde Park Fire District 1,Hyde Park,Fire District,Water,275.0,1,True,False,VT0005153,HYDE PARK FIRE DISTRICT 1,100.0,auto_confident,Y,service_area_proxy
-Irasburg Fire District 1,Irasburg,Fire District,Water,200.0,1,True,False,VT0005200,IRASBURG FD #1,100.0,auto_confident,Y,service_area_proxy
-Jericho Fire District 1,Jericho,Fire District,Water,190.0,1,True,False,VT0005476,JERICHO FIRE DISTRICT 1,100.0,auto_confident,Y,service_area_proxy
-Lunenburg Fire District 1,Lunenburg,Fire District,Water,250.0,2,False,False,VT0005112,LUNENBURG FIRE DISTRICT 1,100.0,auto_confident,Y,
-Lunenburg Fire District 2,Lunenburg,Fire District,Water & WW,400.0,2,False,False,VT0005113,LUNENBURG FIRE DISTRICT 2,100.0,auto_confident,Y,
-Lyn Haven Fire District 1,Lyndon,Fire District,Water,100.0,1,True,False,VT0005041,LYN HAVEN FIRE DISTRICT 1,100.0,auto_confident,Y,service_area_proxy
-East Middlebury Fire District 1,Middlebury,Fire District,Water,642.0,1,True,False,VT0005003,EAST MIDDLEBURY FD 1,100.0,auto_confident,Y,service_area_proxy
-Norwich Fire District 1,Norwich,Fire District,Water,870.0,1,True,False,VT0005326,NORWICH FIRE DISTRICT 1,100.0,auto_confident,Y,service_area_proxy
-Peacham Fire District 1,Peacham,Fire District,Water,150.0,1,True,False,VT0005042,PEACHAM FIRE DISTRICT 1,100.0,auto_confident,Y,service_area_proxy
-Pownal Fire District 2,Pownal,Fire District,Water,682.0,2,False,False,VT0020734,POWNAL FIRE DISTRICT 2,100.0,auto_confident,Y,
-Pownal Fire District 3,Pownal,Fire District,Water,60.0,2,False,False,VT0005517,POWNAL FIRE DISTRICT 3,100.0,auto_confident,Y,
-Richmond Fire District 1,Richmond,Fire District,Water,56.0,1,True,False,VT0005426,RICHMOND FIRE DISTRICT 1,100.0,auto_confident,Y,service_area_proxy
-Royalton Fire District 1,Royalton,Fire District,Water,1500.0,1,True,False,VT0005330,ROYALTON FIRE DISTRICT 1,100.0,auto_confident,Y,service_area_proxy
-Rutland Town Fire District 5,Rutland Town,Fire District,Water,110.0,5,False,False,VT0005429,RUTLAND TOWN FIRE DISTRICT 5,100.0,auto_confident,Y,
-Rutland Town Fire District 1,Rutland Town,Fire District,Water,401.0,5,False,False,VT0005534,RUTLAND TOWN FIRE DISTRICT 1,100.0,auto_confident,Y,
-Rutland Town Fire District 11,Rutland Town,Fire District,Water,29.0,5,False,False,VT0005534,RUTLAND TOWN FIRE DISTRICT 1,97.14285714285714,auto_confident,Y,
-Rutland Town Fire District 4,Rutland Town,Fire District,Water,136.0,5,False,False,VT0020885,RUTLAND TOWN FIRE DISTRICT 4,100.0,auto_confident,Y,
-Rutland Town Fire District 6,Rutland Town,Fire District,Water,137.0,5,False,False,VT0005378,RUTLAND TOWN FIRE DISTRICT 6,100.0,auto_confident,Y,
-Ryegate Fire District 2,Ryegate,Fire District,Water & WW,131.0,1,True,False,VT0005043,RYEGATE FIRE DISTRICT 2,100.0,auto_confident,Y,service_area_proxy
-Sheffield Fire District 1,Sheffield,Fire District,Water,50.0,1,True,False,VT0005381,SHEFFIELD FIRE DISTRICT 1,100.0,auto_confident,Y,service_area_proxy
-Cuttingsville Fire District,Shrewsbury,Fire District,Water,108.0,1,True,False,VT0005241,CUTTINGSVILLE FIRE DISTRICT,100.0,auto_confident,Y,service_area_proxy
-South Burlington Fire District,South Burlington,Fire District,Water,250.0,2,False,False,VT0005090,SOUTH BURLINGTON FIRE DISTRICT,100.0,auto_confident,Y,
-South Hero Fire District 4,South Hero,Fire District,Water,760.0,1,True,False,VT0020080,SOUTH HERO FIRE DISTRICT 4,100.0,auto_confident,Y,service_area_proxy
-St George Fire District 1,St George,Fire District,Water,42.0,2,False,True,VT0005093,ST GEORGE FIRE DISTRICT 1,100.0,auto_confident,Y,
-St George Fire District 2,St George,Fire District,Water,72.0,2,False,True,VT0005094,ST GEORGE FIRE DISTRICT #2,100.0,auto_confident,Y,
-St Johnsbury Center Fire District 1,St Johnsbury,Fire District,Water,370.0,1,True,False,VT0005046,ST JOHNSBURY CENTER F D 1,93.87755102040816,auto_confident,Y,service_area_proxy
-Stowe Fire District 2 Gold Brook Circle,Stowe,Fire District,Water,86.0,2,False,False,VT0005168,STOWE F D 2 GOLD BROOK CIRCLE,94.73684210526316,auto_confident,Y,
-Stowe Fire District 4,Stowe,Fire District,Water,120.0,2,False,False,VT0005523,STOWE FIRE DISTRICT 4,100.0,auto_confident,Y,
-Winhall-Stratton Fire District 1,Stratton,Fire District,Water & WW,6200.0,1,True,False,VT0005305,WINHALL STRATTON F D 1,93.02325581395348,auto_confident,Y,service_area_proxy
-Wallingford Fire District 1,Wallingford,Fire District,Water & WW,956.0,1,True,False,VT0005242,WALLINGFORD FIRE DISTRICT 1,100.0,auto_confident,Y,service_area_proxy
-Washington Fire District,Washington,Fire District,Water,170.0,1,True,False,VT0005185,WASHINGTON FIRE DISTRICT,100.0,auto_confident,Y,service_area_proxy
-Waterville Fire District 1,Waterville,Fire District,Water,84.0,1,True,False,VT0005169,WATERVILLE FIRE DISTRICT 1,100.0,auto_confident,Y,service_area_proxy
-Ascutney Fire District 2,Weathersfield,Fire District,Water,485.0,1,True,False,VT0005339,ASCUTNEY FIRE DISTRICT #2,100.0,auto_confident,Y,service_area_proxy
-Westfield Fire District 1,Westfield,Fire District,Water,120.0,1,True,False,VT0005207,WESTFIELD FIRE DISTRICT 1,100.0,auto_confident,Y,service_area_proxy
-Westford Fire District 1,Westford,Fire District,Water & WW,50.0,1,True,False,VT0005450,WESTFORD FIRE DISTRICT 1,100.0,auto_confident,Y,service_area_proxy
-Wheelock Fire District 1,Wheelock,Fire District,Water,50.0,1,True,False,VT0005049,WHEELOCK FIRE DISTRICT 1,100.0,auto_confident,Y,service_area_proxy
-Williston Fire District 1,Williston,Fire District,Water,212.0,1,True,False,VT0005100,WILLISTON FIRE DISTRICT 1,100.0,auto_confident,Y,service_area_proxy
-Cold Brook Fire District 1,Wilmington,Fire District,Water & WW,700.0,2,False,True,VT0005313,COLD BROOK FIRE DISTRICT 1,100.0,auto_confident,Y,
-Worcester Fire District 1,Worcester,Fire District,Water & WW,350.0,1,True,False,VT0005289,WORCESTER FIRE DISTRICT 1,100.0,auto_confident,Y,service_area_proxy
-Champlain Water District,South Burlington,Water District,Water,,2,False,True,VT0005092,CHAMPLAIN WATER DISTRICT,100.0,auto_confident,Y,
-Derby Line Village Water District,Derby,Water District,Water,,1,True,False,VT0020568,DERBY LINE VILLAGE WATER DISTRICT,100.0,auto_confident,Y,service_area_proxy
-Elmore Water District,Elmore,Water District,Water,,1,True,False,VT0005152,ELMORE WATER DISTRICT,100.0,auto_confident,Y,service_area_proxy
-Grand Isle Consolidated Water District,Grand Isle,Water District,Water,,2,False,False,VT0020614,GRAND ISLE CONSOLIDATED WATER DISTRICT,100.0,auto_confident,Y,
-Tri Town Water District,Bridport,Water District,Water,,1,True,False,VT0005001,TRI TOWN WATER DISTRICT,100.0,auto_confident,Y,service_area_proxy
-Vergennes Panton Water District,Vergennes,Water District,Water,,1,True,False,VT0005010,VERGENNES PANTON WATER DISTRICT,100.0,auto_confident,Y,service_area_proxy
-Wilmington Water District,Wilmington,Water District,Water,,2,False,False,VT0005310,WILMINGTON WATER DIST,91.30434782608697,auto_confident,Y,
-North Branch Fire District 1,Dover,Fire District,WW,,1,True,True,VT0005211,BRANDON FIRE DISTRICT 1,62.06896551724138,none,Y,service_area_proxy
-Sherburne Fire District 1,Killington,Fire District,WW,,1,True,False,VT0005602,SHELBURNE FARMS,68.96551724137932,none,Y,service_area_proxy
+Alburgh Fire District 1,Alburgh,Fire District,Water,87,2,FALSE,FALSE,VT0005137,ALBURGH FIRE DISTRICT 1,100,auto_confident,Y,
+South Alburgh Fire District 2,Alburgh,Fire District,Water,300,2,FALSE,FALSE,,,,,,
+Bakersfield Fire District 1,Bakersfield,Fire District,Water,446,1,TRUE,FALSE,VT0005114,BAKERSFIELD FIRE DISTRICT 1,100,auto_confident,Y,service_area_proxy
+Barnet Fire District 2,Barnet,Fire District,Water,205,3,FALSE,FALSE,VT0005029,BARNET FIRE DISTRICT #2,100,auto_confident,Y,
+McIndoe Falls Fire District 3,Barnet,Fire District,Water,176,3,FALSE,FALSE,VT0005441,MCINDOE FALLS FIRE DISTRICT 3,100,auto_confident,Y,
+Passumpsic Fire District 1,Barnet,Fire District,Water,140,3,FALSE,FALSE,VT0005031,PASSUMPSIC FIRE DISTRICT 1,100,auto_confident,Y,
+Graniteville Fire District 4,Barre Town,Fire District,Water,700,1,TRUE,FALSE,VT0005248,GRANITEVILLE FIRE DISTRICT 4,100,auto_confident,Y,service_area_proxy
+East Berkshire Fire District 1,Berkshire,Fire District,Water,184,1,TRUE,FALSE,VT0005115,EAST BERKSHIRE FIRE DISTRICT 1,100,auto_confident,Y,service_area_proxy
+Brandon Fire District 1,Brandon,Fire District,Water,3963,1,TRUE,FALSE,VT0005211,BRANDON FIRE DISTRICT 1,100,auto_confident,Y,service_area_proxy
+Burke Fire District 1,Burke,Fire District,Water,142,1,TRUE,FALSE,VT0005033,BURKE FIRE DISTRICT 1,100,auto_confident,Y,service_area_proxy
+East Calais Fire District 1,Calais,Fire District,Water,200,1,TRUE,FALSE,VT0005262,EAST CALAIS FIRE DISTRICT 1,100,auto_confident,Y,service_area_proxy
+Canaan Fire District 2,Canaan,Fire District,Water,350,2,FALSE,FALSE,VT0005107,CANAAN FD #2,100,auto_confident,Y,
+Canaan Fire District 1,Canaan,Fire District,Water,970,2,FALSE,FALSE,VT0005106,CANAAN FIRE DISTRICT 1,100,auto_confident,Y,
+Castleton Fire District 1,Castleton,Fire District,Water,1940,2,FALSE,FALSE,VT0005212,CASTLETON FIRE DISTRICT 1,100,auto_confident,Y,
+Castleton Fire District 3,Castleton,Fire District,Water,500,2,FALSE,FALSE,VT0020889,CASTLETON FIRE DISTRICT 3,100,auto_confident,Y,
+Colchester Fire District 2,Colchester,Fire District,Water,8300,1,TRUE,FALSE,VT0005059,COLCHESTER FIRE DISTRICT 2,100,auto_confident,Y,service_area_proxy
+Coventry Fire District 1,Coventry,Fire District,Water,251,1,TRUE,FALSE,VT0005191,COVENTRY FIRE DISTRICT 1,100,auto_confident,Y,service_area_proxy
+Craftsbury Fire District 2,Craftsbury,Fire District,Water,420,1,TRUE,FALSE,VT0005194,CRAFTSBURY FIRE DISTRICT 2,100,auto_confident,Y,service_area_proxy
+Danby Mount Tabor Fire District 1,Danby,Fire District,Water,385,1,TRUE,FALSE,VT0005217,DANBY MOUNT TABOR F D 1,93.33333333333333,auto_confident,Y,service_area_proxy
+Danville Fire District 1,Danville,Fire District,Water,500,1,TRUE,FALSE,VT0005037,DANVILLE FIRE DISTRICT 1,100,auto_confident,Y,service_area_proxy
+Dorset Fire District 1,Dorset,Fire District,Water,530,2,FALSE,FALSE,VT0005020,DORSET FIRE DISTRICT 1,100,auto_confident,Y,
+East Dorset Fire District 1,Dorset,Fire District,Water,192,2,FALSE,FALSE,VT0005021,EAST DORSET FIRE DISTRICT 1,100,auto_confident,Y,
+Fairfax Fire District 1,Fairfax,Fire District,Water,80,1,TRUE,TRUE,VT0005403,FAIRFAX FIRE DISTRICT 1,100,auto_confident,Y,service_area_proxy
+East Fairfield Fire District 1,Fairfield,Fire District,Water,184,2,FALSE,FALSE,VT0005119,EAST FAIRFIELD FIRE DISTRICT 1,100,auto_confident,Y,
+Fairfield Fire District 2,Fairfield,Fire District,Water,126,2,FALSE,FALSE,VT0020415,FAIRFIELD FIRE DISTRICT 2,100,auto_confident,Y,
+South Georgia Fire District,Georgia,Fire District,Water,500,1,TRUE,FALSE,VT0005121,SOUTH GEORGIA FIRE DISTRICT,100,auto_confident,Y,service_area_proxy
+Grand Isle Fire District 4,Grand Isle,Fire District,Water,1078,2,FALSE,FALSE,VT0005139,GRAND ISLE FIRE DISTRICT 4,100,auto_confident,Y,
+Greensboro Bend Fire District 2,Greensboro,Fire District,Water,71,2,FALSE,FALSE,VT0005199,GREENSBORO BEND FIRE DISTRICT #2,100,auto_confident,Y,
+Greensboro Fire District 1,Greensboro,Fire District,Water,551,2,FALSE,FALSE,VT0005198,GREENSBORO FIRE DISTRICT 1,100,auto_confident,Y,
+East Hardwick Fire District 1,Hardwick,Fire District,Water,350,1,TRUE,FALSE,VT0005038,EAST HARDWICK FIRE DISTRICT 1,100,auto_confident,Y,service_area_proxy
+Highgate Fire District 1,Highgate,Fire District,Water,280,1,TRUE,FALSE,,,,,,
+Huntington Fire District 1,Huntington,Fire District,Water,120,1,TRUE,FALSE,VT0005076,HUNTINGTON FIRE DISTRICT 1,100,auto_confident,Y,service_area_proxy
+Hyde Park Fire District 1,Hyde Park,Fire District,Water,275,1,TRUE,FALSE,VT0005153,HYDE PARK FIRE DISTRICT 1,100,auto_confident,Y,service_area_proxy
+Irasburg Fire District 1,Irasburg,Fire District,Water,200,1,TRUE,FALSE,VT0005200,IRASBURG FD #1,100,auto_confident,Y,service_area_proxy
+Jericho Fire District 1,Jericho,Fire District,Water,190,1,TRUE,FALSE,VT0005476,JERICHO FIRE DISTRICT 1,100,auto_confident,Y,service_area_proxy
+Lunenburg Fire District 1,Lunenburg,Fire District,Water,250,2,FALSE,FALSE,VT0005112,LUNENBURG FIRE DISTRICT 1,100,auto_confident,Y,
+Lunenburg Fire District 2,Lunenburg,Fire District,Water & WW,400,2,FALSE,FALSE,VT0005113,LUNENBURG FIRE DISTRICT 2,100,auto_confident,Y,
+Lyn Haven Fire District 1,Lyndon,Fire District,Water,100,1,TRUE,FALSE,VT0005041,LYN HAVEN FIRE DISTRICT 1,100,auto_confident,Y,service_area_proxy
+East Middlebury Fire District 1,Middlebury,Fire District,Water,642,1,TRUE,FALSE,VT0005003,EAST MIDDLEBURY FD 1,100,auto_confident,Y,service_area_proxy
+Norwich Fire District 1,Norwich,Fire District,Water,870,1,TRUE,FALSE,VT0005326,NORWICH FIRE DISTRICT 1,100,auto_confident,Y,service_area_proxy
+Peacham Fire District 1,Peacham,Fire District,Water,150,1,TRUE,FALSE,VT0005042,PEACHAM FIRE DISTRICT 1,100,auto_confident,Y,service_area_proxy
+Pownal Fire District 2,Pownal,Fire District,Water,682,2,FALSE,FALSE,VT0020734,POWNAL FIRE DISTRICT 2,100,auto_confident,Y,
+Pownal Fire District 3,Pownal,Fire District,Water,60,2,FALSE,FALSE,VT0005517,POWNAL FIRE DISTRICT 3,100,auto_confident,Y,
+Richmond Fire District 1,Richmond,Fire District,Water,56,1,TRUE,FALSE,VT0005426,RICHMOND FIRE DISTRICT 1,100,auto_confident,Y,service_area_proxy
+Royalton Fire District 1,Royalton,Fire District,Water,1500,1,TRUE,FALSE,VT0005330,ROYALTON FIRE DISTRICT 1,100,auto_confident,Y,service_area_proxy
+Rutland Town Fire District 5,Rutland Town,Fire District,Water,110,5,FALSE,FALSE,VT0005429,RUTLAND TOWN FIRE DISTRICT 5,100,auto_confident,Y,
+Rutland Town Fire District 1,Rutland Town,Fire District,Water,401,5,FALSE,FALSE,VT0005534,RUTLAND TOWN FIRE DISTRICT 1,100,auto_confident,Y,
+Rutland Town Fire District 11,Rutland Town,Fire District,Water,29,5,FALSE,FALSE,VT0005534,,,,,
+Rutland Town Fire District 4,Rutland Town,Fire District,Water,136,5,FALSE,FALSE,VT0020885,RUTLAND TOWN FIRE DISTRICT 4,100,auto_confident,Y,
+Rutland Town Fire District 6,Rutland Town,Fire District,Water,137,5,FALSE,FALSE,VT0005378,RUTLAND TOWN FIRE DISTRICT 6,100,auto_confident,Y,
+Ryegate Fire District 2,Ryegate,Fire District,Water & WW,131,1,TRUE,FALSE,VT0005043,RYEGATE FIRE DISTRICT 2,100,auto_confident,Y,service_area_proxy
+Sheffield Fire District 1,Sheffield,Fire District,Water,50,1,TRUE,FALSE,VT0005381,SHEFFIELD FIRE DISTRICT 1,100,auto_confident,Y,service_area_proxy
+Cuttingsville Fire District,Shrewsbury,Fire District,Water,108,1,TRUE,FALSE,VT0005241,CUTTINGSVILLE FIRE DISTRICT,100,auto_confident,Y,service_area_proxy
+South Burlington Fire District,South Burlington,Fire District,Water,250,2,FALSE,FALSE,VT0005090,SOUTH BURLINGTON FIRE DISTRICT,100,auto_confident,Y,
+South Hero Fire District 4,South Hero,Fire District,Water,760,1,TRUE,FALSE,VT0020080,SOUTH HERO FIRE DISTRICT 4,100,auto_confident,Y,service_area_proxy
+St George Fire District 1,St George,Fire District,Water,42,2,FALSE,TRUE,VT0005093,ST GEORGE FIRE DISTRICT 1,100,auto_confident,Y,
+St George Fire District 2,St George,Fire District,Water,72,2,FALSE,TRUE,VT0005094,ST GEORGE FIRE DISTRICT #2,100,auto_confident,Y,
+St Johnsbury Center Fire District 1,St Johnsbury,Fire District,Water,370,1,TRUE,FALSE,VT0005046,ST JOHNSBURY CENTER F D 1,93.87755102040816,auto_confident,Y,service_area_proxy
+Stowe Fire District 2 Gold Brook Circle,Stowe,Fire District,Water,86,2,FALSE,FALSE,VT0005168,STOWE F D 2 GOLD BROOK CIRCLE,94.73684210526316,auto_confident,Y,
+Stowe Fire District 4,Stowe,Fire District,Water,120,2,FALSE,FALSE,VT0005523,STOWE FIRE DISTRICT 4,100,auto_confident,Y,
+Winhall-Stratton Fire District 1,Stratton,Fire District,Water & WW,6200,1,TRUE,FALSE,VT0005305,WINHALL STRATTON F D 1,93.02325581395348,auto_confident,Y,service_area_proxy
+Wallingford Fire District 1,Wallingford,Fire District,Water & WW,956,1,TRUE,FALSE,VT0005242,WALLINGFORD FIRE DISTRICT 1,100,auto_confident,Y,service_area_proxy
+Washington Fire District,Washington,Fire District,Water,170,1,TRUE,FALSE,VT0005185,WASHINGTON FIRE DISTRICT,100,auto_confident,Y,service_area_proxy
+Waterville Fire District 1,Waterville,Fire District,Water,84,1,TRUE,FALSE,VT0005169,WATERVILLE FIRE DISTRICT 1,100,auto_confident,Y,service_area_proxy
+Ascutney Fire District 2,Weathersfield,Fire District,Water,485,1,TRUE,FALSE,VT0005339,ASCUTNEY FIRE DISTRICT #2,100,auto_confident,Y,service_area_proxy
+Westfield Fire District 1,Westfield,Fire District,Water,120,1,TRUE,FALSE,VT0005207,WESTFIELD FIRE DISTRICT 1,100,auto_confident,Y,service_area_proxy
+Westford Fire District 1,Westford,Fire District,Water & WW,50,1,TRUE,FALSE,VT0005450,WESTFORD FIRE DISTRICT 1,100,auto_confident,Y,service_area_proxy
+Wheelock Fire District 1,Wheelock,Fire District,Water,50,1,TRUE,FALSE,VT0005049,WHEELOCK FIRE DISTRICT 1,100,auto_confident,Y,service_area_proxy
+Williston Fire District 1,Williston,Fire District,Water,212,1,TRUE,FALSE,VT0005100,WILLISTON FIRE DISTRICT 1,100,auto_confident,Y,service_area_proxy
+Cold Brook Fire District 1,Wilmington,Fire District,Water & WW,700,2,FALSE,TRUE,VT0005313,COLD BROOK FIRE DISTRICT 1,100,auto_confident,Y,
+Worcester Fire District 1,Worcester,Fire District,Water & WW,350,1,TRUE,FALSE,VT0005289,WORCESTER FIRE DISTRICT 1,100,auto_confident,Y,service_area_proxy
+Champlain Water District,South Burlington,Water District,Water,,2,FALSE,TRUE,VT0005092,CHAMPLAIN WATER DISTRICT,100,auto_confident,Y,
+Derby Line Village Water District,Derby,Water District,Water,,1,TRUE,FALSE,VT0020568,DERBY LINE VILLAGE WATER DISTRICT,100,auto_confident,Y,service_area_proxy
+Elmore Water District,Elmore,Water District,Water,,1,TRUE,FALSE,VT0005152,ELMORE WATER DISTRICT,100,auto_confident,Y,service_area_proxy
+Grand Isle Consolidated Water District,Grand Isle,Water District,Water,,2,FALSE,FALSE,VT0020614,GRAND ISLE CONSOLIDATED WATER DISTRICT,100,auto_confident,Y,
+Tri Town Water District,Bridport,Water District,Water,,1,TRUE,FALSE,VT0005001,TRI TOWN WATER DISTRICT,100,auto_confident,Y,service_area_proxy
+Vergennes Panton Water District,Vergennes,Water District,Water,,1,TRUE,FALSE,VT0005010,VERGENNES PANTON WATER DISTRICT,100,auto_confident,Y,service_area_proxy
+Wilmington Water District,Wilmington,Water District,Water,,2,FALSE,FALSE,VT0005310,WILMINGTON WATER DIST,91.30434782608697,auto_confident,Y,
+North Branch Fire District 1,Dover,Fire District,WW,,1,TRUE,TRUE,VT0005211,,,,,
+Sherburne Fire District 1,Killington,Fire District,WW,,1,TRUE,FALSE,VT0005602,,,,,
