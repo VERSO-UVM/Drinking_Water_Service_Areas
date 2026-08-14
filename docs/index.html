@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Vermont Drinking Water Service Areas &amp; Fire Districts</title>
+<meta name="description" content="Mapping Vermont drinking water service areas against political boundaries to find the properties served by water systems but not by fire districts.">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+      integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<nav class="site-nav">
+  <div class="wrap nav-inner">
+    <a class="nav-brand" href="index.html">VT District Boundaries</a>
+    <ul>
+      <li><a href="index.html" aria-current="page">Map</a></li>
+      <li><a href="caveats.html">Data caveats</a></li>
+      <li><a href="contacts.html">Town clerks</a></li>
+    </ul>
+  </div>
+</nav>
+
+<header class="site-header">
+  <div class="wrap">
+    <p class="eyebrow">Vermont Bond Bank &middot; pilot mapping project</p>
+    <h1>Fire Districts &amp; Drinking Water Service Areas</h1>
+    <p class="lede">
+      The area a drinking water system actually serves rarely lines up with the political
+      boundary of the fire district or municipality that governs it. This map puts the two
+      on top of each other so the gap can be measured.
+    </p>
+
+    <div class="callout callout-warn">
+      <p>
+        <strong>What this map is not.</strong> These are <em>service areas</em> — where water
+        is delivered — not the corporate or taxing boundaries of Vermont's fire and water
+        districts. Those political boundaries do not exist as a statewide dataset anywhere;
+        they were never centrally collected. The service areas are a defensible proxy only
+        where a single district serves an entire town.
+        <a href="caveats.html">Read the full data caveats &rarr;</a>
+      </p>
+    </div>
+  </div>
+</header>
+
+<main>
+
+<section class="map-section">
+  <div class="map-shell">
+    <div id="map" role="application" aria-label="Map of Vermont drinking water service areas"></div>
+
+    <div class="panel" id="layer-panel">
+      <div class="panel-head">
+        <h2>Layers</h2>
+        <button type="button" id="panel-toggle" aria-expanded="true"
+                aria-controls="panel-body" title="Collapse layer panel">&minus;</button>
+      </div>
+
+      <div class="panel-body" id="panel-body">
+        <fieldset class="layer-group">
+          <legend>Water service areas</legend>
+          <label class="layer-row">
+            <input type="checkbox" id="lyr-water" checked>
+            <span class="swatch swatch-auth"></span>
+            <span class="layer-name">Service areas <em id="count-water"></em></span>
+          </label>
+          <div class="sub-options" id="water-options">
+            <label><input type="radio" name="water-filter" value="all" checked> All systems</label>
+            <label><input type="radio" name="water-filter" value="community"> Community systems only</label>
+            <label><input type="radio" name="water-filter" value="authoritative"> Authoritative boundaries only</label>
+          </div>
+        </fieldset>
+
+        <fieldset class="layer-group">
+          <legend>Political boundaries</legend>
+          <label class="layer-row">
+            <input type="checkbox" id="lyr-towns" checked>
+            <span class="swatch swatch-town"></span>
+            <span class="layer-name">Town boundaries (VCGI) <em id="count-towns"></em></span>
+          </label>
+          <p class="pending">
+            Fire district boundaries &mdash; digitized through the pilot &mdash; will be added
+            here as a third toggle.
+          </p>
+        </fieldset>
+
+        <fieldset class="layer-group">
+          <legend>Basemap</legend>
+          <label class="layer-row">
+            <input type="radio" name="basemap" value="light" checked>
+            <span class="layer-name">Light</span>
+          </label>
+          <label class="layer-row">
+            <input type="radio" name="basemap" value="imagery">
+            <span class="layer-name">Aerial imagery</span>
+          </label>
+        </fieldset>
+
+        <div class="legend">
+          <h3>Boundary source</h3>
+          <p><span class="swatch swatch-auth"></span> Authoritative (state / utility supplied)</p>
+          <p><span class="swatch swatch-modeled"></span> EPA-modeled (estimated extent)</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="search-box">
+      <label class="sr-only" for="search">Search water systems</label>
+      <input type="search" id="search" placeholder="Search a water system or PWSID&hellip;"
+             autocomplete="off">
+      <ul id="search-results" hidden></ul>
+    </div>
+
+    <p class="map-hint">
+    Click any service area for system details, or a town for its clerk's contact —
+    the office holding the land records that district charters cite.
+  </p>
+  </div>
+
+  <dl class="stats" id="stats">
+    <div><dt>Public water systems mapped</dt><dd data-stat="water_systems">&mdash;</dd></div>
+    <div><dt>Community systems</dt><dd data-stat="community_systems">&mdash;</dd></div>
+    <div><dt>Authoritative boundaries</dt><dd data-stat="authoritative">&mdash;</dd></div>
+    <div><dt>Vermonters served</dt><dd data-stat="population_served">&mdash;</dd></div>
+  </dl>
+</section>
+
+<section class="prose">
+  <h2>What this is</h2>
+  <p>
+    The geographic area served by a drinking water system often does not align perfectly with
+    the political boundaries of fire districts or municipalities. Today, the extent of
+    properties inside a water district that are <strong>not served</strong> by a fire district
+    is not fully known.
+  </p>
+  <p>
+    This project closes that gap with a pilot mapping effort. We are working with selected
+    fire districts to map their current political boundaries and compare them against drinking
+    water service areas. Service areas are defined by the property parcels that intersect
+    drinking water lines, as visualized in the
+    <a href="https://www.arcgis.com/apps/dashboards/978310184fd2420bb682b26c8a32afab">ANR dashboard</a>.
+  </p>
+
+  <h2>Metrics</h2>
+  <ol>
+    <li>
+      <strong>Area difference</strong> &mdash; the spatial difference between a fire district's
+      political boundary and the properties served by its water system.
+    </li>
+    <li>
+      <strong>Coverage percentage</strong> &mdash; the share of the town's area, as defined by
+      <a href="https://geodata.vermont.gov/datasets/VCGI::vt-data-town-boundaries-1/about">VCGI
+      town boundaries</a>, that falls within the fire district.
+    </li>
+  </ol>
+
+  <h2>Pilot fire districts</h2>
+  <ul class="districts">
+    <li><a href="https://peacham.org/peacham-fire-district/">Peacham Fire District 1</a></li>
+    <li>Westford Fire District 1</li>
+    <li>Greensboro Bend Fire District 2</li>
+    <li>Danville Fire District 1</li>
+    <li>Burke Fire District 1 (East Burke)</li>
+    <li><a href="https://ehfd.mystrikingly.com/">East Hardwick Fire District 1</a></li>
+  </ul>
+
+  <h2>Why it matters: the Lead &amp; Copper Rule</h2>
+  <p>
+    Under the EPA's updated Lead &amp; Copper Rule Improvements, Vermont public water systems
+    had to prepare a Service Line Inventory &mdash; documenting every connection from the water
+    main to the building, including material type (lead, galvanized, copper, plastic, or
+    unknown) &mdash; by October 16, 2024. DEC maintains guidance and templates requiring
+    submission in standardized formats on its
+    <a href="https://dec.vermont.gov/water/drinking-water/water-quality-monitoring/lead-and-copper-rule-revisions#ServiceLineMap">LCRR
+    webpage</a>. But Vermont lacks a comprehensive statewide service-area GIS layer linking
+    water systems, their boundaries, and service line inventory data &mdash; which undermines
+    planning for lead replacement, capital needs, and financing.
+  </p>
+
+  <h2>What the Bond Bank would do with it</h2>
+  <p>
+    Beyond regulatory compliance, the Vermont Bond Bank can leverage this mapped data for
+    strategic capital planning and municipal bond financing. Overlaying service area boundaries
+    with past and current infrastructure investments lets staff identify capital gaps, assess
+    where previous funding has landed, and proactively plan future State Revolving Fund
+    (SRF)-backed projects. The map also highlights regions with aging infrastructure and
+    elevated risk, guiding outreach and technical assistance through programs like the Small
+    System Capacity and Resiliency Program. Scenario modeling gets sharper too &mdash;
+    municipalities with multiple flagged service areas could be bundled into a single financing
+    package, improving project readiness and execution.
+  </p>
+  <p>
+    It also contributes to risk management and equity. Mapping service line materials alongside
+    system boundaries and demographic data helps ensure funding is targeted toward under-served
+    and disproportionately affected communities, and it reduces the risk of delays and
+    escalating costs by giving municipalities clearer visibility into the scope and urgency of
+    service line replacement &mdash; particularly during early planning and bond-readiness
+    sessions.
+  </p>
+
+  <h2>Data sources</h2>
+  <ul class="sources">
+    <li>
+      <strong>Water service areas</strong> &mdash; EPA Office of Research and Development,
+      <a href="https://services.arcgis.com/cJ9YHowT8TU7DUyn/arcgis/rest/services/Water_System_Boundaries/FeatureServer">Public
+      Water System Service Area Boundaries</a>, filtered to Vermont PWSIDs. About
+      <strong>89%</strong> of Vermont's boundaries are authoritative (state or utility
+      sourced) and 11% are EPA-modeled — far better than the ~60% national average. The layer
+      panel lets you filter to authoritative geometry only.
+    </li>
+    <li>
+      <strong>Town boundaries</strong> &mdash;
+      <a href="https://geodata.vermont.gov/datasets/VCGI::vt-data-town-boundaries-1/about">VCGI
+      VT Data &ndash; Town Boundaries</a>.
+    </li>
+    <li>
+      <strong>Service line inventory</strong> &mdash; Vermont DEC
+      <a href="https://dec.vermont.gov/water/drinking-water/water-quality-monitoring/lead-and-copper-rule-revisions#ServiceLineMap">Lead
+      and Copper Rule Revisions</a> (contact: Rachel O'Reilly,
+      <a href="mailto:Rachel.OReilly@vermont.gov">Rachel.OReilly@vermont.gov</a>).
+    </li>
+    <li>
+      <strong>Town clerk contacts</strong> — Vermont Secretary of State, Elections Division,
+      <em>Town Clerk Contact Information</em>. Browse the
+      <a href="contacts.html">clerk directory</a>, or click any town on the map.
+    </li>
+  </ul>
+  <p class="note">
+    Boundaries on this map are simplified for web display and are not survey-grade. Use the
+    source GeoPackage in <code>data/</code> for analysis, and read the
+    <a href="caveats.html">data caveats</a> before drawing conclusions from any layer.
+  </p>
+
+
+</section>
+
+</main>
+
+<footer class="site-footer">
+  <div class="wrap">
+    <p>
+      Source and data on
+      <a href="https://github.com/VERSO-UVM/Drinking_Water_Service_Areas">GitHub</a>.
+      Basemaps &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>
+      contributors, &copy; <a href="https://carto.com/attributions">CARTO</a>, Esri.
+    </p>
+  </div>
+</footer>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+        integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+<script src="app.js"></script>
+</body>
+</html>

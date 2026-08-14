@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Town Clerk Directory — VT District Boundaries</title>
+<meta name="description" content="Vermont town clerk contacts, from the Secretary of State's maintained list. The clerks who hold the land records that charter boundary sections cite.">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<nav class="site-nav">
+  <div class="wrap nav-inner">
+    <a class="nav-brand" href="index.html">VT District Boundaries</a>
+    <ul>
+      <li><a href="index.html">Map</a></li>
+      <li><a href="caveats.html">Data caveats</a></li>
+      <li><a href="contacts.html" aria-current="page">Town clerks</a></li>
+    </ul>
+  </div>
+</nav>
+
+<header class="site-header">
+  <div class="wrap">
+    <p class="eyebrow">Vermont Secretary of State &middot; Elections Division</p>
+    <h1>Town Clerk Directory</h1>
+    <p class="lede">
+      Charter boundary sections almost never describe a boundary — they cite a plat recorded in
+      a town's land records. These are the offices that hold those records, and the people to
+      ask for them.
+    </p>
+    <p class="stamp" id="source-stamp">Loading&hellip;</p>
+  </div>
+</header>
+
+<main class="prose wide">
+
+  <div class="callout callout-info">
+    <p>
+      <strong>Why this is here.</strong> See
+      <a href="caveats.html#c6">caveat 6</a> — for the 10 legislatively chartered districts, the
+      Title&nbsp;24 charter points to a book and page in a town clerk's office rather than
+      giving geometry. Cold Brook Fire District No. 1, for example, is defined as
+      <em>"recorded in Book 111, page 184 … of the land records of the Town of Wilmington."</em>
+      Pulling that plat starts with the clerk.
+    </p>
+  </div>
+
+  <div class="controls">
+    <div class="control-field">
+      <label class="sr-only" for="clerk-search">Search towns or clerks</label>
+      <input type="search" id="clerk-search" placeholder="Search a town, county, or clerk&hellip;"
+             autocomplete="off">
+    </div>
+    <div class="control-field">
+      <label class="sr-only" for="county-filter">Filter by county</label>
+      <select id="county-filter"><option value="">All counties</option></select>
+    </div>
+    <div class="control-field">
+      <label class="checkbox">
+        <input type="checkbox" id="email-only"> Only entries with an email
+      </label>
+    </div>
+    <p class="result-count" id="result-count"></p>
+  </div>
+
+  <div class="table-scroll">
+    <table class="contacts" id="clerk-table">
+      <thead>
+        <tr>
+          <th scope="col">Town</th>
+          <th scope="col">County</th>
+          <th scope="col">Clerk</th>
+          <th scope="col">Contact</th>
+          <th scope="col">Mailing address</th>
+        </tr>
+      </thead>
+      <tbody id="clerk-body"></tbody>
+    </table>
+  </div>
+
+  <p class="note" id="coverage-note"></p>
+
+  <h2>Source and limits</h2>
+  <ul>
+    <li>
+      Contacts come from the Vermont Secretary of State's maintained
+      <em>Town Clerk Contact Information</em> workbook, not from scraping individual town
+      sites. The SoS file is the one authoritative, actively maintained list.
+    </li>
+    <li>
+      Municipalities with no entry are villages, gores, and unincorporated places that have no
+      town clerk in the SoS town list — expected, not missing data. Village records are
+      generally held by the surrounding town.
+    </li>
+    <li>
+      Regenerate with <code>python script/merge_clerk_contacts.py</code>, then
+      <code>python script/build_site_data.py</code>.
+    </li>
+  </ul>
+
+</main>
+
+<footer class="site-footer">
+  <div class="wrap">
+    <p>
+      Source and data on
+      <a href="https://github.com/VERSO-UVM/Drinking_Water_Service_Areas">GitHub</a>.
+      Clerk contacts &copy; Vermont Secretary of State, Elections Division.
+    </p>
+  </div>
+</footer>
+
+<script src="contacts.js"></script>
+</body>
+</html>

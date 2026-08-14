@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Data Caveats &amp; Limitations — VT District Boundaries</title>
+<meta name="description" content="Every known limitation in the Vermont district-boundary dataset. Read this before using the crosswalk, the service-area polygons, or the district inventory.">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<nav class="site-nav">
+  <div class="wrap nav-inner">
+    <a class="nav-brand" href="index.html">VT District Boundaries</a>
+    <ul>
+      <li><a href="index.html">Map</a></li>
+      <li><a href="caveats.html" aria-current="page">Data caveats</a></li>
+      <li><a href="contacts.html">Town clerks</a></li>
+    </ul>
+  </div>
+</nav>
+
+<header class="site-header">
+  <div class="wrap">
+    <p class="eyebrow">Prepared for the Vermont Bond Bank boundaries project &middot; VERSO / UVM</p>
+    <h1>Data Caveats &amp; Limitations</h1>
+    <p class="lede">
+      This page consolidates every known limitation in the district-boundary dataset
+      assembled to date. It is meant to travel with the data: anyone using the crosswalk,
+      the service-area polygons, or the district inventory should read this first.
+    </p>
+    <p class="stamp">Draft for review — August 2026</p>
+  </div>
+</header>
+
+<main class="prose">
+
+<div class="headline-caveat">
+  <h2>Headline caveat</h2>
+  <p>
+    The political boundaries the project set out to deliver — the corporate/taxing
+    boundaries of Vermont's water and fire districts — <strong>do not exist as a statewide
+    dataset anywhere.</strong> They were never centrally collected. Everything assembled so
+    far is either a <em>service boundary</em> (where water flows) or an <em>enumeration</em>
+    (which districts exist). Those are useful proxies and inputs, but they are not the
+    political boundaries themselves.
+  </p>
+</div>
+
+<h2>At a glance: what each data layer is, and is not</h2>
+
+<div class="table-scroll">
+  <table class="matrix">
+    <thead>
+      <tr>
+        <th>Source layer</th>
+        <th>What it is</th>
+        <th>Authoritative?</th>
+        <th>Ready to use?</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <th scope="row">EPA service-area polygons <span class="dim">(392 VT systems)</span></th>
+        <td>Where each public water system delivers water, keyed on PWSID</td>
+        <td>~89% VT-sourced; ~11% EPA-modeled</td>
+        <td>As service areas, yes; as political boundaries, no</td>
+      </tr>
+      <tr>
+        <th scope="row">VRWA district roster <span class="dim">(80 districts)</span></th>
+        <td>Named + town-tagged list of fire/water districts providing water</td>
+        <td>Best available; nonprofit compilation, not a legal registry</td>
+        <td>As an enumeration, yes</td>
+      </tr>
+      <tr>
+        <th scope="row">Title 24 Appendix charters <span class="dim">(10 districts)</span></th>
+        <td>Legislatively chartered districts; boundary sections in statute</td>
+        <td>Legally authoritative for those 10 only</td>
+        <td>Mostly point to town land records, not geometry</td>
+      </tr>
+      <tr class="row-negative">
+        <th scope="row">Political district boundaries <span class="dim">(all 80)</span></th>
+        <td>The taxing/corporate boundary the Bond Bank asked for</td>
+        <td>Does not exist as a statewide GIS layer</td>
+        <td>No — must be assembled district by district</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<h2>Detailed caveats</h2>
+
+<p class="severity-key">
+  <span class="sev sev-critical">CRITICAL</span> affects whether the deliverable is valid
+  <span class="sep">&middot;</span>
+  <span class="sev sev-major">MAJOR</span> affects accuracy of a subset
+  <span class="sep">&middot;</span>
+  <span class="sev sev-minor">MINOR</span> worth noting, limited impact
+</p>
+
+<ol class="caveats">
+
+  <li id="c1">
+    <h3>Service area &ne; political boundary <span class="sev sev-critical">CRITICAL</span></h3>
+    <p>
+      The EPA dataset is, by definition, <em>service areas</em>: the geographic extent where a
+      public water system delivers water, keyed on PWSID. A district's political boundary is
+      its legal/taxing extent, which can differ from where pipes actually run. For the Bond
+      Bank's stated ask — political boundaries — the EPA polygons are a reference and a proxy,
+      not the answer. They are treated as a defensible proxy only where a single district
+      serves an entire town (see <a href="#c4">caveat 4</a>).
+    </p>
+  </li>
+
+  <li id="c2">
+    <h3>No authoritative statewide district registry exists <span class="sev sev-critical">CRITICAL</span></h3>
+    <p>
+      Vermont fire districts are not required to file articles of incorporation with the
+      Secretary of State or any state agency. VLCT and VRWA have both said, in writing, that
+      the true count is uncertain and had to be reconstructed from indirect sources (Fire
+      Academy rolls, VLCT membership, DEC permits). There is no master list to validate
+      against. The 80-district roster used here is the best available compilation, not a legal
+      census.
+    </p>
+  </li>
+
+  <li id="c3">
+    <h3>The district roster is a nonprofit compilation dated Sept 2025 <span class="sev sev-major">MAJOR</span></h3>
+    <p>
+      The 80-district spine comes from the Vermont Rural Water Association's <em>Fire Districts
+      and Special Use Districts</em> document (Sept 2025). It is the best enumeration in
+      existence and is water-system-specific, but it is one nonprofit's working list. It may
+      omit districts, may include districts that have since dissolved or merged, and its
+      population figures are self-reported. State this provenance plainly rather than
+      presenting the roster as authoritative.
+    </p>
+  </li>
+
+  <li id="c4">
+    <h3>The service-area-as-proxy shortcut only holds for single-district towns <span class="sev sev-major">MAJOR</span></h3>
+    <p>
+      VRWA notes that roughly two-thirds to three-quarters of fire districts are the primary
+      water provider for their town or village. Where one district serves a whole town, the
+      service-area polygon is a reasonable stand-in for the political boundary (~46 of 80
+      districts). Where a town contains multiple districts (~34 districts across 15 towns —
+      Rutland Town alone has 5), the service areas carve the town up and the political
+      boundaries genuinely differ; the proxy is invalid there and those boundaries must be
+      drawn from other sources.
+    </p>
+  </li>
+
+  <li id="c5">
+    <h3>Name-based matching is unreliable and produced known errors <span class="sev sev-major">MAJOR</span></h3>
+    <p>
+      The first crosswalk matched each district to its closest-named EPA system. Because
+      same-town districts have near-identical names ("Rutland Town Fire District 1/4/5/6/11"),
+      and because of cross-town string collisions, at least four matches were visibly wrong
+      (e.g. Sherburne Fire District → "Shelburne Farms"; North Branch → "Brandon"; Highgate →
+      "Huntington"). Do not trust any match with a score below ~85, and do not read the
+      <code>has_service_polygon: Y</code> flag as confirmation of a correct match. The spatial
+      matcher was written to replace this; its output supersedes the name match.
+    </p>
+  </li>
+
+  <li id="c6">
+    <h3>Even the 10 chartered districts don't yield digitizable geometry <span class="sev sev-major">MAJOR</span></h3>
+    <p>
+      The Title 24 Appendix charters were expected to carry authoritative boundary
+      descriptions. In practice most charters' "Boundaries" sections point to a recorded plat
+      in town land records rather than describing the boundary (e.g. Cold Brook: <em>"as
+      recorded in Book 111, page 184 … Town of Wilmington"</em>). This is a citation to a
+      document in a town clerk's office, not geometry. The handful that do carry a full survey
+      description use 19th/20th-century metes-and-bounds prose that requires manual GIS
+      reconstruction. <strong>"Chartered" means "boundary is findable in a named record," not
+      "boundary in hand."</strong>
+    </p>
+    <p class="aside">
+      This is why the <a href="contacts.html">town clerk directory</a> is part of this site:
+      the cited plats live in those offices, and the clerk is who you ask for them.
+    </p>
+  </li>
+
+  <li id="c7">
+    <h3>About 11% of the EPA polygons are machine-modeled, not real <span class="sev sev-major">MAJOR</span></h3>
+    <p>
+      Of the 392 Vermont EPA polygons, ~44 are EPA-modeled (Random Forest / parcel /
+      decision-tree estimates), not authoritative boundaries — mostly small systems and
+      mobile-home parks the state didn't map. The dataset is tagged so these can be isolated
+      (<code>boundary_source = EPA-modeled</code>). Vermont's authoritative share (~89%) is far
+      better than the national average (~60%), but modeled polygons should not be handed over
+      as real boundaries without that flag visible.
+    </p>
+    <p class="aside">
+      The <a href="index.html">map</a> renders modeled polygons in dashed amber and offers an
+      "Authoritative boundaries only" filter for exactly this reason.
+    </p>
+  </li>
+
+  <li id="c8">
+    <h3>"Water systems" is a larger, different set than "water districts" <span class="sev sev-minor">MINOR</span></h3>
+    <p>
+      The 392 EPA polygons include schools, hotels, mobile-home parks, medical facilities and
+      other single-purpose systems that are public water systems but not districts. The layers
+      were split (<code>all_public_water_systems</code> / <code>community_water_systems</code> /
+      <code>community_authoritative</code>) so the district-relevant subset can be used cleanly.
+      Don't equate the 392 systems with 392 districts.
+    </p>
+  </li>
+
+  <li id="c9">
+    <h3>One district can map to several systems, and vice versa <span class="sev sev-minor">MINOR</span></h3>
+    <p>
+      A chartered district corporation may operate more than one public water system (several
+      PWSIDs), and there is no shared key linking a Title 24 district to its PWSIDs. Any
+      district-level rollup that assumes one district = one polygon will be wrong for the
+      multi-system districts. This has to be reconciled by hand.
+    </p>
+  </li>
+
+  <li id="c10">
+    <h3>Fire-district political boundaries are absent entirely <span class="sev sev-critical">CRITICAL</span></h3>
+    <p>
+      Nothing pulled from EPA, SDWIS, or DEC contains fire-district political boundaries —
+      those systems are keyed on water service, not on the Title 20 district as a governmental
+      entity. The three sample shapefiles provided at the project's start (Danville, Hardwick,
+      Peacham) are examples of that boundary already digitized locally; the rest of the state
+      is that same work, roughly 34 hard cases plus verification of the rest.
+    </p>
+  </li>
+
+  <li id="c11">
+    <h3>The sample shapefiles were incomplete as delivered <span class="sev sev-minor">MINOR</span></h3>
+    <p>
+      The initial Danville/Hardwick/Peacham shapefiles arrived as bare <code>.shp</code> files
+      with no <code>.dbf</code>/<code>.shx</code>/<code>.prj</code> sidecars — meaning no
+      attributes and no projection metadata (three different CRSs had to be inferred). If
+      partners will keep sending boundaries, fix the intake spec now: require complete zipped
+      shapefile sets or GeoPackage/GeoJSON, with attributes and a defined CRS.
+    </p>
+  </li>
+
+  <li id="c12">
+    <h3>Geometry required repair; CRS was standardized <span class="sev sev-minor">MINOR</span></h3>
+    <p>
+      Ten of the 392 EPA polygons had invalid (self-intersecting) geometry and were repaired
+      with a zero-width buffer, which can very slightly alter vertices. All layers were
+      reprojected to EPSG:32145 (Vermont State Plane meters). Anyone comparing against data in
+      another projection must account for the reprojection.
+    </p>
+  </li>
+
+</ol>
+
+<h2>What this means for the deliverable</h2>
+
+<p>Read together, the caveats point to a clear framing for the Bond Bank rather than a blocker:</p>
+
+<ul class="takeaways">
+  <li>
+    The realistic first deliverable is a <strong>coverage inventory, not a finished boundary
+    layer</strong>: for all 80 districts, what exists, what can be proxied, and what must be
+    digitized.
+  </li>
+  <li>
+    <strong>~46 single-district towns</strong> can use the service-area polygon as a defensible
+    political-boundary proxy today, with that assumption documented.
+  </li>
+  <li>
+    <strong>~34 multi-district cases</strong> are the genuine manual-GIS backlog — parcel data,
+    town maps, and the charter-cited plats. This is well-scoped work suitable for ORCA
+    students, with the crosswalk as their worklist.
+  </li>
+  <li>
+    The <strong>~10 chartered districts</strong> come with a land-records pointer that tells a
+    digitizer exactly which recorded plat to pull first.
+  </li>
+</ul>
+
+<p class="closing">
+  Stating these limits up front is itself valuable to the Bond Bank: it converts an open-ended
+  "map the districts" request into a priced, bounded scope with a defensible methodology.
+</p>
+
+</main>
+
+<footer class="site-footer">
+  <div class="wrap">
+    <p>
+      Source and data on
+      <a href="https://github.com/VERSO-UVM/Drinking_Water_Service_Areas">GitHub</a>.
+      This page mirrors <code>District_Boundary_Data_Caveats.docx</code> in the repository.
+    </p>
+  </div>
+</footer>
+
+</body>
+</html>
