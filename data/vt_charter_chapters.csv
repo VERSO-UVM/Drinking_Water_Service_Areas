@@ -1,0 +1,115 @@
+﻿chapter,chapter_title,municipality,municipality_type,sections,boundary_sections,status
+001,City of Barre,Barre,City,89,1,ok
+003,City of Burlington,Burlington,City,362,13,ok
+004,City of Essex Junction,Essex Junction,City,52,3,ok
+005,City of Montpelier,Montpelier,City,150,3,ok
+007,City of Newport,Newport,City,43,2,ok
+009,City of Rutland,Rutland,City,160,2,ok
+011,City of St. Albans,St. Albans,City,35,2,ok
+013,City of South Burlington,South Burlington,City,67,3,ok
+015,City of Vergennes,Vergennes,City,39,3,ok
+017,City of Winooski,Winooski,City,11,0,ok
+019,City of Winooski,Winooski,City,81,1,ok
+101,Town of Barre,Barre,Town,51,0,ok
+103,Town of Bennington,Bennington,Town,39,1,ok
+105,Town of Berlin,Berlin,Town,28,1,ok
+106,Town of Bradford,Bradford,Town,20,1,ok
+106B,Town of Brandon,Brandon,Town,2,0,ok
+107,Town of Brattleboro,Brattleboro,Town,53,0,ok
+107A,Town of Bridport,Bridport,Town,4,0,ok
+108,Town of Bristol,Bristol,Town,8,0,ok
+108C,Town of Calais,Calais,Town,5,0,ok
+109,Town of Cavendish,Cavendish,Town,23,0,ok
+110,Town of Charlotte,Charlotte,Town,1,0,ok
+111,Town of Chester,Chester,Town,15,2,ok
+113,Town of Colchester,Colchester,Town,57,3,ok
+114,Town of Danville,Danville,Town,1,0,ok
+114E,Town of East Montpelier,East Montpelier,Town,9,0,ok
+114G,Town of Elmore,Elmore,Town,1,0,ok
+115,Town of Enosburgh,Enosburgh,Town,1,0,ok
+117,Town of Essex,Essex,Town,80,2,ok
+119,Town of Ferrisburgh,Ferrisburgh,Town,4,0,ok
+120,Town of Franklin,Franklin,Town,4,0,ok
+123,Town of Hardwick,Hardwick,Town,65,3,ok
+123A,Town of Hartford,Hartford,Town,10,0,ok
+123B,Town of Jamaica,Jamaica,Town,22,1,ok
+124,Town of Jericho,Jericho,Town,10,0,ok
+125,Town of Ludlow,Ludlow,Town,2,0,ok
+126,Town of Lyndon,Lyndon,Town,55,1,ok
+127,Town of Middlebury,Middlebury,Town,63,4,ok
+129,Town of Milton,Milton,Town,63,1,ok
+129B,Town of Montgomery,Montgomery,Town,5,0,ok
+129C,Town of Morristown,Morristown,Town,3,1,ok
+129D,Town of Northfield,Northfield,Town,10,0,ok
+129F,Town of Panton,Panton,Town,4,0,ok
+131,Town of Plainfield,Plainfield,Town,49,2,ok
+133,Town of Poultney,Poultney,Town,36,0,ok
+141,Town of Readsboro,Readsboro,Town,17,0,ok
+142,Town of Richford,Richford,Town,26,0,ok
+143,Town of Richmond,Richmond,Town,42,2,ok
+145,Town of Royalton,Royalton,Town,1,0,ok
+146,Town of Salisbury,Salisbury,Town,3,0,ok
+147,Town of Shelburne,Shelburne,Town,40,3,ok
+148,Town of South Hero,South Hero,Town,7,0,ok
+149,Town of Springfield,Springfield,Town,33,0,ok
+150,Town of St. Albans,St. Albans,Town,5,1,ok
+151,Town of St. Johnsbury,St. Johnsbury,Town,48,1,ok
+153,Town of Stowe,Stowe,Town,47,3,ok
+155,Town of Underhill,Underhill,Town,14,1,ok
+157,Town of Waitsfield,Waitsfield,Town,6,1,ok
+159,Town of Waterbury,Waterbury,Town,2,0,ok
+161,Town of West Fairlee,West Fairlee,Town,1,0,ok
+163,Town of Westford,Westford,Town,7,0,ok
+165,Town of Westminster,Westminster,Town,4,0,ok
+167,Town of Weybridge,Weybridge,Town,4,0,ok
+169,Town of Williamstown,Williamstown,Town,3,0,ok
+171,Town of Williston,Williston,Town,20,1,ok
+173,Town of Windsor,Windsor,Town,41,1,ok
+175,Town of Woodford,Woodford,Town,33,1,ok
+203,Village of Alburgh,Alburgh,Village,28,1,ok
+207,Village of Bellows Falls,Bellows Falls,Village,30,4,ok
+213,Village of Cambridge,Cambridge,Village,25,1,ok
+215,Village of Derby Center,Derby Center,Village,21,2,ok
+217,Village of Derby Line,Derby Line,Village,18,2,ok
+219,Village of Enosburg Falls,Enosburg Falls,Village,34,3,ok
+221,Village of Essex Junction [Repealed],Essex Junction [Repealed],Village,1,0,ok
+225,Village of Hyde Park,Hyde Park,Village,38,3,ok
+227,Village of Jacksonville,Jacksonville,Village,15,2,ok
+235,Village of Ludlow,Ludlow,Village,59,2,ok
+237,Village of Lyndonville [Repealed],Lyndonville [Repealed],Village,1,0,ok
+239,Village of Manchester,Manchester,Village,30,3,ok
+245,Village of Morrisville,Morrisville,Village,27,10,ok
+247,Village of Newbury,Newbury,Village,40,7,ok
+249,Village of Newfane,Newfane,Village,21,1,ok
+251,Village of North Bennington,North Bennington,Village,51,5,ok
+253,Village of North Troy,North Troy,Village,20,1,ok
+257,Village of Northfield,Northfield,Village,8,0,ok
+261,Village of Orleans,Orleans,Village,51,7,ok
+269,Village of Poultney,Poultney,Village,52,2,ok
+279,Village of Swanton,Swanton,Village,22,5,ok
+283,Village of Waterbury [Repealed.],Waterbury [Repealed.],Village,3,0,ok
+285,Village of Wells River,Wells River,Village,33,3,ok
+289,Village of Westminster,Westminster,Village,16,1,ok
+291,Village of Woodstock,Woodstock,Village,16,1,ok
+401,Addison County Solid Waste Management District,Addison County Solid Waste Management District,District,56,1,ok
+403,Central Vermont Solid Waste Management District,Central Vermont Solid Waste Management District,District,64,1,ok
+405,Chittenden Solid Waste Management District,Chittenden Solid Waste Management District,District,63,1,ok
+407,Greater Upper Valley Solid Waste Management District,Greater Upper Valley Solid Waste Management District,District,61,1,ok
+409,Lamoille Regional Solid Waste Management District,Lamoille Regional Solid Waste Management District,District,58,1,ok
+411,Northeast Kingdom Waste Management District,Northeast Kingdom Waste Management District,District,57,1,ok
+413,Northwest Vermont Solid Waste Management District,Northwest Vermont Solid Waste Management District,District,58,1,ok
+414,Rutland County Solid Waste District,Rutland County Solid Waste District,District,58,0,ok
+417,Windham Solid Waste Management District,Windham Solid Waste Management District,District,62,2,ok
+501,Milton Fire District No. 1,Milton Fire District No. 1,Fire District,9,2,ok
+503,St. George Fire District No. 1,St. George Fire District No. 1,Fire District,13,3,ok
+504,Bolton Fire District No. 1,Bolton Fire District No. 1,Fire District,9,3,ok
+505,Williamstown Fire District Charter,Williamstown Fire District Charter,Fire District,8,1,ok
+507,Cold Brook Fire District No. 1,Cold Brook Fire District No. 1,Fire District,5,1,ok
+509,North Branch Fire District No. 1,North Branch Fire District No. 1,Fire District,4,1,ok
+511,Fairfax Fire District No. 1,Fairfax Fire District No. 1,Fire District,2,2,ok
+601,Rutland County Recreational District,Rutland County Recreational District,Recreational District,54,0,ok
+701,Morristown Corners Water Corporation,Morristown Corners Water Corporation,Water Corporation,9,1,ok
+703,Champlain Water District,Champlain Water District,Water District,21,3,ok
+705,Edward Farrar Utility District,Edward Farrar Utility District,Utility District,8,1,ok
+801,Green Mountain Transit Authority,Green Mountain Transit Authority,Authority,13,0,ok
+901,Central Vermont Public Safety Authority,Central Vermont Public Safety Authority,Authority,54,1,ok

@@ -138,7 +138,9 @@ def build_town_boundaries():
 FIRE_FIELDS = [
     "fd_id", "district_name", "town", "county", "population", "pwsid",
     "pws_name", "area_sqkm", "town_iou", "geometry_status", "extent",
-    "verified", "confirmed_by", "source_file", "source_crs", "crs_inferred",
+    "verified", "confirmed_by", "district_website", "source_type",
+    "source_citation", "source_url", "source_text", "derivation",
+    "source_file", "source_crs", "crs_inferred",
     "clerk_name", "clerk_email", "notes",
 ]
 

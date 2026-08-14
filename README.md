@@ -10,7 +10,7 @@ This project aims to address this gap by conducting a **pilot mapping project**.
 
 ## Current Status: Inventory, Not Boundaries
 
-The fire-district boundary layer now exists as [`data/vt_fire_districts.gpkg`](data/vt_fire_districts.gpkg) — see [`build_fire_districts.py`](#build_fire_districtspy). It holds **3 confirmed boundaries out of 80 districts**, so the framing below still stands: the near-term deliverable is the inventory, and this layer is the container that inventory is gradually filled into.
+The fire-district boundary layer now exists as [`data/vt_fire_districts.gpkg`](data/vt_fire_districts.gpkg) — see [`build_fire_districts.py`](#build_fire_districtspy). It holds **4 confirmed boundaries plus 1 approximate extent**, so the framing below still stands: the near-term deliverable is the inventory, and this layer is the container that inventory is gradually filled into.
 
 The first deliverable is **a coverage map of the problem, not the boundaries themselves**. Before anyone can quote a digitizing estimate, we need to know how many districts exist, which already have a service-area polygon to start from, and which need boundary work from scratch. That inventory now exists in [`data/vt_district_crosswalk.csv`](data/vt_district_crosswalk.csv).
 
@@ -92,7 +92,9 @@ Two hard limits on how far this gets us:
 
 1. **The charters are a minority of the real universe.** The whole 500s/700s fire-and-water cluster is maybe a couple dozen districts, and only **6 of the 80** districts in our roster are flagged `has_legal_charter`: Fairfax FD 1, St George FD 1, St George FD 2, Cold Brook FD 1, Champlain Water District, and North Branch FD 1. VLCT confirmed that most districts formed by local action never got a legislative charter and file nothing with the state. The charter index gives you the authoritative-but-small core; the EPA water systems give you the "has a service area" reality; **the gap between them is the actual project.**
 
-2. **The Boundaries sections do not contain boundaries.** This was tested against all 10 charter chapters (see below). Not one returns a metes-and-bounds survey description. `pull_charter_boundaries.py` exists to extract whatever is there, and what is there is mostly a citation.
+2. **The district chapters' Boundaries sections mostly cite a record rather than describe one.** Of the 10 district chapters, most point to a plat in town land records. But see the correction below: this is true of the *district* chapters specifically, not of the Appendix as a whole, and even within them the first pass under-reported.
+
+> **Superseded in part.** The two sections below were written from a 10-chapter pull whose regex missed real content. [`scrape_charter_boundaries.py`](#scrape_charter_boundariespy) now covers all 114 chapters and finds genuine metes-and-bounds descriptions plus usable boundary sections in chapters previously reported as empty. Read that section for the corrected picture.
 
 ### What the 10 charters actually say
 
@@ -128,6 +130,7 @@ Chapters returning nothing: 505 Williamstown, 509 North Branch, 703 Champlain Wa
 python script/pull_vt_water_boundaries.py   # EPA service areas -> data/vt_water_boundaries.gpkg
 python script/merge_clerk_contacts.py       # SoS clerk xlsx -> data/vt_town_clerk_contacts_filled.csv
 python script/build_fire_districts.py       # pilot shapefiles -> data/vt_fire_districts.gpkg
+python script/scrape_charter_boundaries.py  # Title 24 App -> data/vt_charter_boundary_sections.csv
 python script/build_site_data.py            # all of the above -> docs/data/
 python script/build_district_crosswalk.py --epa vt_water_boundaries.csv [--vlct vlct_list.csv]
 python script/spatial_match_districts.py    # repair name-matches spatially
@@ -155,7 +158,44 @@ fd.merge(epa, left_on="pwsid", right_on="PWSID")     # verified: 3 of 3 join
 
 **CRS is inferred, not read.** The pilot shapefiles have no `.prj` ([caveat 11](docs/caveats.html)), so the script reprojects each file under every candidate CRS and keeps whichever lands the polygon on its own town — the town is the ground truth. It independently recovered **EPSG:4326** for Danville and Hardwick and **EPSG:32145** for Peacham, the three CRSs the caveats document noted. Rows record `source_crs` and `crs_inferred = Y` so a guess is never mistaken for a declaration. The same mechanism will handle the next partner submission that arrives without a projection.
 
-#### Two of the three districts are coextensive with their town
+#### Provenance: every polygon cites its source
+
+Any boundary in this layer can be defended. Each row carries:
+
+| Field | Purpose |
+| --- | --- |
+| `source_type` | partner shapefile / statute (town-wide) / statute (road-bounded) |
+| `source_citation` | e.g. `24 V.S.A. App. ch. 505, § 2` |
+| `source_url` | direct link to the statute section or submission |
+| `source_text` | **the verbatim text that authorizes the polygon** |
+| `derivation` | how the geometry was actually produced |
+| `district_website` | the district's own site, where one exists |
+
+The map popup renders the citation, the quoted statute, and the derivation, so a reviewer can see *why* a polygon is shaped the way it is without opening the CSV.
+
+#### The five current boundaries
+
+| District | Source | Area | Extent | Verified |
+| --- | --- | --- | --- | --- |
+| Danville FD 1 | partner shapefile | 158.03 km² | coextensive with town | Y |
+| East Hardwick FD 1 | partner shapefile | 100.24 km² | coextensive with town | Y |
+| Peacham FD 1 | partner shapefile | 94.72 km² | sub-town (76.6%) | N |
+| **Williamstown FD** | **24 V.S.A. App. ch. 505, § 2** | 104.53 km² | coextensive with town | Y |
+| **Fairfax FD 1** | **24 V.S.A. App. ch. 511, § 2** | 2.65 km² | **approximate** | N |
+
+**Williamstown Fire District** is exact, not an approximation. The statute reads: *"The corporate limits shall be the boundary lines of the Town of Williamstown…"* — so the VCGI town polygon **is** the district boundary, copied unmodified.
+
+Williamstown also exposes a roster gap: it is **not among the 80 VRWA districts**, and SDWIS shows it operates no public water system (Williamstown's water is a town department, VT0005186). The VRWA roster is *water-system-scoped*, so a chartered fire district that provides no water falls outside it. **The true universe of Vermont fire districts is larger than 80** — worth stating to the Bond Bank alongside [caveat 3](docs/caveats.html).
+
+**Fairfax FD 1 is approximate, and I over-promised it earlier.** I described it as digitizable from its four named roads without a clerk visit. Testing that: the roads exist in the VT E911 centerline layer, but they **do not close a ring** — gaps of 163 m, 825 m, and 1,072 m sit between them. So the polygon is the convex hull of the four centerlines, `geometry_status = approximate`, `extent = approximate_from_statute`, `verified = N`, drawn dotted teal on the map. Two things support it as a starting estimate: it is 2.65 km², a plausible scale for an 80-person district, and it contains **98.6%** of that district's EPA service area. But the statute itself says *"as recorded with the Town of Fairfax"* — the authoritative geometry is a town record, same as Cold Brook.
+
+#### North Branch Fire District 1 — no polygon yet
+
+The district publishes a boundary map at <https://www.northbranchfiredistrict.com/>, but it is a raster image on a Wix page: no GeoJSON, KML, or ArcGIS layer, and the site's 10 PDFs are ordinances and minutes rather than georeferenced maps. Tracing pixels off a screenshot would fabricate coordinates, so no geometry was created. Its charter ([ch. 509, § 1](https://legislature.vermont.gov/statutes/section/24APPENDIX/509/00001)) is circular — *"within the corporate limits presently established"* — and gives nothing either.
+
+It is tracked in **`data/vt_fire_districts_pending.csv`** so it stays visible. Ask the district for the source GIS file or a georeferenced PDF; the map exists, so someone has the underlying data.
+
+#### Two of the three pilot districts are coextensive with their town
 
 The script measures each polygon against its own **unsimplified** VCGI town boundary and records the result as `extent`:
 
@@ -178,6 +218,65 @@ Danville and East Hardwick genuinely cover their whole town — **confirmed by t
 That gap is the quantity this project exists to measure, and it is why a service area cannot proxy for a political boundary.
 
 `geometry_status` stays as a separate field for boundaries that equal their town but have **not** been confirmed as town-wide — those come through as `unconfirmed_townwide`, since without confirmation an equal-to-town polygon is genuinely ambiguous between a town-wide district and a mis-filed town outline. Add confirmed districts to `TOWNWIDE_CONFIRMED` in the script as they are checked off.
+
+### `scrape_charter_boundaries.py`
+
+Scrapes **all 114 chapters** of Title 24 Appendix and extracts, verbatim, every section that describes a district's or municipality's boundaries.
+
+```bash
+python script/scrape_charter_boundaries.py
+python script/scrape_charter_boundaries.py --chapter 127        # one chapter
+python script/scrape_charter_boundaries.py --cache-dir .cache   # reclassify without refetching
+```
+
+Outputs:
+
+- **`data/vt_charter_boundary_sections.csv`** — 165 matching sections across **72 municipalities**, with `municipality`, `municipality_type`, `chapter`, `section_number`, `section_heading`, `match_reason`, `char_count`, a direct `section_url`, and `section_text`.
+- **`data/vt_charter_chapters.csv`** — all 114 chapters with section counts and hit counts, so the 41 chapters with no boundary section are visible rather than silently absent.
+
+`section_text` is the statute's own words. Tags are stripped and entities decoded, and the source's layout line-wrapping is normalized to one line per paragraph — no summarizing, truncation, or rewording. `char_count` lets you spot anything suspiciously short. CSV is UTF-8 with BOM so Excel opens the `§` correctly, and multi-paragraph text is quoted (77 rows contain paragraph breaks).
+
+**Why the whole Appendix, not just the district chapters.** District provisions live inside *town* charters too. Chapter 127 (Town of Middlebury) carries [§ 1505 "Fire District No. 1 East Middlebury"](https://legislature.vermont.gov/statutes/section/24APPENDIX/127/01505), which no scan of the 500s would ever reach.
+
+Three independent match rules, recorded per row so you can filter by confidence:
+
+| `match_reason` | Rows | Rule |
+| --- | --- | --- |
+| `boundary_language` | 105 | body has "beginning at", "thence north", "metes and bounds", "land records of"… |
+| `boundary_heading\|boundary_language` | 28 | both |
+| `district_heading` | 23 | heading names a fire/water/sewer/lighting district |
+| `boundary_heading` | 8 | heading says Boundaries / Territory / corporate limits |
+
+#### This corrects two earlier findings
+
+**1. Metes-and-bounds descriptions do exist in the Appendix.** The earlier claim of zero was drawn from only the 10 district chapters. Across all 114, real survey prose is common in city and village charters. [St. Albans § 2 Boundaries](https://legislature.vermont.gov/statutes/section/24APPENDIX/011/00002) runs **12,566 characters**:
+
+> "(1) Beginning at the southeasterly corner of Aldis Hill playground, thence northerly, westerly, southerly, and again westerly in the bounds of said playground to the northwesterly corner thereof. (2) Thence northerly, in a line parallel to High Street, to a point on the southerly boundary of property owned or formerly owned by Adhemard and Amanda Bertrand…"
+
+That is digitizable — by hand, per district, as previously scoped.
+
+**2. `pull_charter_boundaries.py` under-reported.** It found "nothing" for three chapters and only a circular Creation clause for Fairfax. Those were regex failures, not empty statutes. This scraper finds real sections in all of them:
+
+| Chapter | Old result | Actually contains |
+| --- | --- | --- |
+| 511 Fairfax FD 1 | circular Creation clause | **§ 2 Boundaries** — bounded by four named roads |
+| 505 Williamstown FD | nothing | § 2 Body corporate and corporate limits |
+| 703 Champlain Water District | nothing | § 2, § 5, § 17 |
+| 509 North Branch FD 1 | nothing | § 1 — genuinely circular |
+
+**Fairfax Fire District No. 1 § 2** is immediately usable geometry:
+
+> "The boundaries of Fairfax Fire District No. 1, as recorded with the Town of Fairfax, are bounded on the north by Bessette Road, the west by Highland Road, the south by Brick Church Road, and the east by VT Route 104."
+
+Four named roads — that can be digitized from the road centerline layer without a trip to the town clerk.
+
+**Williamstown Fire District § 2 confirms town-wide districts are a real, statutory pattern:**
+
+> "The corporate limits shall be the boundary lines of the Town of Williamstown, being bounded as follows: easterly by the line of Washington; southerly by the lines of Chelsea and Brookfield; westerly by the lines of Northfield and Berlin; and northerly by the lines of Berlin and Barre."
+
+A fire district whose corporate limits are its town's boundary lines, stated in statute. That is independent corroboration for treating Danville and East Hardwick as `coextensive_with_town` rather than as mis-filed town outlines, and it means Williamstown's boundary can be populated today by copying the VCGI town polygon.
+
+`pull_charter_boundaries.py` is superseded by this script for boundary text; keep it only for its `boundary_is_record_pointer` flag.
 
 ### `build_district_crosswalk.py`
 
@@ -327,13 +426,15 @@ This system would also contribute meaningfully to risk management and equity. Ma
 
 1. Commit a generator script for `data/vt_district_crosswalk.csv`.
 2. Request the VLCT compiled district list as CSV.
-3. Add `Rutland Town`, `Newport Town`, and `Saint Albans Town` to `data/vt_town_clerk_contacts.csv` so the skeleton stops depending on the merge script to append them.
-4. Fill `town_website` for the 35 municipalities missing one.
-5. Have Peacham confirm its 94.72 km² boundary, then add it to `TOWNWIDE_CONFIRMED`/set `verified = Y`. Clerk: Rebecca Washington (<townclerk@peacham.org>).
-6. Fix the partner intake spec ([caveat 11](docs/caveats.html)): require zipped shapefile sets or GeoPackage/GeoJSON with attributes and a defined CRS, so CRS never has to be inferred again.
-7. Pull the cited plats from town land records for the 5 charter districts whose boundary is a record pointer.
+3. Obtain the plat "recorded with the Town of Fairfax" to replace the approximate Fairfax FD 1 hull with the real boundary, and ask North Branch FD for the GIS source behind the map on its website.
+4. Triage the 165 rows in `data/vt_charter_boundary_sections.csv` for the remaining districts; `char_count` and `match_reason` sort the survey descriptions from the one-line citations.
+5. Add `Rutland Town`, `Newport Town`, and `Saint Albans Town` to `data/vt_town_clerk_contacts.csv` so the skeleton stops depending on the merge script to append them.
+6. Fill `town_website` for the 35 municipalities missing one.
+7. Have Peacham confirm its 94.72 km² boundary, then add it to `TOWNWIDE_CONFIRMED`/set `verified = Y`. Clerk: Rebecca Washington (<townclerk@peacham.org>).
+8. Fix the partner intake spec ([caveat 11](docs/caveats.html)): require zipped shapefile sets or GeoPackage/GeoJSON with attributes and a defined CRS, so CRS never has to be inferred again.
+9. Pull the cited plats from town land records for the 5 charter districts whose boundary is a record pointer.
 
 ### The actual project
 
-1. Grow `data/vt_fire_districts.gpkg` from 3 confirmed boundaries toward 80. Add each new district as a row with its `pwsid` so it stays joinable to the water data.
+1. Grow `data/vt_fire_districts.gpkg` from 4 confirmed boundaries toward 80 (and beyond — see the Williamstown roster gap). Add each new district as a row with its `pwsid` so it stays joinable to the water data.
 2. Digitize political boundaries for the districts in multi-district towns — the multi-month ORCA-student-scale project. Hand the Bond Bank the inventory first and let it drive the estimate, rather than quoting the digitizing blind. The remaining boundaries are genuine manual GIS work (parcel data, town maps, the charter-cited plats) that no script pulls.

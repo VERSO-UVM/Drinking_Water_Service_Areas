@@ -13,7 +13,8 @@ var COLORS = {
   auth: '#2563eb',
   modeled: '#d97706',
   town: '#475569',
-  fd: '#9333ea',          // fire district, confirmed boundary
+  fd: '#9333ea',           // fire district, confirmed boundary
+  fdApprox: '#0d9488',     // extent derived from a statute description
   fdUnconfirmed: '#a1a1aa' // equals its town, not yet confirmed as town-wide
 };
 
@@ -202,19 +203,24 @@ function isTownwide(props) {
   return props.extent === 'coextensive_with_town';
 }
 
+function isApproximate(props) {
+  return props.geometry_status === 'approximate';
+}
+
 function fireStyle(feature) {
   var p = feature.properties;
   var real = isRealDistrict(p);
+  var approx = isApproximate(p);
   return {
-    color: real ? COLORS.fd : COLORS.fdUnconfirmed,
-    weight: real ? 2.4 : 1.6,
+    color: real ? COLORS.fd : approx ? COLORS.fdApprox : COLORS.fdUnconfirmed,
+    weight: real ? 2.4 : 1.8,
     opacity: 0.95,
     // Town-wide districts get a dashed edge so they read as "same line as the
     // town" rather than looking like a missing boundary; both are filled,
-    // because both are real district extents.
-    dashArray: real ? (isTownwide(p) ? '7 4' : null) : '2 4',
-    fillColor: real ? COLORS.fd : COLORS.fdUnconfirmed,
-    fillOpacity: real ? 0.16 : 0.05
+    // because both are real district extents. Approximate extents are dotted.
+    dashArray: real ? (isTownwide(p) ? '7 4' : null) : approx ? '3 5' : '2 4',
+    fillColor: real ? COLORS.fd : approx ? COLORS.fdApprox : COLORS.fdUnconfirmed,
+    fillOpacity: real ? 0.16 : 0.09
   };
 }
 
@@ -233,18 +239,26 @@ function firePopupHtml(p) {
   var real = isRealDistrict(p);
   var townwide = isTownwide(p);
 
-  var tag = !real ? 'Unconfirmed'
+  var approx = isApproximate(p);
+
+  var tag = approx ? 'Approximate extent'
+          : !real ? 'Unconfirmed'
           : townwide ? 'Town-wide district'
           : 'Sub-town district';
+
+  var tagClass = approx ? 'approx' : real ? 'district' : 'placeholder';
 
   var html =
     '<h3>' + esc(p.district_name) + '</h3>' +
     '<p class="popup-id">' + esc(p.town) +
     (p.county ? ', ' + esc(p.county) + ' County' : '') + ' &middot; ' +
-    '<span class="popup-tag ' + (real ? 'district' : 'placeholder') + '">' +
-    tag + '</span></p>';
+    '<span class="popup-tag ' + tagClass + '">' + tag + '</span></p>';
 
-  if (!real) {
+  if (approx) {
+    html +=
+      '<p class="popup-warn">Derived from the roads named in statute, not a ' +
+      'surveyed boundary. Use as a starting estimate only.</p>';
+  } else if (!real) {
     html +=
       '<p class="popup-warn">This boundary equals the town outline at ' +
       pct(p.town_iou) + '. It may be a town-wide district or a town outline ' +
@@ -273,11 +287,34 @@ function firePopupHtml(p) {
   });
   html += '</table>';
 
+  // Provenance: what authorizes this polygon, quoted and linked.
+  if (p.source_citation) {
+    html += '<div class="popup-source"><h4>Source</h4>';
+    html += p.source_url
+      ? '<p><a href="' + esc(p.source_url) + '" target="_blank" ' +
+        'rel="noopener">' + esc(p.source_citation) + ' &rarr;</a></p>'
+      : '<p>' + esc(p.source_citation) + '</p>';
+    if (p.source_text) {
+      html += '<blockquote>' + esc(p.source_text) + '</blockquote>';
+    }
+    if (p.derivation) {
+      html += '<p class="derivation">' + esc(p.derivation) + '</p>';
+    }
+    html += '</div>';
+  }
+
+  var foot = [];
   if (p.clerk_email) {
-    html +=
-      '<p class="popup-foot">Town clerk: ' + esc(p.clerk_name || '') +
-      ' &middot; <a href="mailto:' + esc(p.clerk_email) + '">' +
-      esc(p.clerk_email) + '</a></p>';
+    foot.push('Town clerk: ' + esc(p.clerk_name || '') +
+              ' &middot; <a href="mailto:' + esc(p.clerk_email) + '">' +
+              esc(p.clerk_email) + '</a>');
+  }
+  if (p.district_website) {
+    foot.push('<a href="' + esc(p.district_website) + '" target="_blank" ' +
+              'rel="noopener">District website &rarr;</a>');
+  }
+  if (foot.length) {
+    html += '<p class="popup-foot">' + foot.join('<br>') + '</p>';
   }
   return html;
 }
