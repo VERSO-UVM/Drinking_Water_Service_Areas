@@ -61,7 +61,7 @@ Before this goes to the Bond Bank: swap the name-match for a spatial match on th
 
 The authoritative registry is **SDWIS**, queryable without a key via EPA Envirofacts:
 
-```
+```text
 https://data.epa.gov/efservice/WATER_SYSTEM/PRIMACY_AGENCY_CODE/VT/JSON
 ```
 
