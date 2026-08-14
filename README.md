@@ -10,7 +10,7 @@ This project aims to address this gap by conducting a **pilot mapping project**.
 
 ## Current Status: Inventory, Not Boundaries
 
-The fire-district boundary layer now exists as [`data/vt_fire_districts.gpkg`](data/vt_fire_districts.gpkg) — see [`build_fire_districts.py`](#build_fire_districtspy). It holds **3 of 80 districts, only 1 of which is usable geometry**, so the framing below still stands: the near-term deliverable is the inventory, and this layer is the container that inventory is gradually filled into.
+The fire-district boundary layer now exists as [`data/vt_fire_districts.gpkg`](data/vt_fire_districts.gpkg) — see [`build_fire_districts.py`](#build_fire_districtspy). It holds **3 confirmed boundaries out of 80 districts**, so the framing below still stands: the near-term deliverable is the inventory, and this layer is the container that inventory is gradually filled into.
 
 The first deliverable is **a coverage map of the problem, not the boundaries themselves**. Before anyone can quote a digitizing estimate, we need to know how many districts exist, which already have a service-area polygon to start from, and which need boundary work from scratch. That inventory now exists in [`data/vt_district_crosswalk.csv`](data/vt_district_crosswalk.csv).
 
@@ -54,6 +54,33 @@ Before this goes to the Bond Bank: swap the name-match for a spatial match on th
 **Update — the spatial matcher has now been run**, and it both confirms and complicates this. It rescued two of the four visible misses (Sherburne, North Branch), found the `has_service_polygon = Y` column to be wrong on at least one district, and disagreed with the name pass on **9** rows rather than 4. It also introduced two regressions of its own. See [`spatial_match_districts.py`](#spatial_match_districtspy) for the measured results and the three issues to fix before the output is trustworthy.
 
 **On provenance:** the VRWA document is the best enumeration in existence, but it is one nonprofit's compilation, not a legal registry. State that plainly to the Bond Bank rather than implying it is authoritative.
+
+### Where to look up a district's PWSID by hand
+
+**The EPA polygon layer is the wrong place to look.** It holds 392 mapped service areas; Vermont has **1,356 active public water systems**. A district missing from the polygon layer usually still has a PWSID — it just has no mapped boundary. Looking only at the 392 makes real systems look nonexistent.
+
+The authoritative registry is **SDWIS**, queryable without a key via EPA Envirofacts:
+
+```
+https://data.epa.gov/efservice/WATER_SYSTEM/PRIMACY_AGENCY_CODE/VT/JSON
+```
+
+4,415 Vermont rows (1,356 with `pws_activity_code = A`), carrying `pwsid`, `pws_name`, `population_served_count`, `pws_type_code` (CWS / NTNCWS / TNCWS), and activity status. Filter to active, then match on name **and** population — the VRWA roster's population figures come from the same reporting chain, so an exact population match is strong corroboration of a name match.
+
+For a browser instead of an API:
+
+- **VT DEC Drinking Water Watch** — <https://anrweb.vt.gov/DEC/DWW/> — search by system name, town, or PWSID; the state's own front end on the same data.
+- **EPA ECHO** — <https://echo.epa.gov/> — detailed facility report per PWSID (the crosswalk already links these).
+- **The town clerk**, for who actually operates what. Contacts are in [`contacts.html`](docs/contacts.html).
+
+Two important distinctions this exposes, which the crosswalk currently conflates in one column:
+
+| Question | Source | Meaning |
+| --- | --- | --- |
+| Does this district exist as a water system? | SDWIS | it has a PWSID |
+| Does it have a mapped service area? | EPA polygon layer | it has geometry |
+
+A district can answer yes to the first and no to the second. Splitting `matched_pwsid` into a system identity and a separate "has a polygon" flag would make the roster considerably clearer.
 
 ## Legislative Charters (Title 24 Appendix)
 
@@ -128,23 +155,29 @@ fd.merge(epa, left_on="pwsid", right_on="PWSID")     # verified: 3 of 3 join
 
 **CRS is inferred, not read.** The pilot shapefiles have no `.prj` ([caveat 11](docs/caveats.html)), so the script reprojects each file under every candidate CRS and keeps whichever lands the polygon on its own town — the town is the ground truth. It independently recovered **EPSG:4326** for Danville and Hardwick and **EPSG:32145** for Peacham, the three CRSs the caveats document noted. Rows record `source_crs` and `crs_inferred = Y` so a guess is never mistaken for a declaration. The same mechanism will handle the next partner submission that arrives without a projection.
 
-#### Two of the three pilot files are not fire districts
+#### Two of the three districts are coextensive with their town
 
-The script measures each polygon against its own VCGI town boundary and sets `geometry_status` accordingly. Measured against the **unsimplified** town geometry:
+The script measures each polygon against its own **unsimplified** VCGI town boundary and records the result as `extent`:
 
-| District | Source CRS | Area | IoU vs town | `geometry_status` |
-| --- | --- | --- | --- | --- |
-| Danville Fire District 1 | EPSG:4326 | 158.03 km² | **99.93%** | `town_outline_not_district` |
-| East Hardwick Fire District 1 | EPSG:4326 | 100.24 km² | **99.80%** | `town_outline_not_district` |
-| Peacham Fire District 1 | EPSG:32145 | 94.72 km² | 76.62% | `district` |
+| District | Source CRS | Area | IoU vs town | `extent` | Verified |
+| --- | --- | --- | --- | --- | --- |
+| Danville Fire District 1 | EPSG:4326 | 158.03 km² | 99.93% | `coextensive_with_town` | Y |
+| East Hardwick Fire District 1 | EPSG:4326 | 100.24 km² | 99.80% | `coextensive_with_town` | Y |
+| Peacham Fire District 1 | EPSG:32145 | 94.72 km² | 76.62% | `sub_town` | N |
 
-`Danville Fire District.shp` and `HardwickFD.shp` **are the town outlines**, filed under district names. This is not a simplification artifact — the comparison above uses unsimplified VCGI geometry, and the shapefiles carry 852 and 160 vertices respectively, so they are high-resolution town boundaries. The roster corroborates it: East Hardwick Fire District 1 serves **350 people**, and a village district of that size does not span Hardwick's entire 100 km².
+Danville and East Hardwick genuinely cover their whole town — **confirmed by the project lead**. A Title 20 fire district can be coextensive with its municipality, so a boundary equal to the town outline is a real district extent, not a mis-filed town shape. All **3 of 80** are usable.
 
-**Consequence:** only **1 of 80** districts currently has usable political-boundary geometry. Any area-difference metric computed on the other two would come out at essentially zero and be meaningless. Filter on `geometry_status = 'district'` before computing anything.
+**This matters for how the metrics are computed.** For a town-wide district the *area difference against the town* is zero by definition — that is the answer, not a missing result. The meaningful comparison for those districts is against the **water service area**, where the gap is large:
 
-The two placeholders are kept in the layer rather than dropped, flagged and styled distinctly on the map, so the pilot's real state stays visible. All three rows are `verified = N` pending partner confirmation.
+| District | Political boundary | Water service area | Ratio |
+| --- | --- | --- | --- |
+| Danville FD 1 | 158.03 km² | 6.80 km² | 23× |
+| East Hardwick FD 1 | 100.24 km² | 1.56 km² | 64× |
+| Peacham FD 1 | 94.72 km² | 0.69 km² | 138× |
 
-For context on what the usable one shows: Peacham FD 1's political boundary is 94.72 km² against a 0.69 km² water service area — a 138× gap. That gap is exactly the quantity this project exists to measure, and it is why service area cannot proxy for political boundary in the general case.
+That gap is the quantity this project exists to measure, and it is why a service area cannot proxy for a political boundary.
+
+`geometry_status` stays as a separate field for boundaries that equal their town but have **not** been confirmed as town-wide — those come through as `unconfirmed_townwide`, since without confirmation an equal-to-town polygon is genuinely ambiguous between a town-wide district and a mis-filed town outline. Add confirmed districts to `TOWNWIDE_CONFIRMED` in the script as they are checked off.
 
 ### `build_district_crosswalk.py`
 
@@ -296,12 +329,11 @@ This system would also contribute meaningfully to risk management and equity. Ma
 2. Request the VLCT compiled district list as CSV.
 3. Add `Rutland Town`, `Newport Town`, and `Saint Albans Town` to `data/vt_town_clerk_contacts.csv` so the skeleton stops depending on the merge script to append them.
 4. Fill `town_website` for the 35 municipalities missing one.
-5. **Request the real boundaries for Danville Fire District 1 and East Hardwick Fire District 1** — the files on hand are town outlines. Clerk contacts are on the rows: Michelle Leclerc (<townclerk@danvillevt.gov>) and Tonia Chase (<tonia.chase@hardwickvt.gov>).
-6. Have Peacham confirm its 94.72 km² boundary, then set `verified = Y`.
-7. Fix the partner intake spec ([caveat 11](docs/caveats.html)): require zipped shapefile sets or GeoPackage/GeoJSON with attributes and a defined CRS, so CRS never has to be inferred again.
-8. Pull the cited plats from town land records for the 5 charter districts whose boundary is a record pointer.
+5. Have Peacham confirm its 94.72 km² boundary, then add it to `TOWNWIDE_CONFIRMED`/set `verified = Y`. Clerk: Rebecca Washington (<townclerk@peacham.org>).
+6. Fix the partner intake spec ([caveat 11](docs/caveats.html)): require zipped shapefile sets or GeoPackage/GeoJSON with attributes and a defined CRS, so CRS never has to be inferred again.
+7. Pull the cited plats from town land records for the 5 charter districts whose boundary is a record pointer.
 
 ### The actual project
 
-1. Grow `data/vt_fire_districts.gpkg` from 1 usable boundary toward 80. Add each new district as a row with its `pwsid` so it stays joinable to the water data.
+1. Grow `data/vt_fire_districts.gpkg` from 3 confirmed boundaries toward 80. Add each new district as a row with its `pwsid` so it stays joinable to the water data.
 2. Digitize political boundaries for the districts in multi-district towns — the multi-month ORCA-student-scale project. Hand the Bond Bank the inventory first and let it drive the estimate, rather than quoting the digitizing blind. The remaining boundaries are genuine manual GIS work (parcel data, town maps, the charter-cited plats) that no script pulls.

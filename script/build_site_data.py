@@ -137,9 +137,9 @@ def build_town_boundaries():
 
 FIRE_FIELDS = [
     "fd_id", "district_name", "town", "county", "population", "pwsid",
-    "pws_name", "area_sqkm", "town_iou", "geometry_status", "verified",
-    "source_file", "source_crs", "crs_inferred", "clerk_name", "clerk_email",
-    "notes",
+    "pws_name", "area_sqkm", "town_iou", "geometry_status", "extent",
+    "verified", "confirmed_by", "source_file", "source_crs", "crs_inferred",
+    "clerk_name", "clerk_email", "notes",
 ]
 
 
@@ -159,8 +159,10 @@ def build_fire_districts():
 
     write_geojson(gdf, OUT_DIR / "fire_districts.geojson")
     usable = int((gdf["geometry_status"] == "district").sum())
-    print(f"  {usable} usable as district geometry, "
-          f"{len(gdf) - usable} town outlines flagged")
+    townwide = int((gdf["extent"] == "coextensive_with_town").sum())
+    print(f"  {usable} confirmed district boundaries "
+          f"({townwide} town-wide, {usable - townwide} sub-town), "
+          f"{len(gdf) - usable} unconfirmed")
     return gdf
 
 

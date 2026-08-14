@@ -13,8 +13,8 @@ var COLORS = {
   auth: '#2563eb',
   modeled: '#d97706',
   town: '#475569',
-  fd: '#9333ea',          // fire district, real boundary
-  fdPlaceholder: '#a1a1aa' // filed under a district name but actually the town
+  fd: '#9333ea',          // fire district, confirmed boundary
+  fdUnconfirmed: '#a1a1aa' // equals its town, not yet confirmed as town-wide
 };
 
 /* ---------- basemaps ---------- */
@@ -198,15 +198,23 @@ function isRealDistrict(props) {
   return props.geometry_status === 'district';
 }
 
+function isTownwide(props) {
+  return props.extent === 'coextensive_with_town';
+}
+
 function fireStyle(feature) {
-  var real = isRealDistrict(feature.properties);
+  var p = feature.properties;
+  var real = isRealDistrict(p);
   return {
-    color: real ? COLORS.fd : COLORS.fdPlaceholder,
+    color: real ? COLORS.fd : COLORS.fdUnconfirmed,
     weight: real ? 2.4 : 1.6,
     opacity: 0.95,
-    dashArray: real ? null : '2 4',
-    fillColor: real ? COLORS.fd : COLORS.fdPlaceholder,
-    fillOpacity: real ? 0.12 : 0.05
+    // Town-wide districts get a dashed edge so they read as "same line as the
+    // town" rather than looking like a missing boundary; both are filled,
+    // because both are real district extents.
+    dashArray: real ? (isTownwide(p) ? '7 4' : null) : '2 4',
+    fillColor: real ? COLORS.fd : COLORS.fdUnconfirmed,
+    fillOpacity: real ? 0.16 : 0.05
   };
 }
 
@@ -223,29 +231,38 @@ function bindFirePopup(feature, layer) {
 
 function firePopupHtml(p) {
   var real = isRealDistrict(p);
+  var townwide = isTownwide(p);
+
+  var tag = !real ? 'Unconfirmed'
+          : townwide ? 'Town-wide district'
+          : 'Sub-town district';
 
   var html =
     '<h3>' + esc(p.district_name) + '</h3>' +
     '<p class="popup-id">' + esc(p.town) +
     (p.county ? ', ' + esc(p.county) + ' County' : '') + ' &middot; ' +
     '<span class="popup-tag ' + (real ? 'district' : 'placeholder') + '">' +
-    (real ? 'District boundary' : 'Town outline — placeholder') + '</span></p>';
+    tag + '</span></p>';
 
   if (!real) {
     html +=
-      '<p class="popup-warn">This file matches the town boundary at ' +
-      pct(p.town_iou) + ', so it is the town outline rather than the ' +
-      'district\'s political boundary. Not usable for area-difference ' +
-      'metrics.</p>';
+      '<p class="popup-warn">This boundary equals the town outline at ' +
+      pct(p.town_iou) + '. It may be a town-wide district or a town outline ' +
+      'filed under a district name — confirm before use.</p>';
+  } else if (townwide) {
+    html +=
+      '<p class="popup-note">This district is coextensive with its town, so ' +
+      'its area difference against the town is zero by definition. Compare it ' +
+      'against the water service area instead.</p>';
   }
 
   var rows = [
     ['Population', num(p.population)],
     ['Boundary area', p.area_sqkm != null ? fixed(p.area_sqkm, 1) + ' km²' : null],
-    ['Overlap with town', pct(p.town_iou)],
+    ['Extent', townwide ? 'Coextensive with town' : 'Part of town (' + pct(p.town_iou) + ')'],
     ['PWSID', p.pwsid],
     ['Water system', p.pws_name ? titleCase(p.pws_name) : null],
-    ['Verified', p.verified === 'Y' ? 'Yes' : 'Not yet'],
+    ['Confirmed by', p.confirmed_by],
     ['Source CRS', p.source_crs + (p.crs_inferred === 'Y' ? ' (inferred)' : '')]
   ];
 

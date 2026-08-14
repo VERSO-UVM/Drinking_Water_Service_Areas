@@ -21,10 +21,13 @@ CRS HANDLING:
   its own town. Rows record `source_crs` and `crs_inferred = Y` so nobody later
   mistakes a guess for a declaration.
 
-QUALITY FLAG -- READ THIS:
-  `geometry_status` distinguishes a real district boundary from a town outline
-  filed under a district's name. Two of the three pilot files are the latter.
-  Anything not `district` must not be used to compute area-difference metrics.
+EXTENT, NOT QUALITY:
+  `extent` records whether a district's boundary is coextensive with its town or
+  covers only part of it. Danville and East Hardwick are town-wide -- confirmed
+  by the project lead -- so their boundary legitimately equals the town outline.
+  That is a real finding, not a data error: for those districts the political
+  boundary matches the town, and the area difference against the town is zero
+  while the difference against the *water service area* stays large.
 
 INPUTS:
   pilotData/*.shp                    (bare .shp, sidecars missing)
@@ -88,17 +91,25 @@ SOURCES = [
     },
 ]
 
-# Above this IoU against its own town, a "district" polygon is really just the
-# town outline. Real village districts cover a fraction of their town.
-TOWN_OUTLINE_IOU = 0.97
+# At or above this IoU against its own town, the district is coextensive with
+# the town rather than a village-scale district inside it.
+TOWNWIDE_IOU = 0.97
+
+# Districts confirmed town-wide by the project lead. Without this, a boundary
+# that equals its town looks like a mis-filed town outline; these are the cases
+# where it is genuinely the district's extent.
+TOWNWIDE_CONFIRMED = {
+    "Danville Fire District 1": "Project lead, 2026-08-14",
+    "East Hardwick Fire District 1": "Project lead, 2026-08-14",
+}
 
 ATTRS = [
     "fd_id", "district_name", "town", "county", "district_type", "services",
     "population", "pwsid", "pws_name", "match_score", "match_status",
     "districts_in_town", "single_district_town", "has_legal_charter",
-    "area_sqkm", "town_iou", "geometry_status", "verified",
-    "boundary_source", "source_file", "source_crs", "crs_inferred",
-    "clerk_name", "clerk_email", "notes",
+    "area_sqkm", "town_iou", "geometry_status", "extent", "verified",
+    "confirmed_by", "boundary_source", "source_file", "source_crs",
+    "crs_inferred", "clerk_name", "clerk_email", "notes",
 ]
 
 
@@ -172,17 +183,28 @@ def main():
         geom = gdf.geometry.buffer(0).union_all()
         area = geom.area / 1e6
 
-        # A polygon that is essentially its own town is a town outline that was
-        # filed under a district name -- not a district boundary.
-        if iou >= TOWN_OUTLINE_IOU:
-            status = "town_outline_not_district"
-            note = (f"Matches the VCGI {src['town']} town boundary at "
-                    f"{iou:.1%} IoU. This is the town outline, not the "
-                    f"district's political boundary. Placeholder only -- "
-                    f"request the real boundary before using.")
+        # A boundary equal to its town is a town-wide district, provided someone
+        # has confirmed that is really the district's extent.
+        confirmed = TOWNWIDE_CONFIRMED.get(src["district_name"], "")
+        if iou >= TOWNWIDE_IOU:
+            extent = "coextensive_with_town"
+            if confirmed:
+                status, verified = "district", "Y"
+                note = (f"District is coextensive with the Town of "
+                        f"{src['town']} ({iou:.1%} IoU). Confirmed town-wide, "
+                        f"so area difference against the town is ~0 by "
+                        f"definition; compare against the water service area "
+                        f"instead.")
+            else:
+                status, verified = "unconfirmed_townwide", "N"
+                note = (f"Equals the VCGI {src['town']} town boundary "
+                        f"({iou:.1%} IoU). Either a town-wide district or a "
+                        f"town outline filed under a district name -- confirm "
+                        f"with the district before use.")
         else:
-            status = "district"
-            note = (f"Distinct from the town boundary "
+            extent = "sub_town"
+            status, verified = "district", "Y" if confirmed else "N"
+            note = (f"Covers part of the Town of {src['town']} "
                     f"({iou:.1%} IoU, {area:.1f} of "
                     f"{town_geom.area / 1e6:.1f} km2 town).")
 
@@ -193,7 +215,9 @@ def main():
             "area_sqkm": round(area, 4),
             "town_iou": round(iou, 4),
             "geometry_status": status,
-            "verified": "N",
+            "extent": extent,
+            "verified": verified,
+            "confirmed_by": confirmed,
             "boundary_source": "Pilot submission (partner-supplied shapefile)",
             "source_file": f"pilotData/{src['file']}",
             "source_crs": f"EPSG:{epsg}",
@@ -232,7 +256,7 @@ def main():
         rows.append(rec)
         geoms.append(geom)
         print(f"  {src['district_name']:32} {rec['source_crs']:11} "
-              f"IoU={iou:6.1%}  {status}")
+              f"IoU={iou:6.1%}  {extent:22} {status}")
 
     if not rows:
         sys.exit("No pilot boundaries could be read.")
@@ -249,11 +273,13 @@ def main():
     gdf.to_file(OUT_GPKG, driver="GPKG", layer=LAYER)
     gdf.drop(columns="geometry").to_csv(OUT_CSV, index=False)
 
-    usable = (gdf["geometry_status"] == "district").sum()
+    usable = int((gdf["geometry_status"] == "district").sum())
+    townwide = int((gdf["extent"] == "coextensive_with_town").sum())
     print(f"\nWrote {OUT_GPKG.relative_to(ROOT)} (layer '{LAYER}') and "
           f"{OUT_CSV.relative_to(ROOT)}")
-    print(f"{len(gdf)} pilot boundaries; {usable} usable as district geometry, "
-          f"{len(gdf) - usable} town outlines needing the real boundary.")
+    print(f"{len(gdf)} pilot boundaries; {usable} usable as district geometry "
+          f"({townwide} town-wide, {usable - townwide} sub-town), "
+          f"{len(gdf) - usable} unconfirmed.")
     print(f"Coverage: {usable} of 80 districts have a political boundary.")
 
 
