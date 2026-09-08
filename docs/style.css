@@ -247,6 +247,10 @@ a:hover { text-decoration: none; }
 .swatch-fd { background: rgba(147, 51, 234, .22); border: 1.5px solid #9333ea; }
 .swatch-fd-townwide { background: rgba(147, 51, 234, .22); border: 1.5px dashed #9333ea; }
 .swatch-fd-approx { background: rgba(13, 148, 136, .14); border: 1.5px dotted #0d9488; }
+/* ANR live services. Their symbology is set server-side, so these swatches
+   approximate what ANR draws rather than defining it. */
+.swatch-sewer { background: rgba(234, 179, 8, .35); border: 1.5px solid #eab308; }
+.swatch-parcels { background: rgba(56, 189, 248, .28); border: 1.5px solid #38bdf8; }
 
 .pending {
   margin: 10px 0 0 24px;
@@ -268,6 +272,8 @@ a:hover { text-decoration: none; }
   text-transform: uppercase;
   color: var(--ink-soft);
 }
+
+.legend h3.legend-sub { margin-top: 11px; }
 
 .legend p {
   display: flex;
@@ -489,46 +495,32 @@ a:hover { text-decoration: none; }
 
 /* ---------- district roster ---------- */
 
-.district-controls {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 10px 18px;
-  margin: 18px 0 12px;
-}
-
-#district-search {
-  flex: 1 1 260px;
-  min-width: 200px;
-  padding: 9px 12px;
-  font: inherit;
-  color: var(--ink);
-  border: 1px solid var(--line);
-  border-radius: var(--radius);
-  background: var(--bg);
-}
-
-#district-search:focus-visible {
-  outline: 2px solid var(--accent);
-  outline-offset: 1px;
-}
-
-.district-controls label {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  font-size: .9rem;
-  color: var(--ink-soft);
-  cursor: pointer;
-  white-space: nowrap;
-}
-
 .district-count {
-  flex-basis: 100%;
-  margin: 0;
+  margin: 18px 0 10px;
   font-size: .85rem;
   color: var(--ink-soft);
 }
+
+.sort-btn {
+  padding: 0;
+  font: inherit;
+  font-size: .78rem;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+  background: none;
+  border: 0;
+  cursor: pointer;
+}
+
+.sort-btn:hover { color: var(--ink); text-decoration: underline; }
+.sort-btn.sorted { color: var(--ink); font-weight: 700; }
+
+.sort-btn.sorted::after { content: ' \25B2'; font-size: .7em; }
+.sort-btn.sorted[aria-sort="descending"]::after { content: ' \25BC'; }
+
+.dd-docs { margin: 0; padding-left: 20px; font-size: 14px; }
+.dd-docs li { margin-bottom: 9px; }
 
 /* The table is wider than the prose column on narrow screens, so it scrolls
    inside its own box rather than pushing the page sideways. */
@@ -611,6 +603,118 @@ button.tag-mapped {
 }
 
 button.tag-mapped:hover { background: rgba(147, 51, 234, .24); }
+
+/* ---------- district details dialog ---------- */
+
+.details-btn {
+  padding: 3px 10px;
+  font: inherit;
+  font-size: .8rem;
+  color: var(--accent);
+  background: var(--bg);
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.details-btn:hover { background: var(--bg-soft); border-color: var(--accent); }
+
+#district-dialog {
+  width: min(720px, calc(100vw - 32px));
+  max-height: min(84vh, 900px);
+  padding: 0 26px 26px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  box-shadow: 0 18px 60px rgba(23, 33, 46, .3);
+  color: var(--ink);
+  background: var(--bg);
+}
+
+#district-dialog::backdrop { background: rgba(23, 33, 46, .45); }
+
+/* Sticky close button rides above the scrolling body. */
+.dd-close-form {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  display: flex;
+  justify-content: flex-end;
+  padding-top: 12px;
+  margin: 0 -26px 0;
+  padding-right: 14px;
+  background: var(--bg);
+}
+
+.dd-close {
+  width: 30px; height: 30px;
+  display: grid; place-items: center;
+  font-size: 20px;
+  line-height: 1;
+  color: var(--ink-soft);
+  background: var(--bg);
+  border: 1px solid var(--line);
+  border-radius: 7px;
+  cursor: pointer;
+}
+
+.dd-close:hover { background: var(--bg-soft); color: var(--ink); }
+
+#dd-body h2 { margin: 0 0 2px; font-size: 20px; line-height: 1.25; }
+#dd-body h3 {
+  margin: 26px 0 8px;
+  padding-top: 12px;
+  border-top: 1px solid var(--line);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: .07em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+}
+#dd-body h4 { margin: 16px 0 6px; font-size: 13px; }
+#dd-body p { margin: 0 0 8px; font-size: 14px; }
+
+.dd-sub { color: var(--ink-soft); font-size: 13px; }
+.dd-meta { color: var(--ink-soft); font-size: 12px; }
+
+.dd-pending {
+  padding: 9px 12px;
+  border: 1px dashed var(--line);
+  border-radius: 7px;
+  color: var(--ink-soft);
+  font-size: 13px;
+  font-style: italic;
+  background: var(--bg-soft);
+}
+
+.dd-links, .dd-notes { margin: 0; padding-left: 20px; font-size: 14px; }
+.dd-links li, .dd-notes li { margin-bottom: 6px; }
+
+.dd-table { width: 100%; border-collapse: collapse; font-size: 13.5px; }
+.dd-table th {
+  width: 34%;
+  padding: 6px 12px 6px 0;
+  text-align: left;
+  vertical-align: top;
+  font-weight: 600;
+  color: var(--ink-soft);
+}
+.dd-table td { padding: 6px 0; vertical-align: top; }
+
+.dd-section { margin-bottom: 8px; }
+.dd-section summary { cursor: pointer; font-size: 13.5px; font-weight: 600; }
+
+#dd-body blockquote {
+  margin: 8px 0 0;
+  padding: 10px 14px;
+  border-left: 3px solid var(--line);
+  background: var(--bg-soft);
+  font-size: 13px;
+  white-space: pre-wrap;
+  max-height: 260px;
+  overflow-y: auto;
+}
+
 
 .sources li { margin-bottom: 12px; }
 

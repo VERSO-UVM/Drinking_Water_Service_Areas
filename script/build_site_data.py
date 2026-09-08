@@ -34,6 +34,10 @@ GPKG = ROOT / "data" / "vt_water_boundaries.gpkg"
 FIRE_GPKG = ROOT / "data" / "vt_fire_districts.gpkg"
 CROSSWALK = ROOT / "data" / "vt_district_crosswalk.csv"
 WEBSITES = ROOT / "data" / "vt_district_websites.csv"
+ROSTER = ROOT / "data" / "vt_district_roster.csv"
+CHARTER_CHAPTERS = ROOT / "data" / "vt_charter_chapters.csv"
+CHARTER_SECTIONS = ROOT / "data" / "vt_charter_boundary_sections.csv"
+ORDINANCES = ROOT / "docs" / "data" / "ordinances.json"
 CLERKS_FILLED = ROOT / "data" / "vt_town_clerk_contacts_filled.csv"
 CLERKS_SKELETON = ROOT / "data" / "vt_town_clerk_contacts.csv"
 OUT_DIR = ROOT / "docs" / "data"
@@ -202,6 +206,218 @@ def load_websites():
     }
 
 
+# Longest charter excerpt carried into the browser. The full text is one click
+# away on the legislature's site, and St. Albans's § 2 alone runs 12,566 chars.
+EXCERPT_CHARS = 1500
+
+# ECHO is the only per-system federal report with a stable, guessable URL.
+ECHO_URL = "https://echo.epa.gov/detailed-facility-report?fid={pwsid}&sys=SDWIS"
+SDWIS_URL = ("https://data.epa.gov/efservice/WATER_SYSTEM/PWSID/{pwsid}/JSON")
+
+
+def norm_district(name):
+    """Fold the naming variants across the roster, charters and crosswalk.
+
+    "Fairfax Fire District No. 1", "Fairfax FD 1" and "Fairfax Fire District 1"
+    all have to land on the same key.
+    """
+    s = str(name or "").lower()
+    s = re.sub(r"\[.*?\]", "", s)          # "[Repealed.]"
+    s = re.sub(r"\(.*?\)", "", s)
+    s = s.replace("#", "").replace(".", "")
+    s = re.sub(r"\bno\s*(\d)", r"\1", s)   # "No. 1" -> "1"
+    s = re.sub(r"\bcharter\b", "", s)
+    s = re.sub(r"\bfd\s*(\d)", r"fire district \1", s)
+    s = re.sub(r"\bfd\b", "fire district", s)
+    s = re.sub(r"[^a-z0-9]+", " ", s).strip()
+    return s
+
+
+def load_charters():
+    """(by_district, by_municipality) -> charter chapter dicts with sections."""
+    if not CHARTER_CHAPTERS.exists() or not CHARTER_SECTIONS.exists():
+        print("  no charter CSVs -- district details will omit charters")
+        return {}, {}
+
+    chapters = pd.read_csv(CHARTER_CHAPTERS, encoding="utf-8-sig", dtype=str).fillna("")
+    sections = pd.read_csv(CHARTER_SECTIONS, encoding="utf-8-sig", dtype=str).fillna("")
+
+    by_chapter = {}
+    for _, r in sections.iterrows():
+        by_chapter.setdefault(r["chapter"], []).append({
+            "number": r["section_number"],
+            "heading": r["section_heading"],
+            "url": r["section_url"],
+            "why": r["match_reason"],
+            "excerpt": r["section_text"][:EXCERPT_CHARS],
+            "truncated": len(r["section_text"]) > EXCERPT_CHARS,
+        })
+
+    by_district, by_muni = {}, {}
+    for _, r in chapters.iterrows():
+        entry = {
+            "chapter": r["chapter"],
+            "title": r["chapter_title"],
+            "url": f"https://legislature.vermont.gov/statutes/chapter/24APPENDIX/{r['chapter']}",
+            "sections": by_chapter.get(r["chapter"], []),
+        }
+        title = r["chapter_title"].lower()
+        if "fire district" in title or "water district" in title or "water corporation" in title:
+            by_district[norm_district(r["chapter_title"])] = entry
+        else:
+            by_muni.setdefault(norm_district(r["municipality"]), entry)
+    return by_district, by_muni
+
+
+def load_roster_permits():
+    """district key -> wastewater permit fields from the VRWA workbook."""
+    if not ROSTER.exists():
+        return {}
+    df = pd.read_csv(ROSTER, encoding="utf-8-sig", dtype=str).fillna("")
+    out = {}
+    for _, r in df.iterrows():
+        if any(r.get(c, "") for c in ("ww_permit", "ww_npdes", "ww_treatment_type")):
+            out[norm_district(r["district_name"])] = {
+                "permit": r.get("ww_permit", ""),
+                "npdes": r.get("ww_npdes", ""),
+                "permit_type": r.get("ww_permit_type", ""),
+                "treatment": r.get("ww_treatment_type", ""),
+                "capacity_mgd": r.get("ww_capacity_mgd", ""),
+            }
+    return out
+
+
+def load_website_notes():
+    """district name -> the research note recorded while hunting for a URL."""
+    if not WEBSITES.exists():
+        return {}
+    df = pd.read_csv(WEBSITES, encoding="utf-8-sig", dtype=str).fillna("")
+    return {
+        str(r["district_name"]).strip(): {
+            "note": str(r.get("notes", "")).strip(),
+            "checked_on": str(r.get("checked_on", "")).strip(),
+        }
+        for _, r in df.iterrows()
+    }
+
+
+def load_ordinances():
+    """district name -> its documents, newest-looking first.
+
+    Written by script/fetch_district_ordinances.py. Metadata only -- the full
+    extracted text stays in data/vt_district_ordinance_text.json, which is a
+    research corpus rather than something the page renders.
+    """
+    if not ORDINANCES.exists():
+        print("  no ordinances.json -- run script/fetch_district_ordinances.py")
+        return {}
+    payload = json.loads(ORDINANCES.read_text(encoding="utf-8"))
+    out = {}
+    for d in payload.get("documents", []):
+        out.setdefault(d["district_name"], []).append({
+            "title": d.get("title", ""),
+            "type": d.get("doc_type", ""),
+            "url": d.get("url", ""),
+            "adopted": d.get("adopted", ""),
+            "pages": d.get("pages", 0),
+            "chars": d.get("chars", 0),
+            "status": d.get("status", ""),
+            "needs_ocr": bool(d.get("needs_ocr")),
+            "refs": d.get("statutory_refs", []),
+            "source_page": d.get("source_page", ""),
+        })
+    for docs in out.values():
+        docs.sort(key=lambda d: (d["type"], d["title"]))
+    return out
+
+
+def describe(rec):
+    """A plain-language summary built only from fields we actually hold."""
+    bits = []
+    kind = rec["type"] or "District"
+    where = f" in {rec['town']}" if rec["town"] else ""
+    bits.append(f"{kind}{where}.")
+    if rec["services"]:
+        bits.append(f"Provides {rec['services'].lower()}.")
+    if rec["population"]:
+        bits.append(f"Serves about {rec['population']:,} people.")
+    if rec["pwsid"]:
+        bits.append(f"Public water system {rec['pwsid']}.")
+    return " ".join(bits)
+
+
+def attach_details(records, fire):
+    """Hang a `details` block on each district for the site's Details panel.
+
+    Every sub-block is allowed to come back empty -- the browser renders "In
+    progress" for those rather than hiding the heading, so a gap reads as work
+    still to do instead of as an absence of anything to find.
+    """
+    by_district, by_muni = load_charters()
+    permits = load_roster_permits()
+    notes_by_name = load_website_notes()
+    ordinances = load_ordinances()
+
+    boundary = {}
+    if fire is not None:
+        for _, r in fire.iterrows():
+            boundary[str(r["district_name"]).strip()] = {
+                "extent": str(r.get("extent", "") or ""),
+                "status": str(r.get("geometry_status", "") or ""),
+                "citation": str(r.get("source_citation", "") or ""),
+                "url": str(r.get("source_url", "") or ""),
+                "text": str(r.get("source_text", "") or "")[:EXCERPT_CHARS],
+                "derivation": str(r.get("derivation", "") or ""),
+                "verified": str(r.get("verified", "") or ""),
+                "confirmed_by": str(r.get("confirmed_by", "") or ""),
+            }
+
+    charter_hits = permit_hits = 0
+    for rec in records:
+        key = norm_district(rec["name"])
+        charter = by_district.get(key)
+        if charter:
+            charter_hits += 1
+
+        notes = []
+        wn = notes_by_name.get(rec["name"], {})
+        if wn.get("note"):
+            notes.append(wn["note"])
+        if not rec["in_roster"]:
+            notes.append("Has a boundary polygon but does not appear in the "
+                         "VRWA district list or the roster workbook.")
+
+        epa = {}
+        if rec["pwsid"]:
+            epa = {
+                "pwsid": rec["pwsid"],
+                "echo": ECHO_URL.format(pwsid=rec["pwsid"]),
+                "sdwis": SDWIS_URL.format(pwsid=rec["pwsid"]),
+            }
+        ww = permits.get(key, {})
+        if ww:
+            permit_hits += 1
+
+        rec["details"] = {
+            "description": describe(rec),
+            "charter": charter,
+            # The town's own charter is context, not the district's authority.
+            "town_charter": by_muni.get(norm_district(rec["town"])),
+            "epa": epa,
+            "ww": ww,
+            "boundary": boundary.get(rec["name"], {}),
+            "documents": ordinances.get(rec["name"], []),
+            "notes": notes,
+            "checked_on": wn.get("checked_on", ""),
+        }
+
+    doc_districts = sum(1 for r in records if r["details"]["documents"])
+    doc_total = sum(len(r["details"]["documents"]) for r in records)
+    print(f"  details: {charter_hits} with their own charter, "
+          f"{permit_hits} with a wastewater permit, "
+          f"{doc_total} documents across {doc_districts} districts")
+
+
 def build_district_list(fire):
     """The full district roster the site lists under the map.
 
@@ -275,6 +491,8 @@ def build_district_list(fire):
             "geometry_status": geom.get("geometry_status", ""),
             "extent": geom.get("extent", ""),
         })
+
+    attach_details(records, fire)
 
     records.sort(key=lambda d: (d["town"].lower(), d["name"].lower()))
     payload = {"districts": records}

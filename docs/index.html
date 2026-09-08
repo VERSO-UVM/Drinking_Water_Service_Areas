@@ -34,12 +34,14 @@
 
     <div class="callout callout-warn">
       <p>
-        <strong>What this map is not.</strong> These are <em>service areas</em> — where water
-        is delivered — not the corporate or taxing boundaries of Vermont's fire and water
-        districts. Those political boundaries do not exist as a statewide dataset anywhere;
-        they were never centrally collected. The service areas are a defensible proxy only
-        where a single district serves an entire town.
-        <a href="caveats.html">Read the full data caveats &rarr;</a>
+        <strong>This map is incomplete.</strong> It shows two different things:
+        drinking water <em>service areas</em> — where water is actually delivered —
+        and the political boundaries of the fire and water districts that govern the
+        systems, which we are mapping one district at a time. Only <strong>4 of 81
+        districts</strong> have a confirmed boundary today, because Vermont has never
+        collected them centrally. Each layer carries caveats about how it was built
+        and what it can fairly be used for.
+        <a href="caveats.html">Read the data caveats &rarr;</a>
       </p>
     </div>
   </div>
@@ -60,20 +62,6 @@
 
       <div class="panel-body" id="panel-body">
         <fieldset class="layer-group">
-          <legend>Water service areas</legend>
-          <label class="layer-row">
-            <input type="checkbox" id="lyr-water" checked>
-            <span class="swatch swatch-auth"></span>
-            <span class="layer-name">Service areas <em id="count-water"></em></span>
-          </label>
-          <div class="sub-options" id="water-options">
-            <label><input type="radio" name="water-filter" value="all" checked> All systems</label>
-            <label><input type="radio" name="water-filter" value="community"> Community systems only</label>
-            <label><input type="radio" name="water-filter" value="authoritative"> Authoritative boundaries only</label>
-          </div>
-        </fieldset>
-
-        <fieldset class="layer-group">
           <legend>Political boundaries</legend>
           <label class="layer-row">
             <input type="checkbox" id="lyr-fire" checked>
@@ -93,6 +81,41 @@
         </fieldset>
 
         <fieldset class="layer-group">
+          <legend>Water service areas</legend>
+          <label class="layer-row">
+            <input type="checkbox" id="lyr-water" checked>
+            <span class="swatch swatch-auth"></span>
+            <span class="layer-name">Service areas <em id="count-water"></em></span>
+          </label>
+          <div class="sub-options" id="water-options">
+            <label><input type="radio" name="water-filter" value="all" checked> All systems</label>
+            <label><input type="radio" name="water-filter" value="community"> Community systems only</label>
+            <label><input type="radio" name="water-filter" value="authoritative"> Authoritative boundaries only</label>
+          </div>
+        </fieldset>
+
+        <fieldset class="layer-group">
+          <legend>ANR infrastructure</legend>
+          <label class="layer-row">
+            <input type="checkbox" id="lyr-sewer">
+            <span class="swatch swatch-sewer"></span>
+            <span class="layer-name">Sewer lines <em>(22,552)</em></span>
+          </label>
+          <label class="layer-row">
+            <input type="checkbox" id="lyr-parcels">
+            <span class="swatch swatch-parcels"></span>
+            <span class="layer-name">Served parcels <em>(144,195)</em></span>
+          </label>
+          <p class="pending">
+            Drawn live by Vermont ANR, so these are pictures rather than data
+            &mdash; no popups, search or filtering. Off by default; nothing is
+            requested until you tick one. ANR publishes <strong>no public
+            drinking water lines</strong>.
+            <a href="caveats.html">Why &rarr;</a>
+          </p>
+        </fieldset>
+
+        <fieldset class="layer-group">
           <legend>Basemap</legend>
           <label class="layer-row">
             <input type="radio" name="basemap" value="light" checked>
@@ -105,12 +128,13 @@
         </fieldset>
 
         <div class="legend">
-          <h3>Boundary source</h3>
-          <p><span class="swatch swatch-auth"></span> Authoritative (state / utility supplied)</p>
-          <p><span class="swatch swatch-modeled"></span> EPA-modeled (estimated extent)</p>
+          <h3>Political boundaries</h3>
           <p><span class="swatch swatch-fd"></span> Fire district, sub-town extent</p>
           <p><span class="swatch swatch-fd-townwide"></span> Fire district, coextensive with town</p>
           <p><span class="swatch swatch-fd-approx"></span> Approximate extent from statute</p>
+          <h3 class="legend-sub">Water service areas</h3>
+          <p><span class="swatch swatch-auth"></span> Authoritative (state / utility supplied)</p>
+          <p><span class="swatch swatch-modeled"></span> EPA-modeled (estimated extent)</p>
         </div>
       </div>
     </div>
@@ -167,35 +191,31 @@
 
   <h2>Fire and water districts</h2>
   <p>
-    Every district in the inventory, with the town it sits in. District names link
-    out where we have found a website &mdash; most districts have none, which is
-    itself part of the problem. Districts marked <span class="tag tag-pilot">pilot</span>
-    are the six working with us on boundary mapping;
-    <span class="tag tag-mapped">mapped</span> means a polygon exists on the map above,
-    and the badge jumps to it.
+    Every district in the inventory, with the town it sits in. Click any column
+    heading to sort. <strong>Details</strong> opens what we hold on that
+    district &mdash; website, charter, EPA and permit links, ordinances and
+    research notes &mdash; and says <em>In progress</em> where we have nothing
+    yet. Districts marked <span class="tag tag-pilot">pilot</span> are the six
+    working with us on boundary mapping;
+    <span class="tag tag-mapped">mapped</span> means a polygon exists on the map
+    above, and the badge jumps to it.
   </p>
 
-  <div class="district-controls">
-    <label class="sr-only" for="district-search">Filter districts</label>
-    <input type="search" id="district-search" autocomplete="off"
-           placeholder="Filter by district or town&hellip;">
-    <label><input type="checkbox" id="district-pilot-only"> Pilot only</label>
-    <label><input type="checkbox" id="district-web-only"> Has a website</label>
-    <p class="district-count" id="district-count" aria-live="polite"></p>
-  </div>
+  <p class="district-count" id="district-count"></p>
 
   <div class="table-scroll">
     <table class="district-table" id="district-table">
       <thead>
         <tr>
-          <th scope="col">Town</th>
-          <th scope="col">District</th>
-          <th scope="col">Serves</th>
-          <th scope="col" class="num">Population</th>
+          <th scope="col"><button type="button" class="sort-btn" data-sort="town">Town</button></th>
+          <th scope="col"><button type="button" class="sort-btn" data-sort="name">District</button></th>
+          <th scope="col"><button type="button" class="sort-btn" data-sort="services">Serves</button></th>
+          <th scope="col" class="num"><button type="button" class="sort-btn" data-sort="population">Population</button></th>
+          <th scope="col"><span class="sr-only">Details</span></th>
         </tr>
       </thead>
       <tbody id="district-rows">
-        <tr><td colspan="4" class="loading">Loading districts&hellip;</td></tr>
+        <tr><td colspan="5" class="loading">Loading districts&hellip;</td></tr>
       </tbody>
     </table>
   </div>
@@ -258,6 +278,15 @@
 </section>
 
 </main>
+
+<dialog id="district-dialog" aria-labelledby="dd-title">
+  <form method="dialog" class="dd-close-form">
+    <button value="close" class="dd-close" aria-label="Close">&times;</button>
+  </form>
+  <div id="dd-body"></div>
+</dialog>
+
+
 
 <footer class="site-footer">
   <div class="wrap">
