@@ -390,15 +390,28 @@ Three pages:
 
 | Page | What it is |
 | --- | --- |
-| `index.html` | Map of the 392 EPA service areas, 3 fire district boundaries, and 256 VCGI town boundaries, with layer toggles, a provenance filter, and system search. Leads with the headline caveat so nobody mistakes service areas for political boundaries. |
+| `index.html` | Map of the 392 EPA service areas, 5 fire district polygons (4 confirmed, 1 approximate), and 256 VCGI town boundaries, with layer toggles, a provenance filter, and system search. Below the map, a filterable roster of all 81 districts with their town and website. Leads with the headline caveat so nobody mistakes service areas for political boundaries. |
 | `caveats.html` | The full contents of `District_Boundary_Data_Caveats.docx` as a web page — the at-a-glance matrix, all 12 severity-tagged caveats, and the deliverable framing. |
 | `contacts.html` | Searchable town clerk directory, filterable by county, with an "has an email" filter. |
 
 **The three pages are wired to each other, not just co-located.** Clicking a town on the map opens its clerk's contact, because the charter-cited plats live in that office. Caveat 6 links to the clerk directory; caveat 7 links back to the map's authoritative-only filter; the clerk directory explains its own existence by pointing at caveat 6.
 
-`build_site_data.py` reprojects to WGS84, simplifies geometry for the browser, and writes `water_service_areas.geojson`, `town_boundaries.geojson`, `town_clerks.json`, and `meta.json` into `docs/data/`. The clerk payload is `{municipalities: [...], byTown: {key: index}}`; `byTown` is resolved at build time against the VCGI town names so the browser only has to recompute a simple key. It currently joins **254 of 256** town polygons — the two misses are Avery's Gore and Lewis, both unincorporated with no clerk.
+`build_site_data.py` reprojects to WGS84, simplifies geometry for the browser, and writes `water_service_areas.geojson`, `town_boundaries.geojson`, `fire_districts.geojson`, `districts.json`, `town_clerks.json`, and `meta.json` into `docs/data/`. The clerk payload is `{municipalities: [...], byTown: {key: index}}`; `byTown` is resolved at build time against the VCGI town names so the browser only has to recompute a simple key. It currently joins **254 of 256** town polygons — the two misses are Avery's Gore and Lewis, both unincorporated with no clerk.
 
 **Basemap:** standard OpenStreetMap tiles (`tile.openstreetmap.org`), with Esri World Imagery as the aerial option. OSM carries its own labels and colour, so overlay fill opacity is kept low (service areas 0.18) to keep street names readable underneath. Note OSM's [tile usage policy](https://operations.osmfoundation.org/policies/tiles/) if traffic ever grows beyond light use.
+
+### The district roster below the map
+
+`index.html` lists every district in the inventory under the map — town, district name, what it serves, and population — replacing the earlier hard-coded list of the six pilot districts. The list is built from `districts.json`, which is the union of two things:
+
+- **`data/vt_district_crosswalk.csv`** — the 80-district VRWA inventory.
+- **any mapped polygon the crosswalk does not contain.** Today that is exactly one: **Williamstown Fire District**, which has a boundary in `vt_fire_districts.gpkg` but appears in neither the crosswalk nor `vt_district_roster.csv`. A plain inner join would have silently dropped a district we already have geometry for, so those rows are carried through and badged *not in VRWA list* on the page. It is worth resolving whether VRWA's enumeration missed it or it is out of scope.
+
+Totals: **81 districts across 62 towns**, 4 with a confirmed boundary, 3 with a known website.
+
+**Website links live in [`data/vt_district_websites.csv`](data/vt_district_websites.csv)**, a hand-maintained fill-in sheet with one row per district and columns `district_name, town, district_website, checked_on, notes`. Most rows are blank — few Vermont fire districts publish anything, which is part of what makes them hard to contact — so the sheet doubles as a checklist: record a `checked_on` date with no URL to mean "looked, found none." Only non-blank rows produce a link. A URL set in `build_fire_districts.py`'s `SOURCES` is used as a fallback, so a link attached to a polygon is never dropped.
+
+District names in the sheet must match `vt_district_crosswalk.csv` exactly; the six pilot names are asserted against the crosswalk at build time and a mismatch prints a warning rather than failing silently.
 
 The fire district layer draws in its own pane between towns and water, so districts read as containers with their service areas legible on top. Real district geometry is solid purple; town-outline placeholders are dashed grey and their popup says why they cannot be used. To add a further layer, write another GeoJSON into `docs/data/` and add one entry to the `LAYERS` registry in `docs/app.js` plus a checkbox in `docs/index.html`.
 

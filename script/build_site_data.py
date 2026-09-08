@@ -5,11 +5,14 @@ Inputs:
   data/vt_water_boundaries.gpkg           (written by pull_vt_water_boundaries.py)
   data/vt_town_clerk_contacts_filled.csv  (written by merge_clerk_contacts.py;
                                            falls back to the unfilled skeleton)
+  data/vt_district_crosswalk.csv          (the 80-district inventory)
+  data/vt_district_websites.csv           (hand-maintained district URLs)
   VCGI "VT Data - Town Boundaries" feature service (fetched live)
 
 Outputs (GeoJSON in EPSG:4326, simplified + coordinate-rounded for the browser):
   docs/data/water_service_areas.geojson
   docs/data/town_boundaries.geojson
+  docs/data/districts.json
   docs/data/town_clerks.json
   docs/data/meta.json
 
@@ -29,6 +32,8 @@ import requests
 ROOT = Path(__file__).resolve().parent.parent
 GPKG = ROOT / "data" / "vt_water_boundaries.gpkg"
 FIRE_GPKG = ROOT / "data" / "vt_fire_districts.gpkg"
+CROSSWALK = ROOT / "data" / "vt_district_crosswalk.csv"
+WEBSITES = ROOT / "data" / "vt_district_websites.csv"
 CLERKS_FILLED = ROOT / "data" / "vt_town_clerk_contacts_filled.csv"
 CLERKS_SKELETON = ROOT / "data" / "vt_town_clerk_contacts.csv"
 OUT_DIR = ROOT / "docs" / "data"
@@ -168,6 +173,131 @@ def build_fire_districts():
     return gdf
 
 
+# The six districts that agreed to the boundary-mapping pilot. Names must match
+# data/vt_district_crosswalk.csv exactly; the build asserts that they do.
+PILOT = {
+    "Peacham Fire District 1",
+    "Westford Fire District 1",
+    "Greensboro Bend Fire District 2",
+    "Danville Fire District 1",
+    "Burke Fire District 1",
+    "East Hardwick Fire District 1",
+}
+
+
+def load_websites():
+    """district_name -> url, from the hand-maintained website sheet.
+
+    The sheet is a fill-in worklist: every district gets a row, most of them
+    blank. Only non-blank rows end up on the site.
+    """
+    if not WEBSITES.exists():
+        print("  no vt_district_websites.csv -- district links will be blank")
+        return {}
+    df = pd.read_csv(WEBSITES, encoding="utf-8-sig").fillna("")
+    return {
+        str(r["district_name"]).strip(): str(r["district_website"]).strip()
+        for _, r in df.iterrows()
+        if str(r["district_website"]).strip()
+    }
+
+
+def build_district_list(fire):
+    """The full district roster the site lists under the map.
+
+    Union of the 80-district crosswalk and any mapped fire-district polygon
+    that the crosswalk does not know about -- Williamstown is one today, so a
+    silent inner join would drop a district we have a boundary for.
+    """
+    print("District list:")
+    if not CROSSWALK.exists():
+        print("  no vt_district_crosswalk.csv -- skipping districts.json")
+        return []
+
+    xwalk = pd.read_csv(CROSSWALK, encoding="utf-8-sig").fillna("")
+    websites = load_websites()
+
+    # Mapped polygons, keyed by name, so the list can flag what is drawn and
+    # let the browser zoom to it.
+    mapped = {}
+    if fire is not None:
+        for _, r in fire.iterrows():
+            mapped[str(r["district_name"]).strip()] = {
+                "fd_id": str(r.get("fd_id", "")),
+                "geometry_status": str(r.get("geometry_status", "")),
+                "extent": str(r.get("extent", "")),
+                "website": str(r.get("district_website", "") or ""),
+            }
+
+    missing_pilot = PILOT - set(xwalk["district_name"].astype(str).str.strip())
+    if missing_pilot:
+        print(f"  WARNING pilot names not in crosswalk: {sorted(missing_pilot)}")
+
+    records = []
+    seen = set()
+    for _, r in xwalk.iterrows():
+        name = str(r["district_name"]).strip()
+        seen.add(name)
+        geom = mapped.get(name, {})
+        records.append({
+            "name": name,
+            "town": str(r["town"]).strip(),
+            "type": str(r["district_type"]).strip(),
+            "services": str(r["services"]).strip(),
+            "population": num_or_none(r.get("population")),
+            "pwsid": str(r.get("matched_pwsid", "")).strip(),
+            # The polygon's own website field is the fallback so a link added
+            # in build_fire_districts.py is never silently dropped.
+            "website": websites.get(name) or geom.get("website", ""),
+            "pilot": name in PILOT,
+            "in_roster": True,
+            "fd_id": geom.get("fd_id", ""),
+            "geometry_status": geom.get("geometry_status", ""),
+            "extent": geom.get("extent", ""),
+        })
+
+    for name, geom in sorted(mapped.items()):
+        if name in seen:
+            continue
+        print(f"  NOTE mapped but absent from the crosswalk: {name}")
+        row = fire[fire["district_name"] == name].iloc[0]
+        records.append({
+            "name": name,
+            "town": str(row.get("town", "")).strip(),
+            "type": "Fire District",
+            "services": "Water",
+            "population": num_or_none(row.get("population")),
+            "pwsid": str(row.get("pwsid", "")).strip(),
+            "website": websites.get(name) or geom.get("website", ""),
+            "pilot": name in PILOT,
+            "in_roster": False,
+            "fd_id": geom.get("fd_id", ""),
+            "geometry_status": geom.get("geometry_status", ""),
+            "extent": geom.get("extent", ""),
+        })
+
+    records.sort(key=lambda d: (d["town"].lower(), d["name"].lower()))
+    payload = {"districts": records}
+    path = OUT_DIR / "districts.json"
+    path.write_text(json.dumps(payload, separators=(",", ":")), encoding="utf-8")
+
+    linked = sum(1 for d in records if d["website"])
+    drawn = sum(1 for d in records if d["geometry_status"] == "district")
+    print(f"  {len(records)} districts in {len({d['town'] for d in records})} towns, "
+          f"{linked} with a website, {drawn} with a mapped boundary")
+    return records
+
+
+def num_or_none(value):
+    """CSV cell -> int, or None for blanks and non-numeric junk."""
+    try:
+        if value == "" or pd.isna(value):
+            return None
+        return int(float(value))
+    except (TypeError, ValueError):
+        return None
+
+
 def split_name(name):
     """(base, kind) for a municipality name -- mirrors merge_clerk_contacts.py.
 
@@ -258,6 +388,7 @@ def main():
     water = build_water_service_areas()
     towns = build_town_boundaries()
     fire = build_fire_districts()
+    districts = build_district_list(fire)
     clerks = build_town_clerks(towns)
 
     counts = water["boundary_source"].value_counts().to_dict()
@@ -270,7 +401,8 @@ def main():
         "epa_modeled": int(counts.get("EPA-modeled", 0)),
         "population_served": int(water["Population_Served_Count"].fillna(0).sum()),
         "towns": int(len(towns)),
-        "districts": 80,
+        "districts": len(districts),
+        "districts_with_website": sum(1 for d in districts if d["website"]),
         "clerks_with_email": sum(1 for r in clerks if r.get("clerk_email")),
         "fd_boundaries": 0 if fire is None else int(len(fire)),
         "fd_usable": 0 if fire is None else

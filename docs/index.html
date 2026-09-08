@@ -165,15 +165,47 @@
     </li>
   </ol>
 
-  <h2>Pilot fire districts</h2>
-  <ul class="districts">
-    <li><a href="https://peacham.org/peacham-fire-district/">Peacham Fire District 1</a></li>
-    <li>Westford Fire District 1</li>
-    <li>Greensboro Bend Fire District 2</li>
-    <li>Danville Fire District 1</li>
-    <li>Burke Fire District 1 (East Burke)</li>
-    <li><a href="https://ehfd.mystrikingly.com/">East Hardwick Fire District 1</a></li>
-  </ul>
+  <h2>Fire and water districts</h2>
+  <p>
+    Every district in the inventory, with the town it sits in. District names link
+    out where we have found a website &mdash; most districts have none, which is
+    itself part of the problem. Districts marked <span class="tag tag-pilot">pilot</span>
+    are the six working with us on boundary mapping;
+    <span class="tag tag-mapped">mapped</span> means a polygon exists on the map above,
+    and the badge jumps to it.
+  </p>
+
+  <div class="district-controls">
+    <label class="sr-only" for="district-search">Filter districts</label>
+    <input type="search" id="district-search" autocomplete="off"
+           placeholder="Filter by district or town&hellip;">
+    <label><input type="checkbox" id="district-pilot-only"> Pilot only</label>
+    <label><input type="checkbox" id="district-web-only"> Has a website</label>
+    <p class="district-count" id="district-count" aria-live="polite"></p>
+  </div>
+
+  <div class="table-scroll">
+    <table class="district-table" id="district-table">
+      <thead>
+        <tr>
+          <th scope="col">Town</th>
+          <th scope="col">District</th>
+          <th scope="col">Serves</th>
+          <th scope="col" class="num">Population</th>
+        </tr>
+      </thead>
+      <tbody id="district-rows">
+        <tr><td colspan="4" class="loading">Loading districts&hellip;</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p class="note">
+    Source: <a href="https://github.com/VERSO-UVM/Drinking_Water_Service_Areas/blob/main/data/vt_district_crosswalk.csv"><code>data/vt_district_crosswalk.csv</code></a>,
+    derived from the Vermont Rural Water Association's 2025 district list. Website
+    links are collected by hand in
+    <a href="https://github.com/VERSO-UVM/Drinking_Water_Service_Areas/blob/main/data/vt_district_websites.csv"><code>data/vt_district_websites.csv</code></a>
+    &mdash; corrections and additions welcome.
+  </p>
 
   <h2>Why it matters: the Lead &amp; Copper Rule</h2>
   <p>

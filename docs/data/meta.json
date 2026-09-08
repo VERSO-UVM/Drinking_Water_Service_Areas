@@ -6,7 +6,8 @@
   "epa_modeled": 44,
   "population_served": 463847,
   "towns": 256,
-  "districts": 80,
+  "districts": 81,
+  "districts_with_website": 3,
   "clerks_with_email": 247,
   "fd_boundaries": 5,
   "fd_usable": 4

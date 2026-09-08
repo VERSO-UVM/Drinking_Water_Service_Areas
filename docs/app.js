@@ -539,6 +539,114 @@ function zoomToFeature(feature) {
   searchInput.blur();
 }
 
+/* ---------- district roster below the map ---------- */
+
+var districtData = [];
+var districtRows = document.getElementById('district-rows');
+
+fetch('data/districts.json')
+  .then(function (r) {
+    if (!r.ok) throw new Error('districts.json ' + r.status);
+    return r.json();
+  })
+  .then(function (data) {
+    districtData = data.districts || [];
+    renderDistricts();
+  })
+  .catch(function (err) {
+    console.error(err);
+    districtRows.innerHTML =
+      '<tr><td colspan="4" class="loading">District list unavailable.</td></tr>';
+  });
+
+['district-search', 'district-pilot-only', 'district-web-only'].forEach(function (id) {
+  var el = document.getElementById(id);
+  if (el) el.addEventListener('input', renderDistricts);
+});
+
+function renderDistricts() {
+  var q = (document.getElementById('district-search').value || '')
+    .trim().toLowerCase();
+  var pilotOnly = document.getElementById('district-pilot-only').checked;
+  var webOnly = document.getElementById('district-web-only').checked;
+
+  var rows = districtData.filter(function (d) {
+    if (pilotOnly && !d.pilot) return false;
+    if (webOnly && !d.website) return false;
+    if (!q) return true;
+    return (d.name + ' ' + d.town).toLowerCase().indexOf(q) !== -1;
+  });
+
+  document.getElementById('district-count').textContent =
+    rows.length === districtData.length
+      ? districtData.length + ' districts in ' + townCount(districtData) + ' towns'
+      : 'Showing ' + rows.length + ' of ' + districtData.length + ' districts';
+
+  if (!rows.length) {
+    districtRows.innerHTML =
+      '<tr><td colspan="4" class="loading">No districts match that filter.</td></tr>';
+    return;
+  }
+
+  var html = rows.map(function (d) {
+    var name = d.website
+      ? '<a href="' + esc(d.website) + '" target="_blank" rel="noopener">' +
+        esc(d.name) + '</a>'
+      : esc(d.name);
+
+    var tags = '';
+    if (d.pilot) tags += ' <span class="tag tag-pilot">pilot</span>';
+    // Only districts with a real polygon get the jump-to-map badge; the
+    // approximate extents are on the map too but are not a boundary.
+    if (d.geometry_status === 'district') {
+      tags += ' <button type="button" class="tag tag-mapped" data-fd="' +
+        esc(d.fd_id) + '" title="Show this district on the map">mapped</button>';
+    }
+    if (!d.in_roster) tags += ' <span class="tag tag-extra">not in VRWA list</span>';
+
+    return '<tr>' +
+      '<td>' + esc(d.town) + '</td>' +
+      '<td>' + name + tags + '</td>' +
+      '<td>' + esc(d.services || '') + '</td>' +
+      '<td class="num">' + (d.population == null ? '&mdash;' : num(d.population)) +
+      '</td>' +
+      '</tr>';
+  }).join('');
+
+  districtRows.innerHTML = html;
+}
+
+function townCount(list) {
+  var seen = {};
+  list.forEach(function (d) { seen[d.town] = true; });
+  return Object.keys(seen).length;
+}
+
+// Delegated so the badges survive every re-render.
+districtRows.addEventListener('click', function (ev) {
+  var btn = ev.target.closest('.tag-mapped');
+  if (btn) zoomToDistrict(btn.getAttribute('data-fd'));
+});
+
+function zoomToDistrict(fdId) {
+  // districts.json can arrive before fire_districts.geojson does.
+  if (!LAYERS.fire.layer) return;
+  var box = document.getElementById(LAYERS.fire.checkbox);
+  if (!box.checked) {
+    box.checked = true;
+    syncVisibility('fire');
+  }
+  var target = null;
+  LAYERS.fire.layer.eachLayer(function (l) {
+    if (l.feature && l.feature.properties.fd_id === fdId) target = l;
+  });
+  if (!target) return;
+
+  document.getElementById('map').scrollIntoView({ behavior: 'smooth', block: 'center' });
+  map.fitBounds(target.getBounds(), { maxZoom: 13, padding: [40, 40] });
+  target.openPopup();
+}
+
 /* ---------- helpers ---------- */
 
 function setCount(id, value) {

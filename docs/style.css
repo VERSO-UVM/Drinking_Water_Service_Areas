@@ -487,12 +487,130 @@ a:hover { text-decoration: none; }
 .prose ol, .prose ul { padding-left: 22px; }
 .prose li { margin-bottom: 7px; }
 
-.districts { list-style: none; padding-left: 0; }
+/* ---------- district roster ---------- */
 
-.districts li {
-  padding: 7px 0 7px 14px;
-  border-left: 3px solid var(--line);
+.district-controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px 18px;
+  margin: 18px 0 12px;
 }
+
+#district-search {
+  flex: 1 1 260px;
+  min-width: 200px;
+  padding: 9px 12px;
+  font: inherit;
+  color: var(--ink);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--bg);
+}
+
+#district-search:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 1px;
+}
+
+.district-controls label {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: .9rem;
+  color: var(--ink-soft);
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.district-count {
+  flex-basis: 100%;
+  margin: 0;
+  font-size: .85rem;
+  color: var(--ink-soft);
+}
+
+/* The table is wider than the prose column on narrow screens, so it scrolls
+   inside its own box rather than pushing the page sideways. */
+.table-scroll {
+  overflow-x: auto;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+}
+
+.district-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: .92rem;
+}
+
+.district-table th,
+.district-table td {
+  padding: 9px 14px;
+  text-align: left;
+  border-bottom: 1px solid var(--line);
+  vertical-align: top;
+}
+
+.district-table thead th {
+  position: sticky;
+  top: 0;
+  background: var(--bg-soft);
+  font-size: .78rem;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+}
+
+.district-table tbody tr:last-child td { border-bottom: 0; }
+.district-table tbody tr:hover { background: var(--bg-soft); }
+.district-table .num { text-align: right; font-variant-numeric: tabular-nums; }
+.district-table td:first-child { color: var(--ink-soft); white-space: nowrap; }
+
+.district-table .loading {
+  padding: 22px 14px;
+  color: var(--ink-soft);
+  text-align: center;
+}
+
+.tag {
+  display: inline-block;
+  margin-left: 6px;
+  padding: 1px 7px;
+  border-radius: 999px;
+  font-size: .72rem;
+  letter-spacing: .02em;
+  white-space: nowrap;
+  vertical-align: 1px;
+}
+
+.tag-pilot {
+  background: rgba(37, 99, 235, .12);
+  color: #1e40af;
+  border: 1px solid rgba(37, 99, 235, .3);
+}
+
+.tag-extra {
+  background: rgba(217, 119, 6, .12);
+  color: #92400e;
+  border: 1px solid rgba(217, 119, 6, .3);
+}
+
+/* Rendered as a plain span in the explanatory text above the table, and as a
+   button in the table itself — where it moves the map rather than navigating. */
+.tag-mapped {
+  background: rgba(147, 51, 234, .12);
+  color: #6b21a8;
+  border: 1px solid rgba(147, 51, 234, .35);
+}
+
+button.tag-mapped {
+  font-family: inherit;
+  font-size: .72rem;
+  cursor: pointer;
+}
+
+button.tag-mapped:hover { background: rgba(147, 51, 234, .24); }
 
 .sources li { margin-bottom: 12px; }
 
