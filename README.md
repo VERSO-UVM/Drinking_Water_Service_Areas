@@ -400,6 +400,26 @@ Three pages:
 
 **Basemap:** standard OpenStreetMap tiles (`tile.openstreetmap.org`), with Esri World Imagery as the aerial option. OSM carries its own labels and colour, so overlay fill opacity is kept low (service areas 0.18) to keep street names readable underneath. Note OSM's [tile usage policy](https://operations.osmfoundation.org/policies/tiles/) if traffic ever grows beyond light use.
 
+### ANR live infrastructure layers
+
+Two layers come straight from Vermont ANR's public ArcGIS services rather than from files in this repo. Both are **off by default** and nothing is requested from ANR until a user ticks the box.
+
+| Layer | Service | ID | Features | Native CRS |
+| --- | --- | --- | --- | --- |
+| Served parcels (service line inventory) | `MAP_ANR_ANRATLASDWGWP_WM_NOCACHE` | 15 | 144,195 polygons | EPSG:3857 |
+| Sewer lines | `OPENDATA_ANR_UTILITY_SP_NOCACHE_v1` | 165 | 22,552 polylines | EPSG:32145 |
+
+They are rendered **server-side into 256 px tiles** by `ArcGISDynamicLayer` in `docs/app.js`, which converts each Leaflet tile coordinate to a Web Mercator bbox and calls the service's `/export` endpoint. Payload cost is therefore zero regardless of feature count — embedding 144,195 parcel polygons as GeoJSON was never an option. The trade-off is that these arrive as images: **no popups, no search, no filtering.** ANR sends `Access-Control-Allow-Origin` for our Pages origin.
+
+Two behaviours that look like bugs but are ANR's own settings:
+
+- **Served parcels only draw at zoom 14 and closer.** The layer carries `minScale: 40000`, and web-Mercator z13 is 1:72,224. Zoomed out, the layer is legitimately blank.
+- **Sewer lines cover 71 of 256 municipalities.** Coverage is contributed by participating towns; Burlington, for one, has none. Brattleboro (3,402 segments), Middlebury, Rutland City and Hartford are the densest.
+
+**There is no public drinking water line layer.** `Drinking Water Infrastructure` exists as points (171), lines (168) and areas (172) in the same utility service, and all three return **0 features** to an anonymous caller, while every wastewater record carries `Audience: 'Public'`. This is access control on critical infrastructure, not missing data — getting it requires a request to ANR GIS, not a different URL.
+
+**Projection note.** The two ANR services do *not* share a CRS: the utility service is native EPSG:32145 (VT State Plane meters, the `_SP_` in its name), but the DWGWP service is native EPSG:3857. This does not affect the pipeline — `build_site_data.py` already canonicalises everything to EPSG:32145 and reprojects to WGS84 only at the last step, because Leaflet and every web basemap require Web Mercator. A browser map cannot render State Plane without a reprojection library.
+
 ### The district roster below the map
 
 `index.html` lists every district in the inventory under the map — town, district name, what it serves, and population — replacing the earlier hard-coded list of the six pilot districts. The list is built from `districts.json`, which is the union of two things:

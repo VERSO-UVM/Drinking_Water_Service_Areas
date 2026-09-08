@@ -247,6 +247,10 @@ a:hover { text-decoration: none; }
 .swatch-fd { background: rgba(147, 51, 234, .22); border: 1.5px solid #9333ea; }
 .swatch-fd-townwide { background: rgba(147, 51, 234, .22); border: 1.5px dashed #9333ea; }
 .swatch-fd-approx { background: rgba(13, 148, 136, .14); border: 1.5px dotted #0d9488; }
+/* ANR live services. Their symbology is set server-side, so these swatches
+   approximate what ANR draws rather than defining it. */
+.swatch-sewer { background: rgba(234, 179, 8, .35); border: 1.5px solid #eab308; }
+.swatch-parcels { background: rgba(56, 189, 248, .28); border: 1.5px solid #38bdf8; }
 
 .pending {
   margin: 10px 0 0 24px;
@@ -268,6 +272,8 @@ a:hover { text-decoration: none; }
   text-transform: uppercase;
   color: var(--ink-soft);
 }
+
+.legend h3.legend-sub { margin-top: 11px; }
 
 .legend p {
   display: flex;

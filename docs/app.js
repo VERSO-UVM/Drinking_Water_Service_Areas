@@ -49,9 +49,84 @@ L.control.scale({ imperial: true, metric: false }).addTo(map);
 // Panes fix the draw order regardless of the sequence layers finish loading in.
 // Fire districts sit between towns and water: they contain the service areas,
 // so the service areas have to stay readable on top of them.
+map.createPane('parcels').style.zIndex = 350;
 map.createPane('towns').style.zIndex = 400;
 map.createPane('fire').style.zIndex = 425;
 map.createPane('water').style.zIndex = 450;
+map.createPane('sewer').style.zIndex = 460;
+
+/* ---------- ANR live map services ---------- */
+
+/* Vermont ANR publishes these as ArcGIS map services, not as files we can
+ * ship. Rendering them server-side into 256px tiles keeps the payload at zero
+ * regardless of feature count -- the service line inventory alone is 144,195
+ * parcel polygons, which could never be embedded as GeoJSON.
+ *
+ * The trade-off is that these are images: no popups, no search, no filtering.
+ * They are context layers, and both default to off.
+ */
+
+var WEB_MERCATOR_ORIGIN = 20037508.342789244;
+
+var ArcGISDynamicLayer = L.TileLayer.extend({
+  getTileUrl: function (coords) {
+    var size = 256;
+    var res = (WEB_MERCATOR_ORIGIN * 2) / (size * Math.pow(2, coords.z));
+    var minx = -WEB_MERCATOR_ORIGIN + coords.x * size * res;
+    var maxy = WEB_MERCATOR_ORIGIN - coords.y * size * res;
+    var bbox = [minx, maxy - size * res, minx + size * res, maxy].join(',');
+
+    return this.options.service + '/export' +
+      '?bbox=' + bbox +
+      '&bboxSR=3857&imageSR=3857' +
+      '&size=' + size + ',' + size +
+      '&layers=show:' + this.options.layerId +
+      '&format=png32&transparent=true&f=image';
+  }
+});
+
+var ANR_DWGWP = 'https://anrmaps.vermont.gov/arcgis/rest/services/map_services/' +
+                'MAP_ANR_ANRATLASDWGWP_WM_NOCACHE/MapServer';
+var ANR_UTILITY = 'https://anrmaps.vermont.gov/arcgis/rest/services/Open_Data/' +
+                  'OPENDATA_ANR_UTILITY_SP_NOCACHE_v1/MapServer';
+
+var ANR_LAYERS = {
+  parcels: {
+    checkbox: 'lyr-parcels',
+    service: ANR_DWGWP,
+    layerId: 15,
+    pane: 'parcels',
+    attribution: 'Service line inventory &copy; Vermont ANR'
+  },
+  sewer: {
+    checkbox: 'lyr-sewer',
+    service: ANR_UTILITY,
+    layerId: 165,
+    pane: 'sewer',
+    attribution: 'Wastewater infrastructure &copy; Vermont ANR'
+  }
+};
+
+Object.keys(ANR_LAYERS).forEach(function (key) {
+  var cfg = ANR_LAYERS[key];
+  cfg.layer = new ArcGISDynamicLayer('', {
+    service: cfg.service,
+    layerId: cfg.layerId,
+    pane: cfg.pane,
+    opacity: 0.75,
+    maxZoom: 19,
+    attribution: cfg.attribution
+  });
+
+  var box = document.getElementById(cfg.checkbox);
+  if (!box) return;
+  // Off by default: the boxes are unchecked in the markup, and nothing is
+  // requested from ANR until someone ticks one.
+  box.addEventListener('change', function () {
+    if (box.checked) map.addLayer(cfg.layer);
+    else map.removeLayer(cfg.layer);
+  });
+});
 
 /* ---------- layer registry ---------- */
 
