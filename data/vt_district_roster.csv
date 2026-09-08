@@ -1,0 +1,82 @@
+roster_id,district_name,town,district_type,source_type_code,services,population,provides_water,provides_wastewater,unconfirmed,ww_permit,ww_npdes,ww_permit_type,ww_treatment_type,ww_capacity_mgd,ww_ownership,contact_name,contact_title,contact_email,contact_phone,contact_source,matched_pwsid,matched_pws_name,match_status,districts_in_town,single_district_town,has_legal_charter,political_bnd_proxy,in_crosswalk
+VTD-001,Champlain Water District (S Burlington),,Water District,Water Dist.,Water,,Y,N,N,,,,,,,,,,,,VT0005092,CHAMPLAIN WATER DISTRICT,auto_confident,2,FALSE,TRUE,,Y
+VTD-002,Derby Line Village Water District,,Water District,Water Dist.,Water,,Y,N,N,,,,,,,,,,,,VT0020568,DERBY LINE VILLAGE WATER DISTRICT,auto_confident,1,TRUE,FALSE,service_area_proxy,Y
+VTD-003,Elmore Water District,,Water District,Water Dist.,Water,,Y,N,N,,,,,,,,,,,,VT0005152,ELMORE WATER DISTRICT,auto_confident,1,TRUE,FALSE,service_area_proxy,Y
+VTD-004,Grand Isle Consolidated Water District,,Water District,Water Dist.,Water,,Y,N,N,,,,,,,,,,,,VT0020614,GRAND ISLE CONSOLIDATED WATER DISTRICT,auto_confident,2,FALSE,FALSE,,Y
+VTD-005,Tri Town Water District (Bridport),,Water District,Water Dist.,Water,,Y,N,N,,,,,,,,,,,,VT0005001,TRI TOWN WATER DISTRICT,auto_confident,1,TRUE,FALSE,service_area_proxy,Y
+VTD-006,Vergennes Panton Water District,,Water District,Water Dist.,Water,,Y,N,N,,,,,,,,,,,,VT0005010,VERGENNES PANTON WATER DISTRICT,auto_confident,1,TRUE,FALSE,service_area_proxy,Y
+VTD-007,Wilmington Water District,,Water District,Water Dist.,Water,,Y,N,N,,,,,,,,,,,,VT0005310,WILMINGTON WATER DIST,auto_confident,2,FALSE,FALSE,,Y
+VTD-008,Alburgh Fire District 1,Alburgh,Fire District,FD,Water,87,Y,N,N,,,,,,,,,,,,VT0005137,ALBURGH FIRE DISTRICT 1,auto_confident,2,FALSE,FALSE,,Y
+VTD-009,South Alburgh Fire District 2,Alburgh,Fire District,FD,Water,300,Y,N,N,,,,,,,,,,,,,,,2,FALSE,FALSE,,Y
+VTD-010,Bakersfield Fire District 1,Bakersfield,Fire District,FD,Water,446,Y,N,N,,,,,,,,,,,,VT0005114,BAKERSFIELD FIRE DISTRICT 1,auto_confident,1,TRUE,FALSE,service_area_proxy,Y
+VTD-011,Barnet Fire District 2,Barnet,Fire District,FD,Water,205,Y,N,N,,,,,,,,,,,,VT0005029,BARNET FIRE DISTRICT #2,auto_confident,3,FALSE,FALSE,,Y
+VTD-012,McIndoe Falls Fire District 3,Barnet,Fire District,FD,Water,176,Y,N,N,,,,,,,,,,,,VT0005441,MCINDOE FALLS FIRE DISTRICT 3,auto_confident,3,FALSE,FALSE,,Y
+VTD-013,Passumpsic Fire District 1,Barnet,Fire District,FD,Water,140,Y,N,N,,,,,,,,,,,,VT0005031,PASSUMPSIC FIRE DISTRICT 1,auto_confident,3,FALSE,FALSE,,Y
+VTD-014,Graniteville Fire District 4,Barre Town,Fire District,FD,Water,700,Y,N,N,,,,,,,,,,,,VT0005248,GRANITEVILLE FIRE DISTRICT 4,auto_confident,1,TRUE,FALSE,service_area_proxy,Y
+VTD-015,East Berkshire Fire District 1,Berkshire,Fire District,FD,Water,184,Y,N,N,,,,,,,,,,,,VT0005115,EAST BERKSHIRE FIRE DISTRICT 1,auto_confident,1,TRUE,FALSE,service_area_proxy,Y
+VTD-016,Brandon Fire District 1,Brandon,Fire District,FD,Water,3963,Y,N,N,,,,,,,,,,,,VT0005211,BRANDON FIRE DISTRICT 1,auto_confident,1,TRUE,FALSE,service_area_proxy,Y
+VTD-017,Burke Fire District 1,Burke,Fire District,FD,Water,142,Y,N,N,,,,,,,,,,,,VT0005033,BURKE FIRE DISTRICT 1,auto_confident,1,TRUE,FALSE,service_area_proxy,Y
+VTD-018,East Calais Fire District 1,Calais,Fire District,FD,Water,200,Y,N,N,,,,,,,,,,,,VT0005262,EAST CALAIS FIRE DISTRICT 1,auto_confident,1,TRUE,FALSE,service_area_proxy,Y
+VTD-019,Canaan Fire District 1,Canaan,Fire District,FD,Water,970,Y,N,N,,,,,,,,,,,,VT0005106,CANAAN FIRE DISTRICT 1,auto_confident,2,FALSE,FALSE,,Y
+VTD-020,Canaan Fire District 2,Canaan,Fire District,FD,Water,350,Y,N,N,,,,,,,,,,,,VT0005107,CANAAN FD #2,auto_confident,2,FALSE,FALSE,,Y
+VTD-021,Castleton Fire District 1,Castleton,Fire District,FD,Water,1940,Y,N,N,,,,,,,,,,,,VT0005212,CASTLETON FIRE DISTRICT 1,auto_confident,2,FALSE,FALSE,,Y
+VTD-022,Castleton Fire District 3,Castleton,Fire District,FD,Water,500,Y,N,N,,,,,,,,,,,,VT0020889,CASTLETON FIRE DISTRICT 3,auto_confident,2,FALSE,FALSE,,Y
+VTD-023,Colchester Fire District 2,Colchester,Fire District,FD,Water,8300,Y,N,N,,,,,,,,,,,,VT0005059,COLCHESTER FIRE DISTRICT 2,auto_confident,1,TRUE,FALSE,service_area_proxy,Y
+VTD-024,Coventry Fire District 1,Coventry,Fire District,FD,Water,251,Y,N,N,,,,,,,,,,,,VT0005191,COVENTRY FIRE DISTRICT 1,auto_confident,1,TRUE,FALSE,service_area_proxy,Y
+VTD-025,Craftsbury Fire District 2,Craftsbury,Fire District,FD,Water,420,Y,N,N,,,,,,,,,,,,VT0005194,CRAFTSBURY FIRE DISTRICT 2,auto_confident,1,TRUE,FALSE,service_area_proxy,Y
+VTD-026,Danby Mount Tabor Fire District 1,Danby,Fire District,FD,Water,385,Y,N,N,,,,,,,,,,,,VT0005217,DANBY MOUNT TABOR F D 1,auto_confident,1,TRUE,FALSE,service_area_proxy,Y
+VTD-027,Danville Fire District 1,Danville,Fire District,FD,Water,500,Y,N,N,,,,,,,,,,,,VT0005037,DANVILLE FIRE DISTRICT 1,auto_confident,1,TRUE,FALSE,service_area_proxy,Y
+VTD-028,Dorset Fire District 1,Dorset,Fire District,FD,Water,530,Y,N,N,,,,,,,,,,,,VT0005020,DORSET FIRE DISTRICT 1,auto_confident,2,FALSE,FALSE,,Y
+VTD-029,East Dorset Fire District 1,Dorset,Fire District,FD,Water,192,Y,N,N,,,,,,,,,,,,VT0005021,EAST DORSET FIRE DISTRICT 1,auto_confident,2,FALSE,FALSE,,Y
+VTD-030,North Branch Fire District #1,Dover,Fire District,ww,WW,,N,Y,N,9-0074,,Indirect,,,Municipal,Bart Howes,,nbfd@myfairpoint.net,,VT DEC / VRWA fire district workbook (Sept 2025),VT0005211,,,1,TRUE,TRUE,,Y
+VTD-031,Fairfax Fire District 1,Fairfax,Fire District,FD,Water,80,Y,N,N,,,,,,,,,,,,VT0005403,FAIRFAX FIRE DISTRICT 1,auto_confident,1,TRUE,TRUE,service_area_proxy,Y
+VTD-032,East Fairfield Fire District 1,Fairfield,Fire District,FD,Water,184,Y,N,N,,,,,,,,,,,,VT0005119,EAST FAIRFIELD FIRE DISTRICT 1,auto_confident,2,FALSE,FALSE,,Y
+VTD-033,Fairfield Fire District 2,Fairfield,Fire District,FD,Water,126,Y,N,N,,,,,,,,,,,,VT0020415,FAIRFIELD FIRE DISTRICT 2,auto_confident,2,FALSE,FALSE,,Y
+VTD-034,South Georgia Fire District,Georgia,Fire District,FD,Water,500,Y,N,N,,,,,,,,,,,,VT0005121,SOUTH GEORGIA FIRE DISTRICT,auto_confident,1,TRUE,FALSE,service_area_proxy,Y
+VTD-035,Grand Isle Fire District 4,Grand Isle,Fire District,FD,Water,1078,Y,N,N,,,,,,,,,,,,VT0005139,GRAND ISLE FIRE DISTRICT 4,auto_confident,2,FALSE,FALSE,,Y
+VTD-036,Greensboro Bend Fire District 2,Greensboro,Fire District,FD,Water,71,Y,N,N,,,,,,,,,,,,VT0005199,GREENSBORO BEND FIRE DISTRICT #2,auto_confident,2,FALSE,FALSE,,Y
+VTD-037,Greensboro Fire District 1,Greensboro,Fire District,FD,Water,551,Y,N,N,,,,,,,,,,,,VT0005198,GREENSBORO FIRE DISTRICT 1,auto_confident,2,FALSE,FALSE,,Y
+VTD-038,East Hardwick Fire District 1,Hardwick,Fire District,FD,Water,350,Y,N,N,,,,,,,,,,,,VT0005038,EAST HARDWICK FIRE DISTRICT 1,auto_confident,1,TRUE,FALSE,service_area_proxy,Y
+VTD-039,Highgate Fire District 1,Highgate,Fire District,FD,Water,280,Y,N,N,,,,,,,,,,,,,,,1,TRUE,FALSE,,Y
+VTD-040,Huntington Fire District 1,Huntington,Fire District,FD,Water,120,Y,N,N,,,,,,,,,,,,VT0005076,HUNTINGTON FIRE DISTRICT 1,auto_confident,1,TRUE,FALSE,service_area_proxy,Y
+VTD-041,Hyde Park Fire District 1,Hyde Park,Fire District,FD,Water,275,Y,N,N,,,,,,,,,,,,VT0005153,HYDE PARK FIRE DISTRICT 1,auto_confident,1,TRUE,FALSE,service_area_proxy,Y
+VTD-042,Irasburg Fire District 1,Irasburg,Fire District,FD,Water,200,Y,N,N,,,,,,,,,,,,VT0005200,IRASBURG FD #1,auto_confident,1,TRUE,FALSE,service_area_proxy,Y
+VTD-043,Jericho Fire District 1,Jericho,Fire District,FD,Water,190,Y,N,N,,,,,,,,,,,,VT0005476,JERICHO FIRE DISTRICT 1,auto_confident,1,TRUE,FALSE,service_area_proxy,Y
+VTD-044,Lunenburg Fire District 1,Lunenburg,Fire District,FD,Water,250,Y,N,N,,,,,,,,,,,,VT0005112,LUNENBURG FIRE DISTRICT 1,auto_confident,2,FALSE,FALSE,,Y
+VTD-045,Lunenburg Fire District 2,Lunenburg,Fire District,FD-both,Water & WW,400,Y,Y,N,3-1140,VT0101061,Direct,AL - Aerated Lagoon,0.076,Municipal,Rodger G Sheldon,WW Chief Operator,Rodger.sheldon@utilitypartnersllc.com,(802) 626-5939,VT DEC / VRWA fire district workbook (Sept 2025),VT0005113,LUNENBURG FIRE DISTRICT 2,auto_confident,2,FALSE,FALSE,,Y
+VTD-046,Lyn Haven Fire District 1,Lyndon,Fire District,FD,Water,100,Y,N,N,,,,,,,,,,,,VT0005041,LYN HAVEN FIRE DISTRICT 1,auto_confident,1,TRUE,FALSE,service_area_proxy,Y
+VTD-047,East Middlebury Fire District 1,Middlebury,Fire District,FD,Water,642,Y,N,N,,,,,,,,,,,,VT0005003,EAST MIDDLEBURY FD 1,auto_confident,1,TRUE,FALSE,service_area_proxy,Y
+VTD-048,Norwich Fire District 1,Norwich,Fire District,FD,Water,870,Y,N,N,,,,,,,,,,,,VT0005326,NORWICH FIRE DISTRICT 1,auto_confident,1,TRUE,FALSE,service_area_proxy,Y
+VTD-049,Peacham Fire District 1,Peacham,Fire District,FD,Water,150,Y,N,N,,,,,,,,,,,,VT0005042,PEACHAM FIRE DISTRICT 1,auto_confident,1,TRUE,FALSE,service_area_proxy,Y
+VTD-050,Pownal Fire District 2,Pownal,Fire District,FD,Water,682,Y,N,N,,,,,,,,,,,,VT0020734,POWNAL FIRE DISTRICT 2,auto_confident,2,FALSE,FALSE,,Y
+VTD-051,Pownal Fire District 3,Pownal,Fire District,FD,Water,60,Y,N,N,,,,,,,,,,,,VT0005517,POWNAL FIRE DISTRICT 3,auto_confident,2,FALSE,FALSE,,Y
+VTD-052,Richmond Fire District 1,Richmond,Fire District,FD,Water,56,Y,N,N,,,,,,,,,,,,VT0005426,RICHMOND FIRE DISTRICT 1,auto_confident,1,TRUE,FALSE,service_area_proxy,Y
+VTD-053,Royalton Fire District 1,Royalton,Fire District,FD,Water,1500,Y,N,N,,,,,,,,,,,,VT0005330,ROYALTON FIRE DISTRICT 1,auto_confident,1,TRUE,FALSE,service_area_proxy,Y
+VTD-054,Rutland Town Fire District 1,Rutland Town,Fire District,FD,Water,401,Y,N,N,,,,,,,,,,,,VT0005534,RUTLAND TOWN FIRE DISTRICT 1,auto_confident,5,FALSE,FALSE,,Y
+VTD-055,Rutland Town Fire District 11,Rutland Town,Fire District,FD,Water,29,Y,N,N,,,,,,,,,,,,VT0005534,,,5,FALSE,FALSE,,Y
+VTD-056,Rutland Town Fire District 4,Rutland Town,Fire District,FD,Water,136,Y,N,N,,,,,,,,,,,,VT0020885,RUTLAND TOWN FIRE DISTRICT 4,auto_confident,5,FALSE,FALSE,,Y
+VTD-057,Rutland Town Fire District 5,Rutland Town,Fire District,FD,Water,110,Y,N,N,,,,,,,,,,,,VT0005429,RUTLAND TOWN FIRE DISTRICT 5,auto_confident,5,FALSE,FALSE,,Y
+VTD-058,Rutland Town Fire District 6,Rutland Town,Fire District,FD,Water,137,Y,N,N,,,,,,,,,,,,VT0005378,RUTLAND TOWN FIRE DISTRICT 6,auto_confident,5,FALSE,FALSE,,Y
+VTD-059,Ryegate Fire District 2,Ryegate,Fire District,FD-both,Water & WW,131,Y,Y,N,3-1382,VT0100951,Direct,ST/SF - Septic Tanks and Recirculating Sand Filter,0.0103,Municipal,Brian Craig,WW Chief Operator,wrfdk1@charter.net,(802) 757-3983,VT DEC / VRWA fire district workbook (Sept 2025),VT0005043,RYEGATE FIRE DISTRICT 2,auto_confident,1,TRUE,FALSE,service_area_proxy,Y
+VTD-060,Sheffield Fire District 1,Sheffield,Fire District,FD,Water,50,Y,N,N,,,,,,,,,,,,VT0005381,SHEFFIELD FIRE DISTRICT 1,auto_confident,1,TRUE,FALSE,service_area_proxy,Y
+VTD-061,Sherburne FD 1,Sherburne,Fire District,ww,WW,,N,Y,N,3-1243,VT0101141,Direct,RBC - Rotating Biological Contactor,0.6,Municipal,Daniel Lewis,WW Chief Operator,sherburnewastewater@yahoo.com,(802) 422-3831,VT DEC / VRWA fire district workbook (Sept 2025),VT0005602,,,1,TRUE,FALSE,,Y
+VTD-062,Cuttingsville Fire District,Shrewsbury,Fire District,FD,Water,108,Y,N,N,,,,,,,,,,,,VT0005241,CUTTINGSVILLE FIRE DISTRICT,auto_confident,1,TRUE,FALSE,service_area_proxy,Y
+VTD-063,South Burlington Fire District,South Burlington,Fire District,FD,Water,250,Y,N,N,,,,,,,,,,,,VT0005090,SOUTH BURLINGTON FIRE DISTRICT,auto_confident,2,FALSE,FALSE,,Y
+VTD-064,South Hero Fire District 4,South Hero,Fire District,FD,Water,760,Y,N,N,,,,,,,,,,,,VT0020080,SOUTH HERO FIRE DISTRICT 4,auto_confident,1,TRUE,FALSE,service_area_proxy,Y
+VTD-065,St George Fire District 1,St George,Fire District,FD,Water,42,Y,N,N,,,,,,,,,,,,VT0005093,ST GEORGE FIRE DISTRICT 1,auto_confident,2,FALSE,TRUE,,Y
+VTD-066,St George Fire District 2,St George,Fire District,FD,Water,72,Y,N,N,,,,,,,,,,,,VT0005094,ST GEORGE FIRE DISTRICT #2,auto_confident,2,FALSE,TRUE,,Y
+VTD-067,St Johnsbury Center Fire District 1,St Johnsbury,Fire District,FD,Water,370,Y,N,N,,,,,,,,,,,,VT0005046,ST JOHNSBURY CENTER F D 1,auto_confident,1,TRUE,FALSE,service_area_proxy,Y
+VTD-068,Stowe Fire District 2 Gold Brook Circle,Stowe,Fire District,FD,Water,86,Y,N,N,,,,,,,,,,,,VT0005168,STOWE F D 2 GOLD BROOK CIRCLE,auto_confident,2,FALSE,FALSE,,Y
+VTD-069,Stowe Fire District 4,Stowe,Fire District,FD,Water,120,Y,N,N,,,,,,,,,,,,VT0005523,STOWE FIRE DISTRICT 4,auto_confident,2,FALSE,FALSE,,Y
+VTD-070,Winhall-Stratton Fire District 1,Stratton,Fire District,FD-both,Water & WW,6200,Y,Y,N,9-0019,,Indirect,,,Municipal,Margaret Dwyer,,mdwyer@stratton.com,,VT DEC / VRWA fire district workbook (Sept 2025),VT0005305,WINHALL STRATTON F D 1,auto_confident,1,TRUE,FALSE,service_area_proxy,Y
+VTD-071,Wallingford Fire District 1,Wallingford,Fire District,FD-both,Water & WW,956,Y,Y,N,3-0365,VT0100552,Direct,EA - Extended Aeration,0.12,Municipal,Christopher Hayes,,chayes@simonop.com,(802) 446-2964,VT DEC / VRWA fire district workbook (Sept 2025),VT0005242,WALLINGFORD FIRE DISTRICT 1,auto_confident,1,TRUE,FALSE,service_area_proxy,Y
+VTD-072,Washington Fire District,Washington,Fire District,FD,Water,170,Y,N,N,,,,,,,,,,,,VT0005185,WASHINGTON FIRE DISTRICT,auto_confident,1,TRUE,FALSE,service_area_proxy,Y
+VTD-073,Waterville Fire District 1,Waterville,Fire District,FD,Water,84,Y,N,N,,,,,,,,,,,,VT0005169,WATERVILLE FIRE DISTRICT 1,auto_confident,1,TRUE,FALSE,service_area_proxy,Y
+VTD-074,Ascutney Fire District 2,Weathersfield,Fire District,FD,Water,485,Y,N,N,,,,,,,,,,,,VT0005339,ASCUTNEY FIRE DISTRICT #2,auto_confident,1,TRUE,FALSE,service_area_proxy,Y
+VTD-075,Westfield Fire District 1,Westfield,Fire District,FD,Water,120,Y,N,N,,,,,,,,,,,,VT0005207,WESTFIELD FIRE DISTRICT 1,auto_confident,1,TRUE,FALSE,service_area_proxy,Y
+VTD-076,Westford Fire District 1,Westford,Fire District,FD-both,Water & WW,50,Y,Y,N,9-0236,,Indirect,,,Municipal,James Luisi,,jtluisi@gmail.com,,VT DEC / VRWA fire district workbook (Sept 2025),VT0005450,WESTFORD FIRE DISTRICT 1,auto_confident,1,TRUE,FALSE,service_area_proxy,Y
+VTD-077,Wheelock Fire District 1,Wheelock,Fire District,FD,Water,50,Y,N,N,,,,,,,,,,,,VT0005049,WHEELOCK FIRE DISTRICT 1,auto_confident,1,TRUE,FALSE,service_area_proxy,Y
+VTD-078,Williston Fire District 1,Williston,Fire District,FD,Water,212,Y,N,N,,,,,,,,,,,,VT0005100,WILLISTON FIRE DISTRICT 1,auto_confident,1,TRUE,FALSE,service_area_proxy,Y
+VTD-079,Cold Brook Fire District 1,Wilmington,Fire District,FD-both,Water & WW,700,Y,Y,N,3-1296,VT0101214,Direct,AL - Aerated Lagoon,0.028,Municipal,Steven G Bartlett,WW Chief Operator,coldbrookfd1@gmail.com,(802) 464-0460,VT DEC / VRWA fire district workbook (Sept 2025),VT0005313,COLD BROOK FIRE DISTRICT 1,auto_confident,2,FALSE,TRUE,,Y
+VTD-080,Cold Brook Fire District Base Area,Wilmington,Fire District (unconfirmed),FD?,Water,762,Y,N,Y,,,,,,,,,,,,,,,,,,,N
+VTD-081,Worcester Fire District 1,Worcester,Fire District,FD-both,Water & WW,350,Y,Y,N,3-0324,VT0000884,Direct,HT - Holding/Settling Tanks,0.0025,Municipal,Will Sutton,Chief Fire & Rescue Dept,,(802) 223-5633,VT DEC / VRWA fire district workbook (Sept 2025),VT0005289,WORCESTER FIRE DISTRICT 1,auto_confident,1,TRUE,FALSE,service_area_proxy,Y

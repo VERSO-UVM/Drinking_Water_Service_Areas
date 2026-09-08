@@ -21,13 +21,15 @@ var COLORS = {
 /* ---------- basemaps ---------- */
 
 var basemaps = {
+  // Standard OpenStreetMap tiles. Busier than a muted basemap, so the overlay
+  // fill opacities below stay low to keep street names readable underneath.
   light: L.tileLayer(
-    'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png',
+    'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
     {
       maxZoom: 19,
       attribution:
-        '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> ' +
-        'contributors &copy; <a href="https://carto.com/attributions">CARTO</a>'
+        '&copy; <a href="https://www.openstreetmap.org/copyright">' +
+        'OpenStreetMap</a> contributors'
     }
   ),
   imagery: L.tileLayer(
@@ -191,7 +193,7 @@ function waterStyle(feature) {
     opacity: 0.95,
     dashArray: auth ? null : '4 3',
     fillColor: auth ? COLORS.auth : COLORS.modeled,
-    fillOpacity: 0.22
+    fillOpacity: 0.18
   };
 }
 

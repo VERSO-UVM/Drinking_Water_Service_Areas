@@ -288,7 +288,36 @@ Match policy: `>=90` auto_confident, `70–89` review, `<70` none.
 
 The VLCT list is not automated because there is no clean endpoint — VLCT built theirs by hand from Fire Academy records, membership rolls, and DEC permits. If it can be obtained as a CSV (worth an email; they may simply send it), pass it via `--vlct` and it folds into the same crosswalk.
 
-> **Note:** `data/vt_district_crosswalk.csv` (the 80-district VRWA roster) currently has **no committed generator** — it was produced ad hoc from the VRWA PDF. Its schema differs from `build_district_crosswalk.py`'s output. Adding that extraction script is an open task.
+> **Resolved:** `data/vt_district_crosswalk.csv` used to have no committed generator. [`build_district_roster.py`](#build_district_rosterpy) now derives the roster from the source workbook, so it is reproducible.
+
+### `build_district_roster.py`
+
+Builds **`data/vt_district_roster.csv`** from `data/4 - VT PWS Fire District List - Updated Sept 2025 (1).xlsx` — the machine-readable version of the VRWA enumeration that the hand-extracted crosswalk was based on. This closes the "no generator" gap: the roster can now be refreshed when VRWA/DEC reissue the list.
+
+The workbook has two sheets:
+
+- **`Water`** — 79 named water-providing districts (Type, System Name, System Town, Pop Served, Services). Reconciles **78/79** against the existing crosswalk.
+- **`WW`** — 9 wastewater systems with 37 columns: discharge permit, NPDES id, treatment type and capacity, ownership, plus **named operator and administrative contacts**. Seven also appear on the Water sheet as `FD-both`; two (North Branch, Sherburne) are wastewater-only, which is why they are absent from the Water sheet.
+
+Output is 81 rows — the existing 80 plus one candidate the crosswalk omits (below) — carrying the PWSID and charter flags already established in the crosswalk, so it is a superset rather than a replacement.
+
+**New: a candidate 81st district.** `Cold Brook Fire District Base Area` (Wilmington, pop 762) is typed **`FD?`** in the workbook — VRWA itself is unsure whether it is a distinct district. It is separate from Cold Brook Fire District 1, and at 762 people it is not trivial. Flagged `unconfirmed = Y`. Worth resolving, and further evidence for [caveat 3](docs/caveats.html) that the roster is a working compilation rather than a census.
+
+**New: wastewater as a dimension.** The project had no wastewater data. The roster now carries discharge permits (e.g. `3-1296`), NPDES ids (`VT0101214`), treatment type and capacity for 9 districts — new join keys into DEC's wastewater permitting records.
+
+**New: named district contacts.** Nine districts now have a real operator or administrator with an email and phone, versus the generic "look up the PWSID in Drinking Water Watch" placeholder. These are written to the roster CSV but are **deliberately not published to the site** — several are personal addresses (gmail/comcast/yahoo) from a working spreadsheet, unlike the town clerk directory which comes from a published state list. Publishing them should be a conscious decision, not a side effect.
+
+#### Population cross-check — two real drinking-water corrections
+
+The workbook's `Pop Served` and the EPA polygon layer's `Population_Served_Count` are independent reports of the same number, so the generator compares them. **67 of 69 agree exactly.** The two that disagree are both actionable, and are written to `data/vt_district_population_check.csv`:
+
+| District | Workbook | EPA layer | Finding |
+| --- | --- | --- | --- |
+| Rutland Town FD 11 | 29 | 401 | **Wrong PWSID.** `VT0005534` is Rutland Town Fire District **1** in SDWIS (pop 401). FD 11 is **`VT0021007`**, pop **29** — matching the workbook exactly. |
+| Pownal FD 2 | 682 | 400 | **Stale EPA attribute.** SDWIS confirms `VT0020734` = 682. The workbook is right; the EPA polygon's population is out of date. |
+
+The Rutland Town FD 11 error was already suspected from the SDWIS name sweep; the workbook confirms it independently on population, in the five-district town where name matching is least reliable. That is a genuine drinking-water data correction, not just a wastewater addition.
+
 
 ### `spatial_match_districts.py`
 
@@ -368,6 +397,8 @@ Three pages:
 **The three pages are wired to each other, not just co-located.** Clicking a town on the map opens its clerk's contact, because the charter-cited plats live in that office. Caveat 6 links to the clerk directory; caveat 7 links back to the map's authoritative-only filter; the clerk directory explains its own existence by pointing at caveat 6.
 
 `build_site_data.py` reprojects to WGS84, simplifies geometry for the browser, and writes `water_service_areas.geojson`, `town_boundaries.geojson`, `town_clerks.json`, and `meta.json` into `docs/data/`. The clerk payload is `{municipalities: [...], byTown: {key: index}}`; `byTown` is resolved at build time against the VCGI town names so the browser only has to recompute a simple key. It currently joins **254 of 256** town polygons — the two misses are Avery's Gore and Lewis, both unincorporated with no clerk.
+
+**Basemap:** standard OpenStreetMap tiles (`tile.openstreetmap.org`), with Esri World Imagery as the aerial option. OSM carries its own labels and colour, so overlay fill opacity is kept low (service areas 0.18) to keep street names readable underneath. Note OSM's [tile usage policy](https://operations.osmfoundation.org/policies/tiles/) if traffic ever grows beyond light use.
 
 The fire district layer draws in its own pane between towns and water, so districts read as containers with their service areas legible on top. Real district geometry is solid purple; town-outline placeholders are dashed grey and their popup says why they cannot be used. To add a further layer, write another GeoJSON into `docs/data/` and add one entry to the `LAYERS` registry in `docs/app.js` plus a checkbox in `docs/index.html`.
 
