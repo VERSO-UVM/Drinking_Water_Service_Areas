@@ -191,35 +191,31 @@
 
   <h2>Fire and water districts</h2>
   <p>
-    Every district in the inventory, with the town it sits in. District names link
-    out where we have found a website &mdash; most districts have none, which is
-    itself part of the problem. Districts marked <span class="tag tag-pilot">pilot</span>
-    are the six working with us on boundary mapping;
-    <span class="tag tag-mapped">mapped</span> means a polygon exists on the map above,
-    and the badge jumps to it.
+    Every district in the inventory, with the town it sits in. Click any column
+    heading to sort. <strong>Details</strong> opens what we hold on that
+    district &mdash; website, charter, EPA and permit links, ordinances and
+    research notes &mdash; and says <em>In progress</em> where we have nothing
+    yet. Districts marked <span class="tag tag-pilot">pilot</span> are the six
+    working with us on boundary mapping;
+    <span class="tag tag-mapped">mapped</span> means a polygon exists on the map
+    above, and the badge jumps to it.
   </p>
 
-  <div class="district-controls">
-    <label class="sr-only" for="district-search">Filter districts</label>
-    <input type="search" id="district-search" autocomplete="off"
-           placeholder="Filter by district or town&hellip;">
-    <label><input type="checkbox" id="district-pilot-only"> Pilot only</label>
-    <label><input type="checkbox" id="district-web-only"> Has a website</label>
-    <p class="district-count" id="district-count" aria-live="polite"></p>
-  </div>
+  <p class="district-count" id="district-count"></p>
 
   <div class="table-scroll">
     <table class="district-table" id="district-table">
       <thead>
         <tr>
-          <th scope="col">Town</th>
-          <th scope="col">District</th>
-          <th scope="col">Serves</th>
-          <th scope="col" class="num">Population</th>
+          <th scope="col"><button type="button" class="sort-btn" data-sort="town">Town</button></th>
+          <th scope="col"><button type="button" class="sort-btn" data-sort="name">District</button></th>
+          <th scope="col"><button type="button" class="sort-btn" data-sort="services">Serves</button></th>
+          <th scope="col" class="num"><button type="button" class="sort-btn" data-sort="population">Population</button></th>
+          <th scope="col"><span class="sr-only">Details</span></th>
         </tr>
       </thead>
       <tbody id="district-rows">
-        <tr><td colspan="4" class="loading">Loading districts&hellip;</td></tr>
+        <tr><td colspan="5" class="loading">Loading districts&hellip;</td></tr>
       </tbody>
     </table>
   </div>
@@ -282,6 +278,15 @@
 </section>
 
 </main>
+
+<dialog id="district-dialog" aria-labelledby="dd-title">
+  <form method="dialog" class="dd-close-form">
+    <button value="close" class="dd-close" aria-label="Close">&times;</button>
+  </form>
+  <div id="dd-body"></div>
+</dialog>
+
+
 
 <footer class="site-footer">
   <div class="wrap">

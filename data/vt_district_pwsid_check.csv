@@ -1,0 +1,81 @@
+﻿district_name,town,services,assigned_pwsid,sdwis_pws_name,sdwis_city,sdwis_population,sdwis_activity,verdict,failed_checks,notes
+Alburgh Fire District 1,Alburgh,Water,VT0005137,ALBURGH FIRE DISTRICT 1,ALBURGH,87,A,OK,,
+South Alburgh Fire District 2,Alburgh,Water,,,,,,NO_PWSID,,No PWSID assigned.
+Bakersfield Fire District 1,Bakersfield,Water,VT0005114,BAKERSFIELD FIRE DISTRICT 1,BAKERSFIELD,446,A,OK,,
+Barnet Fire District 2,Barnet,Water,VT0005029,BARNET FIRE DISTRICT #2,BARNET,205,A,OK,,
+McIndoe Falls Fire District 3,Barnet,Water,VT0005441,MCINDOE FALLS FIRE DISTRICT 3,MCINDOE FALLS,176,A,OK,town,"district town 'Barnet' vs SDWIS city 'MCINDOE FALLS'; mailing city differs from the town, which is normal where the system serves a named village"
+Passumpsic Fire District 1,Barnet,Water,VT0005031,PASSUMPSIC FIRE DISTRICT 1,ST JOHNSBURY,140,A,OK,town,"district town 'Barnet' vs SDWIS city 'ST JOHNSBURY'; mailing city differs from the town, which is normal where the system serves a named village"
+Graniteville Fire District 4,Barre Town,Water,VT0005248,GRANITEVILLE FIRE DISTRICT 4,GRANITEVILLE,700,A,OK,town,"district town 'Barre Town' vs SDWIS city 'GRANITEVILLE'; mailing city differs from the town, which is normal where the system serves a named village"
+East Berkshire Fire District 1,Berkshire,Water,VT0005115,EAST BERKSHIRE FIRE DISTRICT 1,EAST BERKSHIRE,184,A,OK,,
+Brandon Fire District 1,Brandon,Water,VT0005211,BRANDON FIRE DISTRICT 1,BRANDON,3963,A,OK,,
+Burke Fire District 1,Burke,Water,VT0005033,BURKE FIRE DISTRICT 1,EAST BURKE,142,A,OK,,
+East Calais Fire District 1,Calais,Water,VT0005262,EAST CALAIS FIRE DISTRICT 1,EAST CALAIS,200,A,OK,,
+Canaan Fire District 2,Canaan,Water,VT0005107,CANAAN FD #2,CANAAN,350,A,OK,,
+Canaan Fire District 1,Canaan,Water,VT0005106,CANAAN FIRE DISTRICT 1,CANAAN,970,A,OK,,
+Castleton Fire District 1,Castleton,Water,VT0005212,CASTLETON FIRE DISTRICT 1,CASTLETON,1940,A,OK,,
+Castleton Fire District 3,Castleton,Water,VT0020889,CASTLETON FIRE DISTRICT 3,BOMOSEEN,500,A,OK,town,"district town 'Castleton' vs SDWIS city 'BOMOSEEN'; mailing city differs from the town, which is normal where the system serves a named village"
+Colchester Fire District 2,Colchester,Water,VT0005059,COLCHESTER FIRE DISTRICT 2,COLCHESTER,8300,A,OK,,
+Coventry Fire District 1,Coventry,Water,VT0005191,COVENTRY FIRE DISTRICT 1,COVENTRY,251,A,OK,,
+Craftsbury Fire District 2,Craftsbury,Water,VT0005194,CRAFTSBURY FIRE DISTRICT 2,CRAFTSBURY,420,A,OK,,
+Danby Mount Tabor Fire District 1,Danby,Water,VT0005217,DANBY MOUNT TABOR F D 1,DANBY,385,A,OK,,
+Danville Fire District 1,Danville,Water,VT0005037,DANVILLE FIRE DISTRICT 1,DANVILLE,500,A,OK,,
+Dorset Fire District 1,Dorset,Water,VT0005020,DORSET FIRE DISTRICT 1,DORSET,530,A,OK,,
+East Dorset Fire District 1,Dorset,Water,VT0005021,EAST DORSET FIRE DISTRICT 1,MANCHESTER CENTER,192,A,OK,town,"district town 'Dorset' vs SDWIS city 'MANCHESTER CENTER'; mailing city differs from the town, which is normal where the system serves a named village"
+Fairfax Fire District 1,Fairfax,Water,VT0005403,FAIRFAX FIRE DISTRICT 1,FAIRFAX,80,A,OK,,
+East Fairfield Fire District 1,Fairfield,Water,VT0005119,EAST FAIRFIELD FIRE DISTRICT 1,EAST FAIRFIELD,184,A,OK,,
+Fairfield Fire District 2,Fairfield,Water,VT0020415,FAIRFIELD FIRE DISTRICT 2,FAIRFIELD,126,A,OK,,
+South Georgia Fire District,Georgia,Water,VT0005121,SOUTH GEORGIA FIRE DISTRICT,MILTON,500,A,OK,town,"district town 'Georgia' vs SDWIS city 'MILTON'; mailing city differs from the town, which is normal where the system serves a named village"
+Grand Isle Fire District 4,Grand Isle,Water,VT0005139,GRAND ISLE FIRE DISTRICT 4,GRAND ISLE,1078,A,OK,,
+Greensboro Bend Fire District 2,Greensboro,Water,VT0005199,GREENSBORO BEND FIRE DISTRICT #2,GREENSBORO BEND,71,A,OK,,
+Greensboro Fire District 1,Greensboro,Water,VT0005198,GREENSBORO FIRE DISTRICT 1,GREENSBORO,551,A,OK,,
+East Hardwick Fire District 1,Hardwick,Water,VT0005038,EAST HARDWICK FIRE DISTRICT 1,EAST HARDWICK,350,A,OK,,
+Highgate Fire District 1,Highgate,Water,,,,,,NO_PWSID,,No PWSID assigned.
+Huntington Fire District 1,Huntington,Water,VT0005076,HUNTINGTON FIRE DISTRICT 1,HUNTINGTON,120,A,OK,,
+Hyde Park Fire District 1,Hyde Park,Water,VT0005153,HYDE PARK FIRE DISTRICT 1,HYDE PARK,275,A,OK,,
+Irasburg Fire District 1,Irasburg,Water,VT0005200,IRASBURG FD #1,IRASBURG,200,A,OK,,
+Jericho Fire District 1,Jericho,Water,VT0005476,JERICHO FIRE DISTRICT 1,JERICHO,190,A,OK,,
+Lunenburg Fire District 1,Lunenburg,Water,VT0005112,LUNENBURG FIRE DISTRICT 1,LUNENBURG,250,A,OK,,
+Lunenburg Fire District 2,Lunenburg,Water & WW,VT0005113,LUNENBURG FIRE DISTRICT 2,LUNENBURG,400,A,OK,,
+Lyn Haven Fire District 1,Lyndon,Water,VT0005041,LYN HAVEN FIRE DISTRICT 1,LYNDONVILLE,100,A,OK,,
+East Middlebury Fire District 1,Middlebury,Water,VT0005003,EAST MIDDLEBURY FD 1,EAST MIDDLEBURY,642,A,OK,,
+Norwich Fire District 1,Norwich,Water,VT0005326,NORWICH FIRE DISTRICT 1,NORWICH,870,A,OK,,
+Peacham Fire District 1,Peacham,Water,VT0005042,PEACHAM FIRE DISTRICT 1,PEACHAM,150,A,OK,,
+Pownal Fire District 2,Pownal,Water,VT0020734,POWNAL FIRE DISTRICT 2,POWNAL,682,A,OK,,
+Pownal Fire District 3,Pownal,Water,VT0005517,POWNAL FIRE DISTRICT 3,POWNAL,60,A,OK,,
+Richmond Fire District 1,Richmond,Water,VT0005426,RICHMOND FIRE DISTRICT 1,RICHMOND,56,A,OK,,
+Royalton Fire District 1,Royalton,Water,VT0005330,ROYALTON FIRE DISTRICT 1,SOUTH ROYALTON,1500,A,OK,,
+Rutland Town Fire District 5,Rutland Town,Water,VT0005429,RUTLAND TOWN FIRE DISTRICT 5,RUTLAND,110,A,OK,,
+Rutland Town Fire District 1,Rutland Town,Water,VT0005534,RUTLAND TOWN FIRE DISTRICT 1,CENTER RUTLAND,401,A,OK,town,"district town 'Rutland Town' vs SDWIS city 'CENTER RUTLAND'; mailing city differs from the town, which is normal where the system serves a named village"
+Rutland Town Fire District 11,Rutland Town,Water,VT0021007,RUTLAND TOWN FIRE DISTRICT 11,RUTLAND,29,A,OK,,
+Rutland Town Fire District 4,Rutland Town,Water,VT0020885,RUTLAND TOWN FIRE DISTRICT 4,RUTLAND TOWN,136,A,OK,,
+Rutland Town Fire District 6,Rutland Town,Water,VT0005378,RUTLAND TOWN FIRE DISTRICT 6,RUTLAND,137,A,OK,,
+Ryegate Fire District 2,Ryegate,Water & WW,VT0005043,RYEGATE FIRE DISTRICT 2,E RYEGATE,131,A,OK,,
+Sheffield Fire District 1,Sheffield,Water,VT0005381,SHEFFIELD FIRE DISTRICT 1,SHEFFIELD,50,A,OK,,
+Cuttingsville Fire District,Shrewsbury,Water,VT0005241,CUTTINGSVILLE FIRE DISTRICT,CUTTINGSVILLE,108,A,OK,town,"district town 'Shrewsbury' vs SDWIS city 'CUTTINGSVILLE'; mailing city differs from the town, which is normal where the system serves a named village"
+South Burlington Fire District,South Burlington,Water,VT0005090,SOUTH BURLINGTON FIRE DISTRICT,SOUTH BURLINGTON,250,A,OK,,
+South Hero Fire District 4,South Hero,Water,VT0020080,SOUTH HERO FIRE DISTRICT 4,SOUTH HERO,760,A,OK,,
+St George Fire District 1,St George,Water,VT0005093,ST GEORGE FIRE DISTRICT 1,ST. GEORGE,42,A,OK,,
+St George Fire District 2,St George,Water,VT0005094,ST GEORGE FIRE DISTRICT #2,ST GEORGE,72,A,OK,,
+St Johnsbury Center Fire District 1,St Johnsbury,Water,VT0005046,ST JOHNSBURY CENTER F D 1,ST JOHNSBURY CTR,370,A,OK,,
+Stowe Fire District 2 Gold Brook Circle,Stowe,Water,VT0005168,STOWE F D 2 GOLD BROOK CIRCLE,STOWE,86,A,OK,,
+Stowe Fire District 4,Stowe,Water,VT0005523,STOWE FIRE DISTRICT 4,STOWE,120,A,OK,,
+Winhall-Stratton Fire District 1,Stratton,Water & WW,VT0005305,WINHALL STRATTON F D 1,STRATTON MOUNTAIN,6200,A,OK,,
+Wallingford Fire District 1,Wallingford,Water & WW,VT0005242,WALLINGFORD FIRE DISTRICT 1,WALLINGFORD,956,A,OK,,
+Washington Fire District,Washington,Water,VT0005185,WASHINGTON FIRE DISTRICT,WASHINGTON,170,A,OK,,
+Waterville Fire District 1,Waterville,Water,VT0005169,WATERVILLE FIRE DISTRICT 1,WATERVILLE,84,A,OK,,
+Ascutney Fire District 2,Weathersfield,Water,VT0005339,ASCUTNEY FIRE DISTRICT #2,ASCUTNEY,485,A,OK,town,"district town 'Weathersfield' vs SDWIS city 'ASCUTNEY'; mailing city differs from the town, which is normal where the system serves a named village"
+Westfield Fire District 1,Westfield,Water,VT0005207,WESTFIELD FIRE DISTRICT 1,WESTFIELD,120,A,OK,,
+Westford Fire District 1,Westford,Water & WW,VT0005450,WESTFORD FIRE DISTRICT 1,WESTFORD,50,A,OK,,
+Wheelock Fire District 1,Wheelock,Water,VT0005049,WHEELOCK FIRE DISTRICT 1,LYNDONVILLE,50,A,OK,town,"district town 'Wheelock' vs SDWIS city 'LYNDONVILLE'; mailing city differs from the town, which is normal where the system serves a named village"
+Williston Fire District 1,Williston,Water,VT0005100,WILLISTON FIRE DISTRICT 1,WILLISTON,212,A,OK,,
+Cold Brook Fire District 1,Wilmington,Water & WW,VT0005313,COLD BROOK FIRE DISTRICT 1,WILMINGTON,700,A,OK,,
+Worcester Fire District 1,Worcester,Water & WW,VT0005289,WORCESTER FIRE DISTRICT 1,WORCESTER,350,A,OK,,
+Champlain Water District,South Burlington,Water,VT0005092,CHAMPLAIN WATER DISTRICT,SOUTH BURLINGTON,1,A,OK,,
+Derby Line Village Water District,Derby,Water,VT0020568,DERBY LINE VILLAGE WATER DISTRICT,STANSTEAD,897,A,OK,town,"district town 'Derby' vs SDWIS city 'STANSTEAD'; mailing city differs from the town, which is normal where the system serves a named village"
+Elmore Water District,Elmore,Water,VT0005152,ELMORE WATER DISTRICT,ELMORE,32,A,OK,,
+Grand Isle Consolidated Water District,Grand Isle,Water,VT0020614,GRAND ISLE CONSOLIDATED WATER DISTRICT,GRAND ISLE,1600,A,OK,,
+Tri Town Water District,Bridport,Water,VT0005001,TRI TOWN WATER DISTRICT,BRIDPORT,3800,A,OK,,
+Vergennes Panton Water District,Vergennes,Water,VT0005010,VERGENNES PANTON WATER DISTRICT,SHOREHAM,5100,A,OK,town,"district town 'Vergennes' vs SDWIS city 'SHOREHAM'; mailing city differs from the town, which is normal where the system serves a named village"
+Wilmington Water District,Wilmington,Water,VT0005310,TOWN OF WILMINGTON WATER SYSTEM,WILMINGTON,1400,A,OK,,
+North Branch Fire District 1,Dover,WW,,,,,,NO_PWSID,,No PWSID assigned.
+Sherburne Fire District 1,Killington,WW,,,,,,NO_PWSID,,No PWSID assigned.

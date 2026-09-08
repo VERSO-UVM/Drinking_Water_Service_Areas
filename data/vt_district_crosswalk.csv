@@ -1,4 +1,4 @@
-district_name,town,district_type,services,population,districts_in_town,single_district_town,has_legal_charter,matched_pwsid,matched_pws_name,match_score,match_status,has_service_polygon,political_bnd_proxy
+﻿district_name,town,district_type,services,population,districts_in_town,single_district_town,has_legal_charter,matched_pwsid,matched_pws_name,match_score,match_status,has_service_polygon,political_bnd_proxy
 Alburgh Fire District 1,Alburgh,Fire District,Water,87,2,FALSE,FALSE,VT0005137,ALBURGH FIRE DISTRICT 1,100,auto_confident,Y,
 South Alburgh Fire District 2,Alburgh,Fire District,Water,300,2,FALSE,FALSE,,,,,,
 Bakersfield Fire District 1,Bakersfield,Fire District,Water,446,1,TRUE,FALSE,VT0005114,BAKERSFIELD FIRE DISTRICT 1,100,auto_confident,Y,service_area_proxy
@@ -46,7 +46,7 @@ Richmond Fire District 1,Richmond,Fire District,Water,56,1,TRUE,FALSE,VT0005426,
 Royalton Fire District 1,Royalton,Fire District,Water,1500,1,TRUE,FALSE,VT0005330,ROYALTON FIRE DISTRICT 1,100,auto_confident,Y,service_area_proxy
 Rutland Town Fire District 5,Rutland Town,Fire District,Water,110,5,FALSE,FALSE,VT0005429,RUTLAND TOWN FIRE DISTRICT 5,100,auto_confident,Y,
 Rutland Town Fire District 1,Rutland Town,Fire District,Water,401,5,FALSE,FALSE,VT0005534,RUTLAND TOWN FIRE DISTRICT 1,100,auto_confident,Y,
-Rutland Town Fire District 11,Rutland Town,Fire District,Water,29,5,FALSE,FALSE,VT0005534,,,,,
+Rutland Town Fire District 11,Rutland Town,Fire District,Water,29,5,FALSE,FALSE,VT0021007,,,corrected_2026-09-08,,
 Rutland Town Fire District 4,Rutland Town,Fire District,Water,136,5,FALSE,FALSE,VT0020885,RUTLAND TOWN FIRE DISTRICT 4,100,auto_confident,Y,
 Rutland Town Fire District 6,Rutland Town,Fire District,Water,137,5,FALSE,FALSE,VT0005378,RUTLAND TOWN FIRE DISTRICT 6,100,auto_confident,Y,
 Ryegate Fire District 2,Ryegate,Fire District,Water & WW,131,1,TRUE,FALSE,VT0005043,RYEGATE FIRE DISTRICT 2,100,auto_confident,Y,service_area_proxy
@@ -77,5 +77,5 @@ Grand Isle Consolidated Water District,Grand Isle,Water District,Water,,2,FALSE,
 Tri Town Water District,Bridport,Water District,Water,,1,TRUE,FALSE,VT0005001,TRI TOWN WATER DISTRICT,100,auto_confident,Y,service_area_proxy
 Vergennes Panton Water District,Vergennes,Water District,Water,,1,TRUE,FALSE,VT0005010,VERGENNES PANTON WATER DISTRICT,100,auto_confident,Y,service_area_proxy
 Wilmington Water District,Wilmington,Water District,Water,,2,FALSE,FALSE,VT0005310,WILMINGTON WATER DIST,91.30434782608697,auto_confident,Y,
-North Branch Fire District 1,Dover,Fire District,WW,,1,TRUE,TRUE,VT0005211,,,,,
-Sherburne Fire District 1,Killington,Fire District,WW,,1,TRUE,FALSE,VT0005602,,,,,
+North Branch Fire District 1,Dover,Fire District,WW,,1,TRUE,TRUE,,,,corrected_2026-09-08,,
+Sherburne Fire District 1,Killington,Fire District,WW,,1,TRUE,FALSE,,,,corrected_2026-09-08,,

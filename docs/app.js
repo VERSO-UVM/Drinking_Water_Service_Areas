@@ -631,43 +631,53 @@ fetch('data/districts.json')
   .catch(function (err) {
     console.error(err);
     districtRows.innerHTML =
-      '<tr><td colspan="4" class="loading">District list unavailable.</td></tr>';
+      '<tr><td colspan="5" class="loading">District list unavailable.</td></tr>';
   });
 
-['district-search', 'district-pilot-only', 'district-web-only'].forEach(function (id) {
-  var el = document.getElementById(id);
-  if (el) el.addEventListener('input', renderDistricts);
+// Sort state for the roster table. Town ascending matches the build order.
+var sortKey = 'town';
+var sortAsc = true;
+
+document.querySelectorAll('.sort-btn').forEach(function (btn) {
+  btn.addEventListener('click', function () {
+    var key = btn.getAttribute('data-sort');
+    if (key === sortKey) sortAsc = !sortAsc;
+    else { sortKey = key; sortAsc = true; }
+    renderDistricts();
+  });
 });
 
 function renderDistricts() {
-  var q = (document.getElementById('district-search').value || '')
-    .trim().toLowerCase();
-  var pilotOnly = document.getElementById('district-pilot-only').checked;
-  var webOnly = document.getElementById('district-web-only').checked;
+  var rows = districtData.slice().sort(function (a, b) {
+    var x = a[sortKey], y = b[sortKey];
+    // Population is numeric and may be null; nulls always sort last.
+    if (sortKey === 'population') {
+      if (x == null && y == null) return 0;
+      if (x == null) return 1;
+      if (y == null) return -1;
+      return sortAsc ? x - y : y - x;
+    }
+    x = String(x || '').toLowerCase();
+    y = String(y || '').toLowerCase();
+    if (x < y) return sortAsc ? -1 : 1;
+    if (x > y) return sortAsc ? 1 : -1;
+    // Ties fall back to district name so the order is stable.
+    return String(a.name).localeCompare(String(b.name));
+  });
 
-  var rows = districtData.filter(function (d) {
-    if (pilotOnly && !d.pilot) return false;
-    if (webOnly && !d.website) return false;
-    if (!q) return true;
-    return (d.name + ' ' + d.town).toLowerCase().indexOf(q) !== -1;
+  document.querySelectorAll('.sort-btn').forEach(function (btn) {
+    var on = btn.getAttribute('data-sort') === sortKey;
+    btn.classList.toggle('sorted', on);
+    btn.setAttribute('aria-sort',
+      on ? (sortAsc ? 'ascending' : 'descending') : 'none');
   });
 
   document.getElementById('district-count').textContent =
-    rows.length === districtData.length
-      ? districtData.length + ' districts in ' + townCount(districtData) + ' towns'
-      : 'Showing ' + rows.length + ' of ' + districtData.length + ' districts';
-
-  if (!rows.length) {
-    districtRows.innerHTML =
-      '<tr><td colspan="4" class="loading">No districts match that filter.</td></tr>';
-    return;
-  }
+    districtData.length + ' districts in ' + townCount(districtData) + ' towns \u00b7 ' +
+    districtData.filter(function (d) { return d.website; }).length + ' with a website';
 
   var html = rows.map(function (d) {
-    var name = d.website
-      ? '<a href="' + esc(d.website) + '" target="_blank" rel="noopener">' +
-        esc(d.name) + '</a>'
-      : esc(d.name);
+    var name = esc(d.name);
 
     var tags = '';
     if (d.pilot) tags += ' <span class="tag tag-pilot">pilot</span>';
@@ -685,6 +695,8 @@ function renderDistricts() {
       '<td>' + esc(d.services || '') + '</td>' +
       '<td class="num">' + (d.population == null ? '&mdash;' : num(d.population)) +
       '</td>' +
+      '<td class="num"><button type="button" class="details-btn" data-name="' +
+      esc(d.name) + '">Details</button></td>' +
       '</tr>';
   }).join('');
 
@@ -699,8 +711,13 @@ function townCount(list) {
 
 // Delegated so the badges survive every re-render.
 districtRows.addEventListener('click', function (ev) {
-  var btn = ev.target.closest('.tag-mapped');
-  if (btn) zoomToDistrict(btn.getAttribute('data-fd'));
+  var mapBtn = ev.target.closest('.tag-mapped');
+  if (mapBtn) {
+    zoomToDistrict(mapBtn.getAttribute('data-fd'));
+    return;
+  }
+  var detailBtn = ev.target.closest('.details-btn');
+  if (detailBtn) openDetails(detailBtn.getAttribute('data-name'));
 });
 
 function zoomToDistrict(fdId) {
@@ -720,6 +737,196 @@ function zoomToDistrict(fdId) {
   document.getElementById('map').scrollIntoView({ behavior: 'smooth', block: 'center' });
   map.fitBounds(target.getBounds(), { maxZoom: 13, padding: [40, 40] });
   target.openPopup();
+}
+
+/* ---------- district details dialog ---------- */
+
+/* Every section renders even when it is empty, showing "In progress" instead
+ * of disappearing. A missing charter or permit is a research gap worth seeing,
+ * not an absence of anything to find.
+ */
+
+var dialog = document.getElementById('district-dialog');
+var dialogBody = document.getElementById('dd-body');
+
+function openDetails(name) {
+  var d = null;
+  districtData.forEach(function (x) { if (x.name === name) d = x; });
+  if (!d) return;
+
+  dialogBody.innerHTML = detailsHtml(d);
+  if (typeof dialog.showModal === 'function') dialog.showModal();
+  else dialog.setAttribute('open', '');       // very old browsers
+}
+
+// Backdrop click closes; clicks inside the panel must not.
+dialog.addEventListener('click', function (ev) {
+  if (ev.target === dialog) dialog.close();
+});
+
+function pending(label) {
+  return '<p class="dd-pending">In progress &mdash; ' + esc(label) + '</p>';
+}
+
+function detailsHtml(d) {
+  var x = d.details || {};
+  var h = '';
+
+  var tags = '';
+  if (d.pilot) tags += ' <span class="tag tag-pilot">pilot</span>';
+  if (!d.in_roster) tags += ' <span class="tag tag-extra">not in VRWA list</span>';
+
+  h += '<h2 id="dd-title">' + esc(d.name) + tags + '</h2>';
+  h += '<p class="dd-sub">' + esc(d.town) + (d.pwsid ? ' &middot; ' + esc(d.pwsid) : '') + '</p>';
+
+  h += '<h3>Description</h3>';
+  h += x.description ? '<p>' + esc(x.description) + '</p>' : pending('no description yet');
+
+  /* --- websites and charters --- */
+  h += '<h3>Websites &amp; charters</h3>';
+  var links = [];
+  if (d.website) {
+    links.push('<li><a href="' + esc(d.website) + '" target="_blank" rel="noopener">' +
+               'District website</a></li>');
+  }
+  if (x.charter) {
+    links.push('<li><a href="' + esc(x.charter.url) + '" target="_blank" rel="noopener">' +
+               'Charter: ' + esc(x.charter.title) + '</a> ' +
+               '<span class="dd-meta">24 V.S.A. App. ch. ' + esc(x.charter.chapter) +
+               '</span></li>');
+  }
+  if (x.town_charter) {
+    links.push('<li><a href="' + esc(x.town_charter.url) + '" target="_blank" rel="noopener">' +
+               esc(x.town_charter.title) + '</a> ' +
+               '<span class="dd-meta">town charter, context only</span></li>');
+  }
+  h += links.length ? '<ul class="dd-links">' + links.join('') + '</ul>'
+                    : pending('no website or charter found yet');
+
+  if (x.charter && x.charter.sections && x.charter.sections.length) {
+    h += '<h4>Charter sections describing boundaries or powers</h4>';
+    x.charter.sections.forEach(function (sec) {
+      h += '<details class="dd-section"><summary>&sect; ' + esc(sec.number) + ' &mdash; ' +
+           esc(sec.heading) + '</summary>' +
+           '<p class="dd-meta">Matched because: ' + esc(sec.why) + ' &middot; ' +
+           '<a href="' + esc(sec.url) + '" target="_blank" rel="noopener">read on ' +
+           'legislature.vermont.gov</a></p>' +
+           '<blockquote>' + esc(sec.excerpt) +
+           (sec.truncated ? '\u2026' : '') + '</blockquote></details>';
+    });
+  }
+
+  /* --- EPA and permits --- */
+  h += '<h3>EPA &amp; permit connections</h3>';
+  var rows = [];
+  if (x.epa && x.epa.pwsid) {
+    rows.push(['PWSID', esc(x.epa.pwsid)]);
+    rows.push(['Drinking water', '<a href="' + esc(x.epa.echo) + '" target="_blank" ' +
+               'rel="noopener">ECHO facility report</a> &middot; ' +
+               '<a href="' + esc(x.epa.sdwis) + '" target="_blank" rel="noopener">SDWIS record</a>']);
+  }
+  var w = x.ww || {};
+  if (w.permit) rows.push(['Wastewater permit', esc(w.permit)]);
+  if (w.npdes) rows.push(['NPDES', esc(w.npdes)]);
+  if (w.permit_type) rows.push(['Discharge', esc(w.permit_type)]);
+  if (w.treatment) rows.push(['Treatment', esc(w.treatment)]);
+  if (w.capacity_mgd) rows.push(['Capacity', esc(w.capacity_mgd) + ' MGD']);
+  h += rows.length ? ddTable(rows) : pending('no PWSID or permit on file');
+
+  /* --- ordinances and policy --- */
+  h += '<h3>Ordinances &amp; policy</h3>';
+  var docs = (x.documents || []).slice();
+
+  // Governance documents first, routine meeting records last: a reader looking
+  // for the ordinance should not have to scroll past 260 sets of minutes.
+  var RANK = {
+    ordinance: 0, bylaws: 1, charter: 2, policy: 3, rates: 4, plan: 5,
+    annual_report: 6, budget: 7, audit: 8, permit: 9, ccr: 10,
+    warning: 11, agenda: 12, packet: 13, minutes: 14, other: 15
+  };
+  docs.sort(function (a, b) {
+    var ra = RANK[a.type] === undefined ? 15 : RANK[a.type];
+    var rb = RANK[b.type] === undefined ? 15 : RANK[b.type];
+    if (ra !== rb) return ra - rb;
+    // Newest first within a type.
+    return String(b.adopted || '').localeCompare(String(a.adopted || '')) ||
+           String(a.title).localeCompare(String(b.title));
+  });
+
+  var DOC_LIMIT = 12;
+  var shown = docs.slice(0, DOC_LIMIT);
+  var hidden = docs.length - shown.length;
+
+  if (docs.length) {
+    h += '<p class="dd-meta">' + docs.length + ' document' +
+         (docs.length === 1 ? '' : 's') + ' on file.</p>';
+    h += '<ul class="dd-docs">';
+    shown.forEach(function (doc) {
+      var bits = [];
+      if (doc.type) bits.push(esc(doc.type.replace(/_/g, ' ')));
+      if (doc.adopted) bits.push(esc(doc.adopted));
+      if (doc.pages) bits.push(doc.pages + ' pp');
+      // Say so plainly when a PDF is a scan we could not read.
+      if (doc.needs_ocr) bits.push('scanned, text not extracted');
+      h += '<li><a href="' + esc(doc.url) + '" target="_blank" rel="noopener">' +
+           esc(doc.title) + '</a> <span class="dd-meta">' + bits.join(' &middot; ') +
+           '</span>';
+      if (doc.refs && doc.refs.length) {
+        h += '<br><span class="dd-meta">Cites ' +
+             doc.refs.map(esc).join('; ') + '</span>';
+      }
+      h += '</li>';
+    });
+    h += '</ul>';
+
+    if (hidden > 0) {
+      var src = '';
+      docs.forEach(function (d) { if (!src && d.source_page) src = d.source_page; });
+      h += '<p class="dd-meta">' + hidden + ' more not listed here' +
+           (src ? ' &mdash; <a href="' + esc(src) + '" target="_blank" ' +
+                  'rel="noopener">browse the source</a>' : '') + '.</p>';
+    }
+  } else {
+    h += pending('no ordinances or policies collected yet');
+  }
+
+  /* --- boundary --- */
+  h += '<h3>Boundary</h3>';
+  var b = x.boundary || {};
+  var brows = [];
+  if (b.status) brows.push(['Geometry', esc(b.status)]);
+  if (b.extent) brows.push(['Extent', esc(b.extent)]);
+  if (b.derivation) brows.push(['How it was derived', esc(b.derivation)]);
+  if (b.citation) {
+    brows.push(['Source', b.url
+      ? '<a href="' + esc(b.url) + '" target="_blank" rel="noopener">' + esc(b.citation) + '</a>'
+      : esc(b.citation)]);
+  }
+  if (b.verified) brows.push(['Verified', esc(b.verified) + (b.confirmed_by ? ' by ' + esc(b.confirmed_by) : '')]);
+  h += brows.length ? ddTable(brows) : pending('no boundary mapped yet');
+  if (b.text) h += '<blockquote>' + esc(b.text) + '</blockquote>';
+
+  /* --- notes --- */
+  h += '<h3>Notes</h3>';
+  if (x.notes && x.notes.length) {
+    h += '<ul class="dd-notes">';
+    x.notes.forEach(function (n) { h += '<li>' + esc(n) + '</li>'; });
+    h += '</ul>';
+  } else {
+    h += pending('nothing recorded yet');
+  }
+  if (x.checked_on) {
+    h += '<p class="dd-meta">Website search last run ' + esc(x.checked_on) + '.</p>';
+  }
+  return h;
+}
+
+function ddTable(rows) {
+  var h = '<table class="dd-table">';
+  rows.forEach(function (r) {
+    h += '<tr><th>' + r[0] + '</th><td>' + r[1] + '</td></tr>';
+  });
+  return h + '</table>';
 }
 
 /* ---------- helpers ---------- */

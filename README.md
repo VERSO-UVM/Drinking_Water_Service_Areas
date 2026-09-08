@@ -400,6 +400,86 @@ Three pages:
 
 **Basemap:** standard OpenStreetMap tiles (`tile.openstreetmap.org`), with Esri World Imagery as the aerial option. OSM carries its own labels and colour, so overlay fill opacity is kept low (service areas 0.18) to keep street names readable underneath. Note OSM's [tile usage policy](https://operations.osmfoundation.org/policies/tiles/) if traffic ever grows beyond light use.
 
+### District details panel
+
+Every row in the district roster carries a **Details** button opening a dialog with five fixed sections. Sections never disappear when empty -- they render *In progress* instead, so a gap reads as research still to do rather than as nothing to find.
+
+| Section | Source |
+| --- | --- |
+| Description | Composed from `vt_district_crosswalk.csv` fields only |
+| Websites & charters | `vt_district_websites.csv` + `vt_charter_chapters.csv` / `vt_charter_boundary_sections.csv` |
+| EPA & permit connections | PWSID -> ECHO facility report and SDWIS record; wastewater permit/NPDES/treatment/capacity from `vt_district_roster.csv` |
+| Boundary | Provenance fields from `vt_fire_districts.gpkg` (`source_citation`, `source_url`, `derivation`, `verified`) |
+| Notes | The research note recorded while hunting for each website, plus flags |
+
+Charter matching runs through `norm_district()`, which folds `Fairfax Fire District No. 1`, `Fairfax FD 1` and `Fairfax Fire District 1` onto one key. **Six districts have their own Title 24 Appendix charter** -- St. George FD 1, Williamstown, Cold Brook FD 1, North Branch FD 1, Fairfax FD 1 and Champlain Water District -- and their boundary sections are quoted inline (capped at 1,500 characters, with a link to the full text). Where a district has no charter of its own, the *town's* chapter is offered separately and labelled context only, because a town charter is not the district's authorising instrument.
+
+**Three chartered districts are absent from the 80-district inventory**: Milton FD 1 (ch. 501), Bolton FD 1 (ch. 504) and Morristown Corners Water Corporation (ch. 701). They hold charters but do not appear in VRWA's list.
+
+`districts.json` grows from 18 KB to ~115 KB with the details attached, which is still small enough to ship whole.
+
+### PWSID verification
+
+`script/verify_district_pwsids.py` checks every district's assigned PWSID against EPA SDWIS on **six independent axes**, because name similarity alone hides the failures that matter:
+
+| Check | What it catches |
+| --- | --- |
+| `exists` | PWSID absent from SDWIS |
+| `name` | district name vs. SDWIS system name |
+| `town` | district town vs. SDWIS city |
+| `population` | roster population vs. `population_served_count` |
+| `active` | SDWIS activity code other than A |
+| `service` | a district supplying no drinking water should hold no PWSID |
+| `unique` | two districts sharing one PWSID |
+
+**The `town` check is deliberately weak.** SDWIS `city_name` is a mailing address, so a Barnet district legitimately posts from McIndoe Falls and a Barre Town one from Graniteville. On its own it means nothing; it only counts as corroboration beside another failure. Treating it as substantive produced 13 false flags out of 15.
+
+The sweep found **three wrong assignments**, all now corrected via `--apply`:
+
+| District | Was | Now | Why |
+| --- | --- | --- | --- |
+| Sherburne FD 1 | `VT0005602` | *cleared* | `VT0005602` is **SHELBURNE FARMS** in Shelburne — a one-letter collision with **Sher**burne. The district is a municipal *sewer* district and supplies no drinking water. |
+| North Branch FD 1 | `VT0005211` | *cleared* | That PWSID belongs to Brandon FD 1, which already held it. North Branch is wastewater-only. |
+| Rutland Town FD 11 | `VT0005534` | `VT0021007` | `VT0005534` is Rutland Town FD **1** (SDWIS pop 401). `VT0021007` is FD 11, pop 29, matching the workbook exactly. |
+
+The pattern is worth naming: **two of the three were wastewater-only districts handed drinking-water identifiers**, and both duplicate-PWSID pairs in the data were errors. A district that provides no water should hold no PWSID, and that single rule catches what fuzzy name matching cannot.
+
+After correction: **76 OK, 4 with no PWSID, zero WRONG.** Full per-district results, including the passing rows and their mailing-city notes, are in `data/vt_district_pwsid_check.csv`.
+
+### Google Drive enumeration
+
+Several districts publish records through Drive, which no HTTP crawler can see — the folder listing is drawn by JavaScript, so plain requests return an empty shell. `script/enumerate_drive_folder.py` walks a public folder tree with headless Chrome and proposes registry rows.
+
+Two parsing subtleties, both of which produced silently wrong output first:
+
+- Drive uses **two layouts in one page**. Folders render as tiles whose `aria-label` carries the name; files render as **table rows** whose cells read `[type, filename, sharing, owner, modified, size]`. Reading the nearest `aria-label` yields the literal string `"Shared"` for every file — the first run produced 285 rows all titled that.
+- Drive **lazy-loads on scroll**, so a render sees only the first screen of a long folder. Deep trees need their subfolder ids supplied rather than discovered.
+
+Norwich alone yielded **285 documents, 264 of them meeting minutes** going back to 2001.
+
+### Ordinance & policy corpus
+
+`script/fetch_district_ordinances.py` produces two artifacts from one pipeline, for two audiences:
+
+| Output | Audience | Contents |
+| --- | --- | --- |
+| `docs/data/ordinances.json` | the site | Metadata and links only (16 KB). Feeds the Details dialog. |
+| `data/vt_district_ordinance_text.json` | research | Same documents **with full extracted text** (182 KB). A searchable corpus in its own right; deliberately not shipped to `docs/`. |
+
+The registry `data/vt_district_ordinances.csv` is the hand-maintained input, one row per known document (`district_name, doc_type, title, url, adopted, source_page, notes`).
+
+**Discovery is automated; acceptance is not.** `--discover` crawls the district websites we already know about, one level deep, keeps PDF links whose anchor text or filename matches an ordinance/policy/rate/report vocabulary, and appends them with `PROPOSED by --discover; confirm before trusting.` in the notes. A human clears that note before a row counts. The first run proposed 30 rows across 36 sites; **9 were dropped** — Westfield's district "website" is the Town of Westfield departments page, so discovery returned the town's Board of Listers and Selectboard policies, which are not district documents. Discovery cannot distinguish two bodies sharing one page.
+
+Current corpus: **27 documents across 11 districts, 24,724 words extracted.** By type: CCRs (6), minutes (5), rates (3), bylaws (2), ordinances (2), permits (2), annual reports (2), plus budget, plan, policy and others.
+
+**Statutory references are extracted per document.** Castleton FD 1's water ordinance alone cites nine — including `24 V.S.A, Chapter 89, Section 3315` (its operating authority) and `24 V.S.A., Chapter 129, Section 5147`. This is what makes the corpus comparable across districts rather than just a pile of links.
+
+**14 of 27 documents are scanned images with no text layer.** Extraction falls back from PyMuPDF to pdfplumber and, when both yield under 200 characters, flags `needs_ocr` rather than silently recording an empty document. The site says "scanned, text not extracted" on those. OCR would need Tesseract, which is not installed here; until then those 14 are links only. Whole districts are affected: every South Alburgh document and every Wilmington CCR before 2025 is a scan.
+
+### Roster table
+
+The table sorts by clicking any column heading (town, district, serves, population; nulls sort last, ties break on district name). The earlier text filter and the pilot/website checkboxes were removed in favour of sorting. District names are plain text — the website link lives in the Details dialog, so the table has one job and the dialog holds everything known about a district.
+
 ### ANR live infrastructure layers
 
 Two layers come straight from Vermont ANR's public ArcGIS services rather than from files in this repo. Both are **off by default** and nothing is requested from ANR until a user ticks the box.

@@ -1,0 +1,12 @@
+# Download cache for script/fetch_district_ordinances.py (~24 MB and growing).
+# The extracted text lives in data/vt_district_ordinance_text.json, which IS
+# committed, so the corpus survives without the binaries. Re-run the script to
+# refill this directory.
+#
+# Worth reconsidering: municipal PDFs disappear. One registry URL already 404s
+# and one district domain stopped resolving mid-project. If preservation
+# matters more than repo size, drop this rule and commit the PDFs.
+data/ordinances/
+
+__pycache__/
+*.pyc
