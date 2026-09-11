@@ -10,7 +10,7 @@ This project aims to address this gap by conducting a **pilot mapping project**.
 
 ## Current Status: Inventory, Not Boundaries
 
-The fire-district boundary layer now exists as [`data/vt_fire_districts.gpkg`](data/vt_fire_districts.gpkg) — see [`build_fire_districts.py`](#build_fire_districtspy). It holds **4 confirmed boundaries plus 1 approximate extent**, so the framing below still stands: the near-term deliverable is the inventory, and this layer is the container that inventory is gradually filled into.
+The fire-district boundary layer now exists as [`data/vt_fire_districts.gpkg`](data/vt_fire_districts.gpkg) — see [`build_fire_districts.py`](#build_fire_districtspy). It holds **5 confirmed boundaries plus 1 approximate extent**, so the framing below still stands: the near-term deliverable is the inventory, and this layer is the container that inventory is gradually filled into.
 
 The first deliverable is **a coverage map of the problem, not the boundaries themselves**. Before anyone can quote a digitizing estimate, we need to know how many districts exist, which already have a service-area polygon to start from, and which need boundary work from scratch. That inventory now exists in [`data/vt_district_crosswalk.csv`](data/vt_district_crosswalk.csv).
 
@@ -144,7 +144,9 @@ unfilled skeleton and prints a warning if the filled CSV is absent.
 
 ### `build_fire_districts.py`
 
-Builds **`data/vt_fire_districts.gpkg`** (layer `fire_districts`, EPSG:32145) plus a `vt_fire_districts.csv` attribute sidecar. This is the layer the whole project is trying to produce — the political/taxing boundaries that [caveat 10](docs/caveats.html) says exist nowhere statewide. It currently holds **3 pilot polygons out of 80 districts**. It is the seed, not the deliverable.
+Builds **`data/vt_fire_districts.gpkg`** (layer `fire_districts`, EPSG:32145) plus a `vt_fire_districts.csv` attribute sidecar. This is the layer the whole project is trying to produce — the political/taxing boundaries that [caveat 10](docs/caveats.html) says exist nowhere statewide. It currently holds **6 polygons out of 80 districts** (3 pilot, plus Williamstown, Fairfax, and South Alburgh FD 2). It is the seed, not the deliverable.
+
+**Partner submissions live in `boundary_submissions/<district_name>/`**, one folder per submission (raw shapefile plus whatever sidecars the partner sent). This replaced the flat `pilotData/` folder so a new district's files land next to the pilot districts' rather than in a separate, differently-shaped place. To add a new district: drop its shapefile set into a new `boundary_submissions/<district_name>/` folder, add a `SOURCES` entry in this script naming the file, town, and provenance, then re-run this script and `build_site_data.py`.
 
 **Joining to the water data.** Every row carries `pwsid`, so the layer joins 1:1 to `data/vt_water_boundaries.gpkg` on `PWSID`:
 
@@ -173,17 +175,22 @@ Any boundary in this layer can be defended. Each row carries:
 
 The map popup renders the citation, the quoted statute, and the derivation, so a reviewer can see *why* a polygon is shaped the way it is without opening the CSV.
 
-#### The five current boundaries
+#### The six current boundaries
 
 | District | Source | Area | Extent | Verified |
 | --- | --- | --- | --- | --- |
 | Danville FD 1 | partner shapefile | 158.03 km² | coextensive with town | Y |
 | East Hardwick FD 1 | partner shapefile | 100.24 km² | coextensive with town | Y |
 | Peacham FD 1 | partner shapefile | 94.72 km² | sub-town (76.6%) | N |
+| **South Alburgh FD 2** | **partner shapefile** | 34.06 km² | sub-town (27.7%) | N |
 | **Williamstown FD** | **24 V.S.A. App. ch. 505, § 2** | 104.53 km² | coextensive with town | Y |
 | **Fairfax FD 1** | **24 V.S.A. App. ch. 511, § 2** | 2.65 km² | **approximate** | N |
 
 **Williamstown Fire District** is exact, not an approximation. The statute reads: *"The corporate limits shall be the boundary lines of the Town of Williamstown…"* — so the VCGI town polygon **is** the district boundary, copied unmodified.
+
+**South Alburgh Fire District 2** arrived from John Kiernan (RCAP Solutions, VT State Manager for Community & Environmental Resources) on 2026-09-11, as a full shapefile set with a real `.prj` — the first partner submission to include one. Its CRS (NAD83 / Vermont (ftUS), EPSG:5646) was read directly rather than inferred (`crs_inferred = N`). The geometry itself arrived as a closed boundary **line**, not a filled polygon — `build_fire_districts.py` now converts any closed ring to the polygon it encloses before doing anything else with it (`close_rings_to_polygons`), since `buffer(0)` on a LineString silently produces an empty geometry rather than erroring. The `.dbf` carries no attribute fields at all — just the one boundary geometry, nothing else. Not yet confirmed by the project lead, so `verified = N` like Peacham.
+
+**Tracking who sent a submission and when.** Two new fields, `submitted_by` and `submission_date`, sit alongside the existing provenance fields (`source_citation`, `derivation`, etc.) and are the first fields for *who sent this* rather than *what authorizes it* — the map popup and Details panel render them as "Submitted by ... on ...". They're populated straight from `SOURCES` in the script and, for now, only South Alburgh has them filled in; backfilling the three pilot districts would mean guessing at submission dates that were never recorded. Each `boundary_submissions/<district>/` folder can also carry a `SOURCE.md` with the full human context (email text, file manifest, what was and wasn't included) — South Alburgh's is the first and the template to copy for the next one. This is deliberately not yet a required, repo-wide standard; formalize it once a few more submissions show what the recurring fields actually are.
 
 Williamstown also exposes a roster gap: it is **not among the 80 VRWA districts**, and SDWIS shows it operates no public water system (Williamstown's water is a town department, VT0005186). The VRWA roster is *water-system-scoped*, so a chartered fire district that provides no water falls outside it. **The true universe of Vermont fire districts is larger than 80** — worth stating to the Bond Bank alongside [caveat 3](docs/caveats.html).
 
@@ -390,7 +397,7 @@ Three pages:
 
 | Page | What it is |
 | --- | --- |
-| `index.html` | Map of the 392 EPA service areas, 5 fire district polygons (4 confirmed, 1 approximate), and 256 VCGI town boundaries, with layer toggles, a provenance filter, and system search. Below the map, a filterable roster of all 81 districts with their town and website. Leads with the headline caveat so nobody mistakes service areas for political boundaries. |
+| `index.html` | Map of the 392 EPA service areas, 6 fire district polygons (5 confirmed, 1 approximate), and 256 VCGI town boundaries, with layer toggles, a provenance filter, and system search. Below the map, a filterable roster of all 81 districts with their town and website. Leads with the headline caveat so nobody mistakes service areas for political boundaries. |
 | `caveats.html` | The full contents of `District_Boundary_Data_Caveats.docx` as a web page — the at-a-glance matrix, all 12 severity-tagged caveats, and the deliverable framing. |
 | `contacts.html` | Searchable town clerk directory, filterable by county, with an "has an email" filter. |
 
@@ -509,7 +516,7 @@ Two behaviours that look like bugs but are ANR's own settings:
 - **`data/vt_district_crosswalk.csv`** — the 80-district VRWA inventory.
 - **any mapped polygon the crosswalk does not contain.** Today that is exactly one: **Williamstown Fire District**, which has a boundary in `vt_fire_districts.gpkg` but appears in neither the crosswalk nor `vt_district_roster.csv`. A plain inner join would have silently dropped a district we already have geometry for, so those rows are carried through and badged *not in VRWA list* on the page. It is worth resolving whether VRWA's enumeration missed it or it is out of scope.
 
-Totals: **81 districts across 62 towns**, 4 with a confirmed boundary, 3 with a known website.
+Totals: **81 districts across 62 towns**, 5 with a confirmed boundary, 3 with a known website.
 
 **Website links live in [`data/vt_district_websites.csv`](data/vt_district_websites.csv)**, a hand-maintained fill-in sheet with one row per district and columns `district_name, town, district_website, checked_on, notes`. Most rows are blank — few Vermont fire districts publish anything, which is part of what makes them hard to contact — so the sheet doubles as a checklist: record a `checked_on` date with no URL to mean "looked, found none." Only non-blank rows produce a link. A URL set in `build_fire_districts.py`'s `SOURCES` is used as a fallback, so a link attached to a polygon is never dropped.
 
@@ -582,5 +589,5 @@ This system would also contribute meaningfully to risk management and equity. Ma
 
 ### The actual project
 
-1. Grow `data/vt_fire_districts.gpkg` from 4 confirmed boundaries toward 80 (and beyond — see the Williamstown roster gap). Add each new district as a row with its `pwsid` so it stays joinable to the water data.
+1. Grow `data/vt_fire_districts.gpkg` from 5 confirmed boundaries toward 80 (and beyond — see the Williamstown roster gap). Add each new district as a row with its `pwsid` so it stays joinable to the water data.
 2. Digitize political boundaries for the districts in multi-district towns — the multi-month ORCA-student-scale project. Hand the Bond Bank the inventory first and let it drive the estimate, rather than quoting the digitizing blind. The remaining boundaries are genuine manual GIS work (parcel data, town maps, the charter-cited plats) that no script pulls.

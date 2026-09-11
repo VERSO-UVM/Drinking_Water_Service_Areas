@@ -150,6 +150,7 @@ FIRE_FIELDS = [
     "verified", "confirmed_by", "district_website", "source_type",
     "source_citation", "source_url", "source_text", "derivation",
     "source_file", "source_crs", "crs_inferred",
+    "submitted_by", "submission_date",
     "clerk_name", "clerk_email", "notes",
 ]
 
@@ -370,6 +371,8 @@ def attach_details(records, fire):
                 "derivation": str(r.get("derivation", "") or ""),
                 "verified": str(r.get("verified", "") or ""),
                 "confirmed_by": str(r.get("confirmed_by", "") or ""),
+                "submitted_by": str(r.get("submitted_by", "") or ""),
+                "submission_date": str(r.get("submission_date", "") or ""),
             }
 
     charter_hits = permit_hits = 0
