@@ -19,7 +19,9 @@ CRS HANDLING:
   The pilot shapefiles arrived with no .prj (caveat 11), so the CRS is *inferred*
   by reprojecting under each candidate and keeping whichever lands the polygon on
   its own town. Rows record `source_crs` and `crs_inferred = Y` so nobody later
-  mistakes a guess for a declaration.
+  mistakes a guess for a declaration. When a submission DOES carry a real .prj
+  (South Alburgh FD 2 is the first), that declared CRS is trusted directly --
+  `crs_inferred = N` -- and only checked against the town for QA, not guessed.
 
 EXTENT, NOT QUALITY:
   `extent` records whether a district's boundary is coextensive with its town or
@@ -30,7 +32,21 @@ EXTENT, NOT QUALITY:
   while the difference against the *water service area* stays large.
 
 INPUTS:
-  pilotData/*.shp                    (bare .shp, sidecars missing)
+  boundary_submissions/<district_name>/*.shp  (one folder per partner
+                                        submission; pilot files arrived as a
+                                        bare .shp with sidecars missing, later
+                                        submissions like South Alburgh FD 2
+                                        arrive as a full shapefile set with a
+                                        real .prj)
+  boundary_submissions/<district_name>/SOURCE.md  (optional: who sent the
+                                        submission, when, and how -- see
+                                        South Alburgh FD 2's for the pattern.
+                                        Not required by this script; it's
+                                        human provenance, not an input the
+                                        build reads. `submitted_by` /
+                                        `submission_date` in SOURCES below
+                                        are the machine-readable echo of it,
+                                        shown on the map.)
   data/vt_district_crosswalk.csv     (roster: PWSID, population, charter flags)
   data/vt_town_clerk_contacts_filled.csv  (optional: clerk contact per town)
   VCGI town boundaries               (fetched live, for CRS inference + QA)
@@ -52,11 +68,11 @@ os.environ.setdefault("SHAPE_RESTORE_SHX", "YES")  # must precede the GDAL impor
 import geopandas as gpd
 import pandas as pd
 import requests
-from shapely.geometry import box, shape
+from shapely.geometry import LineString, MultiLineString, Polygon, box, shape
 from shapely.ops import polygonize, unary_union
 
 ROOT = Path(__file__).resolve().parent.parent
-PILOT_DIR = ROOT / "pilotData"
+BOUNDARY_DIR = ROOT / "boundary_submissions"
 CROSSWALK = ROOT / "data" / "vt_district_crosswalk.csv"
 CLERKS = ROOT / "data" / "vt_town_clerk_contacts_filled.csv"
 OUT_GPKG = ROOT / "data" / "vt_fire_districts.gpkg"
@@ -84,7 +100,7 @@ ROADS_URL = (
 # `source_text` that justified it, plus `derivation` for how it was built.
 #
 # `kind` selects the geometry builder:
-#   shapefile   -- partner-supplied .shp from pilotData/
+#   shapefile   -- partner-supplied .shp from boundary_submissions/
 #   town_polygon-- statute says the district equals its town; copy VCGI town
 #   road_bounded-- statute names bounding roads; hull of those centerlines
 #
@@ -92,7 +108,7 @@ ROADS_URL = (
 SOURCES = [
     {
         "kind": "shapefile",
-        "file": "Danville Fire District.shp",
+        "file": "Danville Fire District 1/Danville Fire District.shp",
         "district_name": "Danville Fire District 1",
         "town": "Danville",
         "source_type": "Partner-supplied shapefile",
@@ -104,7 +120,7 @@ SOURCES = [
     },
     {
         "kind": "shapefile",
-        "file": "HardwickFD.shp",
+        "file": "East Hardwick Fire District 1/HardwickFD.shp",
         "district_name": "East Hardwick Fire District 1",
         "town": "Hardwick",
         "source_type": "Partner-supplied shapefile",
@@ -116,7 +132,7 @@ SOURCES = [
     },
     {
         "kind": "shapefile",
-        "file": "Peacham_FD1.shp",
+        "file": "Peacham Fire District 1/Peacham_FD1.shp",
         "district_name": "Peacham Fire District 1",
         "town": "Peacham",
         "source_type": "Partner-supplied shapefile",
@@ -125,6 +141,29 @@ SOURCES = [
         "source_text": "",
         "derivation": "Partner shapefile; CRS inferred (no .prj supplied).",
         "district_website": "https://peacham.org/peacham-fire-district/",
+    },
+    {
+        "kind": "shapefile",
+        "file": "South Alburgh Fire District 2/SAFD2 Boundary.shp",
+        "district_name": "South Alburgh Fire District 2",
+        "town": "Alburgh",
+        "source_type": "Partner-supplied shapefile",
+        "source_citation": "South Alburgh Fire District No. 2, "
+                           "partner-supplied boundary shapefile.",
+        "source_url": "",
+        "source_text": "",
+        "derivation": "Partner shapefile; CRS supplied via .prj "
+                      "(NAD83 / Vermont (ftUS), EPSG:5646) -- not inferred.",
+        "district_website": "http://www.safd2.org/",
+        # Who sent this and when -- distinct from `source_citation` (what
+        # authorizes the polygon) so a submission can be traced even when
+        # there's no statute or citable document behind it, and so future
+        # submissions have a field to fill without overloading citation
+        # prose. See boundary_submissions/<district>/SOURCE.md for the
+        # full email.
+        "submitted_by": "John Kiernan, RCAP Solutions "
+                        "(jkiernan@rcapsolutions.org)",
+        "submission_date": "2026-09-11",
     },
     {
         "kind": "town_polygon",
@@ -216,6 +255,7 @@ ATTRS = [
     # Provenance: why this polygon exists and what authorizes it.
     "source_type", "source_citation", "source_url", "source_text",
     "derivation", "source_file", "source_crs", "crs_inferred",
+    "submitted_by", "submission_date",
     "clerk_name", "clerk_email", "notes",
 ]
 
@@ -238,13 +278,42 @@ def fetch_towns(names):
     return gdf.dissolve("TOWNNAMEMC").geometry
 
 
+def close_rings_to_polygons(geom):
+    """Some partner exports draw a district as a closed boundary LINE rather
+    than a filled polygon (South Alburgh FD 2 is the first). `buffer(0)` on
+    a LineString silently collapses to an empty geometry, not an error, so
+    this has to be caught before that -- convert any closed ring to the
+    polygon it encloses; pass real polygons through unchanged.
+    """
+    if isinstance(geom, LineString) and geom.is_ring:
+        return Polygon(geom.coords)
+    if isinstance(geom, MultiLineString):
+        rings = [Polygon(g.coords) for g in geom.geoms if g.is_ring]
+        if rings:
+            return unary_union(rings)
+    return geom
+
+
 def infer_crs(path, town_geom):
     """Pick the CRS under which this polygon actually lands on its town.
 
-    Returns (epsg, gdf_in_CRS, iou). Without a .prj there is nothing to read,
-    so the town itself is the ground truth.
+    Returns (epsg, gdf_in_CRS, iou, declared). Without a .prj there is
+    nothing to read, so the town itself is the ground truth and `declared`
+    is False. When the shapefile DOES carry a real .prj, that declared CRS
+    is trusted directly rather than guessed -- `declared` is True -- and the
+    town IoU is computed only as a QA check, not to pick among candidates.
     """
     raw = gpd.read_file(path)
+    raw["geometry"] = raw.geometry.apply(close_rings_to_polygons)
+    if raw.crs is not None:
+        epsg = raw.crs.to_epsg(min_confidence=20)
+        if epsg is not None:
+            g = raw.to_crs(CRS)
+            geom = g.geometry.buffer(0).union_all()
+            union = geom.union(town_geom).area
+            iou = geom.intersection(town_geom).area / union if union else 0.0
+            return epsg, g, iou, True
+
     best = (None, None, -1.0)
     for epsg in CANDIDATE_CRS:
         try:
@@ -260,7 +329,7 @@ def infer_crs(path, town_geom):
             # `g` is already reprojected into CRS -- re-tagging it here would
             # transform it a second time and collapse the geometry.
             best = (epsg, g, iou)
-    return best
+    return best + (False,)
 
 
 def fetch_roads(where):
@@ -332,19 +401,19 @@ def main():
         build_note = ""
 
         if kind == "shapefile":
-            path = PILOT_DIR / src["file"]
+            path = BOUNDARY_DIR / src["file"]
             if not path.exists():
                 print(f"  MISSING {path}", file=sys.stderr)
                 continue
-            epsg_num, gdf, _iou = infer_crs(path, town_geom)
+            epsg_num, gdf, _iou, declared = infer_crs(path, town_geom)
             if epsg_num is None:
                 print(f"  could not infer a CRS for {src['file']}",
                       file=sys.stderr)
                 continue
             geom = gdf.geometry.buffer(0).union_all()
             epsg = f"EPSG:{epsg_num}"
-            source_file = f"pilotData/{src['file']}"
-            crs_inferred = "Y"
+            source_file = f"boundary_submissions/{src['file']}"
+            crs_inferred = "N" if declared else "Y"
 
         elif kind == "town_polygon":
             # Statute declares the district coextensive with its town, so the
@@ -433,6 +502,8 @@ def main():
             "source_file": source_file,
             "source_crs": epsg,
             "crs_inferred": crs_inferred,
+            "submitted_by": src.get("submitted_by", ""),
+            "submission_date": src.get("submission_date", ""),
             "notes": note,
         }
 

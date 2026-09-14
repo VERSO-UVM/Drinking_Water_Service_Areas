@@ -377,6 +377,10 @@ function firePopupHtml(p) {
     if (p.derivation) {
       html += '<p class="derivation">' + esc(p.derivation) + '</p>';
     }
+    if (p.submitted_by) {
+      html += '<p>Submitted by ' + esc(p.submitted_by) +
+        (p.submission_date ? ' on ' + esc(p.submission_date) : '') + '</p>';
+    }
     html += '</div>';
   }
 
@@ -903,6 +907,7 @@ function detailsHtml(d) {
       : esc(b.citation)]);
   }
   if (b.verified) brows.push(['Verified', esc(b.verified) + (b.confirmed_by ? ' by ' + esc(b.confirmed_by) : '')]);
+  if (b.submitted_by) brows.push(['Submitted by', esc(b.submitted_by) + (b.submission_date ? ' on ' + esc(b.submission_date) : '')]);
   h += brows.length ? ddTable(brows) : pending('no boundary mapped yet');
   if (b.text) h += '<blockquote>' + esc(b.text) + '</blockquote>';
 
