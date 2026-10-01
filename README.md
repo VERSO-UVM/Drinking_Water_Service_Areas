@@ -12,7 +12,7 @@ This project aims to address this gap by conducting a **pilot mapping project**.
 
 ## Current Status: Inventory, Not Boundaries
 
-The fire-district boundary layer now exists as [`data/vt_fire_districts.gpkg`](data/vt_fire_districts.gpkg) — see [`build_fire_districts.py`](#build_fire_districtspy). It holds **5 confirmed boundaries plus 1 approximate extent**, so the framing below still stands: the near-term deliverable is the inventory, and this layer is the container that inventory is gradually filled into.
+The fire-district boundary layer now exists as [`data/vt_fire_districts.gpkg`](data/vt_fire_districts.gpkg) — see [`build_fire_districts.py`](#build_fire_districtspy). It holds **5 district boundaries plus 1 approximate extent** (none yet verified by the districts), so the framing below still stands: the near-term deliverable is the inventory, and this layer is the container that inventory is gradually filled into.
 
 The first deliverable is **a coverage map of the problem, not the boundaries themselves**. Before anyone can quote a digitizing estimate, we need to know how many districts exist, which already have a service-area polygon to start from, and which need boundary work from scratch. That inventory now exists in [`data/vt_district_crosswalk.csv`](data/vt_district_crosswalk.csv).
 
@@ -158,28 +158,32 @@ epa = gpd.read_file("data/vt_water_boundaries.gpkg", layer="all_public_water_sys
 fd.merge(epa, left_on="pwsid", right_on="PWSID")     # verified: 3 of 3 join
 ```
 
-`district_name` + `town` join to `data/vt_district_crosswalk.csv`; `town` joins to the clerk contact sheet. Roster attributes (population, `district_type`, `services`, `districts_in_town`, `single_district_town`, `has_legal_charter`, `match_score`) and the town clerk's name and email are denormalized onto each row, so the file works as a standalone digitizing worklist.
+`name` + `towns` join to `district_name` + `town` in `data/vt_district_crosswalk.csv`; `towns` joins to the clerk contact sheet. Roster attributes (population, `district_type`, `services`, `districts_in_town`, `single_district_town`, `has_legal_charter`, `match_score`) and the town clerk's name and email are denormalized onto each row, so the file works as a standalone digitizing worklist.
 
 **CRS is inferred, not read.** The pilot shapefiles have no `.prj` ([caveat 11](docs/caveats.html)), so the script reprojects each file under every candidate CRS and keeps whichever lands the polygon on its own town — the town is the ground truth. It independently recovered **EPSG:4326** for Danville and Hardwick and **EPSG:32145** for Peacham, the three CRSs the caveats document noted. Rows record `source_crs` and `crs_inferred = Y` so a guess is never mistaken for a declaration. The same mechanism will handle the next partner submission that arrives without a projection.
 
-#### Provenance: every polygon cites its source
+#### Fields follow the data standard
 
-Any boundary in this layer can be defended. Each row carries:
+The layer's field names and coded values follow [`docs/METADATA_STANDARD.md`](docs/METADATA_STANDARD.md): core identity (§3), provenance (§4), verification (§5) and political-district fields (§6). The build **fails** on any coded value outside the standard's lists (`validate()`), and prints every *required* field still blank. Those blanks are questions for people, not build errors; see [`build_boundary_followup.py`](#build_boundary_followuppy). Following the standard, a field nobody can answer yet holds `Unknown`/`unknown` rather than being left empty. Appendix B of the standard maps the pre-standard names (`fd_id`, `source_citation`, `derivation`, `verified`, …) onto the current ones.
+
+Any boundary in this layer can be defended. The fields that do it:
 
 | Field | Purpose |
 | --- | --- |
-| `source_type` | partner shapefile / statute (town-wide) / statute (road-bounded) |
-| `source_citation` | e.g. `24 V.S.A. App. ch. 505, § 2` |
-| `source_url` | direct link to the statute section or submission |
-| `source_text` | **the verbatim text that authorizes the polygon** |
-| `derivation` | how the geometry was actually produced |
-| `district_website` | the district's own site, where one exists |
+| `method`, `method_basis` | how the geometry was made, and from what (coded) |
+| `method_details` | how the geometry was actually produced, in words |
+| `legal_authority_type`, `legal_citation` | what legally establishes the boundary, e.g. `Legislative charter`, `24 V.S.A. App. ch. 505, § 2`, or `unknown` |
+| `legal_text` | **the verbatim text that authorizes the polygon** |
+| `source_url` | direct link to the statute section or source document |
+| `verification_status` | `Verified` only once the district, its clerk, or the chartering body has checked it |
 
-The map popup renders the citation, the quoted statute, and the derivation, so a reviewer can see *why* a polygon is shaped the way it is without opening the CSV.
+The map popup renders the legal authority, the quoted statute, and the method, so a reviewer can see *why* a polygon is shaped the way it is without opening the CSV.
+
+**None of the six is `Verified` yet.** The project lead's 2026-08-14 check that Danville and East Hardwick are town-wide is a QA check, recorded in `notes`; under the standard (§5), only someone with legal knowledge of the boundary can verify it. Williamstown's statute is unambiguous, but nobody has yet confirmed the charter hasn't been amended since.
 
 #### The six current boundaries
 
-| District | Source | Area | Extent | Verified |
+| District | Source | Area | Extent | Project QA check |
 | --- | --- | --- | --- | --- |
 | Danville FD 1 | partner shapefile | 158.03 km² | coextensive with town | Y |
 | East Hardwick FD 1 | partner shapefile | 100.24 km² | coextensive with town | Y |
@@ -190,13 +194,13 @@ The map popup renders the citation, the quoted statute, and the derivation, so a
 
 **Williamstown Fire District** is exact, not an approximation. The statute reads: *"The corporate limits shall be the boundary lines of the Town of Williamstown…"* — so the VCGI town polygon **is** the district boundary, copied unmodified.
 
-**South Alburgh Fire District 2** arrived from John Kiernan (RCAP Solutions, VT State Manager for Community & Environmental Resources) on 2026-09-11, as a full shapefile set with a real `.prj` — the first partner submission to include one. Its CRS (NAD83 / Vermont (ftUS), EPSG:5646) was read directly rather than inferred (`crs_inferred = N`). The geometry itself arrived as a closed boundary **line**, not a filled polygon — `build_fire_districts.py` now converts any closed ring to the polygon it encloses before doing anything else with it (`close_rings_to_polygons`), since `buffer(0)` on a LineString silently produces an empty geometry rather than erroring. The `.dbf` carries no attribute fields at all — just the one boundary geometry, nothing else. Not yet confirmed by the project lead, so `verified = N` like Peacham.
+**South Alburgh Fire District 2** arrived from John Kiernan (RCAP Solutions, VT State Manager for Community & Environmental Resources) on 2026-09-11, as a full shapefile set with a real `.prj` — the first partner submission to include one. Its CRS (NAD83 / Vermont (ftUS), EPSG:5646) was read directly rather than inferred (`crs_inferred = N`). The geometry itself arrived as a closed boundary **line**, not a filled polygon — `build_fire_districts.py` now converts any closed ring to the polygon it encloses before doing anything else with it (`close_rings_to_polygons`), since `buffer(0)` on a LineString silently produces an empty geometry rather than erroring. The `.dbf` carries no attribute fields at all — just the one boundary geometry, nothing else. Not yet verified, like the other five.
 
-**Tracking who sent a submission and when.** Two new fields, `submitted_by` and `submission_date`, sit alongside the existing provenance fields (`source_citation`, `derivation`, etc.) and are the first fields for *who sent this* rather than *what authorizes it* — the map popup and Details panel render them as "Submitted by ... on ...". They're populated straight from `SOURCES` in the script and, for now, only South Alburgh has them filled in; backfilling the three pilot districts would mean guessing at submission dates that were never recorded. Each `boundary_submissions/<district>/` folder can also carry a `SOURCE.md` with the full human context (email text, file manifest, what was and wasn't included) — South Alburgh's is the first and the template to copy for the next one. `SOURCE.md` and these fields are now part of the draft [data standard](docs/METADATA_STANDARD.md) (§4 provenance, §9 per-submission record); Appendix B there maps this layer's current fields onto the standard's names.
+**Tracking who sent a submission and when.** Two fields, `submitted_by` and `submission_date`, sit alongside the other provenance fields (`legal_citation`, `method_details`, etc.) and are the first fields for *who sent this* rather than *what authorizes it* — the map popup and Details panel render them as "Submitted by ... on ...". They're populated straight from `SOURCES` in the script and, for now, only South Alburgh has them filled in; backfilling the three pilot districts would mean guessing at submission dates that were never recorded. Each `boundary_submissions/<district>/` folder can also carry a `SOURCE.md` with the full human context (email text, file manifest, what was and wasn't included) — South Alburgh's is the first and the template to copy for the next one. `SOURCE.md` and these fields are now part of the draft [data standard](docs/METADATA_STANDARD.md) (§4 provenance, §9 per-submission record); The three pilot submissions' senders and dates are open questions in `data/boundary_followup.md`.
 
 Williamstown also exposes a roster gap: it is **not among the 80 VRWA districts**, and SDWIS shows it operates no public water system (Williamstown's water is a town department, VT0005186). The VRWA roster is *water-system-scoped*, so a chartered fire district that provides no water falls outside it. **The true universe of Vermont fire districts is larger than 80** — worth stating to the Bond Bank alongside [caveat 3](docs/caveats.html).
 
-**Fairfax FD 1 is approximate, and I over-promised it earlier.** I described it as digitizable from its four named roads without a clerk visit. Testing that: the roads exist in the VT E911 centerline layer, but they **do not close a ring** — gaps of 163 m, 825 m, and 1,072 m sit between them. So the polygon is the convex hull of the four centerlines, `geometry_status = approximate`, `extent = approximate_from_statute`, `verified = N`, drawn dotted teal on the map. Two things support it as a starting estimate: it is 2.65 km², a plausible scale for an 80-person district, and it contains **98.6%** of that district's EPA service area. But the statute itself says *"as recorded with the Town of Fairfax"* — the authoritative geometry is a town record, same as Cold Brook.
+**Fairfax FD 1 is approximate, and I over-promised it earlier.** I described it as digitizable from its four named roads without a clerk visit. Testing that: the roads exist in the VT E911 centerline layer, but they **do not close a ring** — gaps of 163 m, 825 m, and 1,072 m sit between them. So the polygon is the convex hull of the four centerlines, `extent = approximate`, `method = Other`, `method_basis = Feature-bounded`, drawn dotted teal on the map. Two things support it as a starting estimate: it is 2.65 km², a plausible scale for an 80-person district, and it contains **98.6%** of that district's EPA service area. But the statute itself says *"as recorded with the Town of Fairfax"* — the authoritative geometry is a town record, same as Cold Brook.
 
 #### North Branch Fire District 1 — no polygon yet
 
@@ -208,13 +212,13 @@ It is tracked in **`data/vt_fire_districts_pending.csv`** so it stays visible. A
 
 The script measures each polygon against its own **unsimplified** VCGI town boundary and records the result as `extent`:
 
-| District | Source CRS | Area | IoU vs town | `extent` | Verified |
+| District | Source CRS | Area | IoU vs town | `extent` | Project QA check |
 | --- | --- | --- | --- | --- | --- |
 | Danville Fire District 1 | EPSG:4326 | 158.03 km² | 99.93% | `coextensive_with_town` | Y |
 | East Hardwick Fire District 1 | EPSG:4326 | 100.24 km² | 99.80% | `coextensive_with_town` | Y |
 | Peacham Fire District 1 | EPSG:32145 | 94.72 km² | 76.62% | `sub_town` | N |
 
-Danville and East Hardwick genuinely cover their whole town — **confirmed by the project lead**. A Title 20 fire district can be coextensive with its municipality, so a boundary equal to the town outline is a real district extent, not a mis-filed town shape. All **3 of 80** are usable.
+Danville and East Hardwick genuinely cover their whole town — **checked by the project lead** (a QA check; `verification_status` stays `Not Verified` until the district confirms). A Title 20 fire district can be coextensive with its municipality, so a boundary equal to the town outline is a real district extent, not a mis-filed town shape. All **3 of 80** are usable.
 
 **This matters for how the metrics are computed.** For a town-wide district the *area difference against the town* is zero by definition — that is the answer, not a missing result. The meaningful comparison for those districts is against the **water service area**, where the gap is large:
 
@@ -226,7 +230,13 @@ Danville and East Hardwick genuinely cover their whole town — **confirmed by t
 
 That gap is the quantity this project exists to measure, and it is why a service area cannot proxy for a political boundary.
 
-`geometry_status` stays as a separate field for boundaries that equal their town but have **not** been confirmed as town-wide — those come through as `unconfirmed_townwide`, since without confirmation an equal-to-town polygon is genuinely ambiguous between a town-wide district and a mis-filed town outline. Add confirmed districts to `TOWNWIDE_CONFIRMED` in the script as they are checked off.
+A boundary that equals its town but is **not** in `TOWNWIDE_CONFIRMED` still gets `extent = coextensive_with_town`, with a `notes` warning that it may be a town outline filed under a district name. Add districts to `TOWNWIDE_CONFIRMED` in the script as they are checked off.
+
+### `build_boundary_followup.py`
+
+Reads `data/vt_fire_districts.gpkg` and turns every remaining gap into a question for whoever can answer it. It writes **`data/boundary_followup.md`** (one section per district, with district and clerk contacts, ready to send alongside a map) and **`data/boundary_followup.csv`** (one row per open question, with the standard fields it fills). The questions are worded from the standard's Appendix A submission form. The current run has 42 questions across the 6 mapped districts plus North Branch: 29 for districts, 7 for town clerks, 6 for the project team.
+
+Answer a question by updating that district's `SOURCES` entry in `build_fire_districts.py`, then re-run both scripts; answered questions drop off the list. Don't edit the generated files by hand.
 
 ### `scrape_charter_boundaries.py`
 
@@ -418,7 +428,7 @@ Every row in the district roster carries a **Details** button opening a dialog w
 | Description | Composed from `vt_district_crosswalk.csv` fields only |
 | Websites & charters | `vt_district_websites.csv` + `vt_charter_chapters.csv` / `vt_charter_boundary_sections.csv` |
 | EPA & permit connections | PWSID -> ECHO facility report and SDWIS record; wastewater permit/NPDES/treatment/capacity from `vt_district_roster.csv` |
-| Boundary | Provenance fields from `vt_fire_districts.gpkg` (`source_citation`, `source_url`, `derivation`, `verified`) |
+| Boundary | Standard fields from `vt_fire_districts.gpkg` (`method`, `legal_citation`, `source_url`, `method_details`, `verification_status`) |
 | Notes | The research note recorded while hunting for each website, plus flags |
 
 Charter matching runs through `norm_district()`, which folds `Fairfax Fire District No. 1`, `Fairfax FD 1` and `Fairfax Fire District 1` onto one key. **Six districts have their own Title 24 Appendix charter** -- St. George FD 1, Williamstown, Cold Brook FD 1, North Branch FD 1, Fairfax FD 1 and Champlain Water District -- and their boundary sections are quoted inline (capped at 1,500 characters, with a link to the full text). Where a district has no charter of its own, the *town's* chapter is offered separately and labelled context only, because a town charter is not the district's authorising instrument.
@@ -585,8 +595,8 @@ This system would also contribute meaningfully to risk management and equity. Ma
 4. Triage the 165 rows in `data/vt_charter_boundary_sections.csv` for the remaining districts; `char_count` and `match_reason` sort the survey descriptions from the one-line citations.
 5. Add `Rutland Town`, `Newport Town`, and `Saint Albans Town` to `data/vt_town_clerk_contacts.csv` so the skeleton stops depending on the merge script to append them.
 6. Fill `town_website` for the 35 municipalities missing one.
-7. Have Peacham confirm its 94.72 km² boundary, then add it to `TOWNWIDE_CONFIRMED`/set `verified = Y`. Clerk: Rebecca Washington (<townclerk@peacham.org>).
-8. Fix the partner intake spec ([caveat 11](docs/caveats.html)): require zipped shapefile sets or GeoPackage/GeoJSON with attributes and a defined CRS, so CRS never has to be inferred again.
+7. Send each district its section of `data/boundary_followup.md` (legal authority, formation date, annexations, verification). Peacham's 94.72 km² boundary is the first to confirm. Clerk: Rebecca Washington (<townclerk@peacham.org>).
+8. Point partners to the intake requirements in the [data standard](docs/METADATA_STANDARD.md) (§2, §10) so a CRS never has to be inferred again ([caveat 11](docs/caveats.html)).
 9. Pull the cited plats from town land records for the 5 charter districts whose boundary is a record pointer.
 
 ### The actual project
