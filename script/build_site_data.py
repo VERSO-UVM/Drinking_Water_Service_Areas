@@ -145,12 +145,14 @@ def build_town_boundaries():
 
 
 FIRE_FIELDS = [
-    "fd_id", "district_name", "town", "county", "population", "pwsid",
-    "pws_name", "area_sqkm", "town_iou", "geometry_status", "extent",
-    "verified", "confirmed_by", "district_website", "source_type",
-    "source_citation", "source_url", "source_text", "derivation",
-    "source_file", "source_crs", "crs_inferred",
-    "submitted_by", "submission_date",
+    "boundary_id", "name", "towns", "county", "population", "pwsid",
+    "pws_name", "area_sqkm", "town_iou", "extent", "status",
+    "original_data_provider", "data_provider_type", "method", "method_basis",
+    "method_details", "source_document", "source_url", "date_created",
+    "submitted_by", "submission_date", "source_crs", "crs_inferred",
+    "verification_status", "verification_date", "verifier_name",
+    "district_type", "legal_authority_type", "legal_citation", "legal_text",
+    "recorded_document", "district_website",
     "clerk_name", "clerk_email", "notes",
 ]
 
@@ -167,14 +169,15 @@ def build_fire_districts():
     gdf = gdf[gdf.geometry.notna() & ~gdf.geometry.is_empty]
 
     keep = [c for c in FIRE_FIELDS if c in gdf.columns]
-    gdf = gdf[keep + ["geometry"]].sort_values("district_name")
+    gdf = gdf[keep + ["geometry"]].sort_values("name")
 
     write_geojson(gdf, OUT_DIR / "fire_districts.geojson")
-    usable = int((gdf["geometry_status"] == "district").sum())
+    usable = int((gdf["extent"] != "approximate").sum())
     townwide = int((gdf["extent"] == "coextensive_with_town").sum())
-    print(f"  {usable} confirmed district boundaries "
+    verified = int((gdf["verification_status"] == "Verified").sum())
+    print(f"  {usable} district boundaries "
           f"({townwide} town-wide, {usable - townwide} sub-town), "
-          f"{len(gdf) - usable} unconfirmed")
+          f"{len(gdf) - usable} approximate; {verified} verified")
     return gdf
 
 
@@ -362,15 +365,17 @@ def attach_details(records, fire):
     boundary = {}
     if fire is not None:
         for _, r in fire.iterrows():
-            boundary[str(r["district_name"]).strip()] = {
+            boundary[str(r["name"]).strip()] = {
                 "extent": str(r.get("extent", "") or ""),
-                "status": str(r.get("geometry_status", "") or ""),
-                "citation": str(r.get("source_citation", "") or ""),
+                "method": str(r.get("method", "") or ""),
+                "method_basis": str(r.get("method_basis", "") or ""),
+                "legal_authority_type": str(r.get("legal_authority_type", "") or ""),
+                "citation": str(r.get("legal_citation", "") or ""),
                 "url": str(r.get("source_url", "") or ""),
-                "text": str(r.get("source_text", "") or "")[:EXCERPT_CHARS],
-                "derivation": str(r.get("derivation", "") or ""),
-                "verified": str(r.get("verified", "") or ""),
-                "confirmed_by": str(r.get("confirmed_by", "") or ""),
+                "text": str(r.get("legal_text", "") or "")[:EXCERPT_CHARS],
+                "derivation": str(r.get("method_details", "") or ""),
+                "verification_status": str(r.get("verification_status", "") or ""),
+                "verifier_name": str(r.get("verifier_name", "") or ""),
                 "submitted_by": str(r.get("submitted_by", "") or ""),
                 "submission_date": str(r.get("submission_date", "") or ""),
             }
@@ -441,9 +446,8 @@ def build_district_list(fire):
     mapped = {}
     if fire is not None:
         for _, r in fire.iterrows():
-            mapped[str(r["district_name"]).strip()] = {
-                "fd_id": str(r.get("fd_id", "")),
-                "geometry_status": str(r.get("geometry_status", "")),
+            mapped[str(r["name"]).strip()] = {
+                "fd_id": str(r.get("boundary_id", "")),
                 "extent": str(r.get("extent", "")),
                 "website": str(r.get("district_website", "") or ""),
             }
@@ -471,7 +475,6 @@ def build_district_list(fire):
             "pilot": name in PILOT,
             "in_roster": True,
             "fd_id": geom.get("fd_id", ""),
-            "geometry_status": geom.get("geometry_status", ""),
             "extent": geom.get("extent", ""),
         })
 
@@ -479,10 +482,10 @@ def build_district_list(fire):
         if name in seen:
             continue
         print(f"  NOTE mapped but absent from the crosswalk: {name}")
-        row = fire[fire["district_name"] == name].iloc[0]
+        row = fire[fire["name"] == name].iloc[0]
         records.append({
             "name": name,
-            "town": str(row.get("town", "")).strip(),
+            "town": str(row.get("towns", "")).strip(),
             "type": "Fire District",
             "services": "Water",
             "population": num_or_none(row.get("population")),
@@ -491,7 +494,6 @@ def build_district_list(fire):
             "pilot": name in PILOT,
             "in_roster": False,
             "fd_id": geom.get("fd_id", ""),
-            "geometry_status": geom.get("geometry_status", ""),
             "extent": geom.get("extent", ""),
         })
 
@@ -503,7 +505,8 @@ def build_district_list(fire):
     path.write_text(json.dumps(payload, separators=(",", ":")), encoding="utf-8")
 
     linked = sum(1 for d in records if d["website"])
-    drawn = sum(1 for d in records if d["geometry_status"] == "district")
+    drawn = sum(1 for d in records
+                if d["extent"] and d["extent"] != "approximate")
     print(f"  {len(records)} districts in {len({d['town'] for d in records})} towns, "
           f"{linked} with a website, {drawn} with a mapped boundary")
     return records
@@ -627,7 +630,9 @@ def main():
         "clerks_with_email": sum(1 for r in clerks if r.get("clerk_email")),
         "fd_boundaries": 0 if fire is None else int(len(fire)),
         "fd_usable": 0 if fire is None else
-                     int((fire["geometry_status"] == "district").sum()),
+                     int((fire["extent"] != "approximate").sum()),
+        "fd_verified": 0 if fire is None else
+                       int((fire["verification_status"] == "Verified").sum()),
     }
     (OUT_DIR / "meta.json").write_text(json.dumps(meta, indent=2), encoding="utf-8")
     print("\nmeta.json:", json.dumps(meta))

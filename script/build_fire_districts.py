@@ -12,8 +12,13 @@ WHY THIS LAYER EXISTS SEPARATELY:
 JOINING TO THE WATER DATA:
   Every row carries `pwsid`, the EPA/SDWIS public water system id, so this layer
   joins 1:1 to data/vt_water_boundaries.gpkg on PWSID and to the EPA CSV export.
-  `district_name` + `town` join to data/vt_district_crosswalk.csv, and `town`
-  joins to the clerk contact sheet.
+  `name` + `towns` join to `district_name` + `town` in
+  data/vt_district_crosswalk.csv, and `towns` joins to the clerk contact sheet.
+
+FIELDS:
+  Names and coded values follow docs/METADATA_STANDARD.md; the build fails on
+  any value outside the standard's lists. Appendix B of the standard maps the
+  pre-standard field names (fd_id, source_citation, derivation, ...) onto these.
 
 CRS HANDLING:
   The pilot shapefiles arrived with no .prj (caveat 11), so the CRS is *inferred*
@@ -96,118 +101,186 @@ ROADS_URL = (
 )
 
 # Every district records WHERE its polygon came from and WHY, so any boundary
-# here can be defended: `source_citation` + `source_url` + the verbatim
-# `source_text` that justified it, plus `derivation` for how it was built.
+# here can be defended. Field names and coded values follow
+# docs/METADATA_STANDARD.md (sections 4-6); `validate()` below rejects any value
+# outside the standard's lists.
 #
 # `kind` selects the geometry builder:
 #   shapefile   -- partner-supplied .shp from boundary_submissions/
 #   town_polygon-- statute says the district equals its town; copy VCGI town
 #   road_bounded-- statute names bounding roads; hull of those centerlines
 #
-# `district_name` must match data/vt_district_crosswalk.csv exactly.
+# `name` must match `district_name` in data/vt_district_crosswalk.csv exactly.
+#
+# Unknown is not blank (standard section 1): a coded field nobody can answer
+# yet is `Unknown`, a free-text one `unknown`. Dates can't hold text, so an
+# unknown date stays blank and the gap is listed by build_boundary_followup.py.
+PROJECT = "VERSO / UVM"
+
+# The three pilot shapefiles were digitized by student interns in the VERSO
+# Program Office's ORCA internship program, not by the districts. Credit the
+# program, not individual students.
+ORCA = "VERSO Program Office (ORCA student internship program)"
+
 SOURCES = [
     {
         "kind": "shapefile",
         "file": "Danville Fire District 1/Danville Fire District.shp",
-        "district_name": "Danville Fire District 1",
-        "town": "Danville",
-        "source_type": "Partner-supplied shapefile",
-        "source_citation": "Danville Fire District, pilot submission",
-        "source_url": "",
-        "source_text": "",
-        "derivation": "Partner shapefile; CRS inferred (no .prj supplied).",
+        "name": "Danville Fire District 1",
+        "towns": "Danville",
+        "original_data_provider": ORCA,
+        "data_provider_type": "Academic",
+        "method": "Unknown",
+        "method_basis": "Unknown",
+        "method_details": "Pilot shapefile digitized by ORCA interns; CRS "
+                          "inferred (no .prj supplied).",
+        "legal_authority_type": "Unknown",
+        "legal_citation": "unknown",
         "district_website": "",
+        # The file entered the project record when first committed (as
+        # pilotData/); the digitizing date itself wasn't recorded.
+        "submitted_by": ORCA,
+        "submission_date": "2025-10-20",
+        "notes": "Digitized for the pilot by ORCA student interns; the "
+                 "source they digitized from was not recorded. Submission "
+                 "date is the date the file was first committed to this "
+                 "repository.",
     },
     {
         "kind": "shapefile",
         "file": "East Hardwick Fire District 1/HardwickFD.shp",
-        "district_name": "East Hardwick Fire District 1",
-        "town": "Hardwick",
-        "source_type": "Partner-supplied shapefile",
-        "source_citation": "East Hardwick Fire District 1, pilot submission",
-        "source_url": "https://ehfd.mystrikingly.com/",
-        "source_text": "",
-        "derivation": "Partner shapefile; CRS inferred (no .prj supplied).",
+        "name": "East Hardwick Fire District 1",
+        "towns": "Hardwick",
+        "original_data_provider": ORCA,
+        "data_provider_type": "Academic",
+        "method": "Unknown",
+        "method_basis": "Unknown",
+        "method_details": "Pilot shapefile digitized by ORCA interns; CRS "
+                          "inferred (no .prj supplied).",
+        "legal_authority_type": "Unknown",
+        "legal_citation": "unknown",
         "district_website": "https://ehfd.mystrikingly.com/",
+        # The file entered the project record when first committed (as
+        # pilotData/); the digitizing date itself wasn't recorded.
+        "submitted_by": ORCA,
+        "submission_date": "2025-10-20",
+        "notes": "Digitized for the pilot by ORCA student interns; the "
+                 "source they digitized from was not recorded. Submission "
+                 "date is the date the file was first committed to this "
+                 "repository.",
     },
     {
         "kind": "shapefile",
         "file": "Peacham Fire District 1/Peacham_FD1.shp",
-        "district_name": "Peacham Fire District 1",
-        "town": "Peacham",
-        "source_type": "Partner-supplied shapefile",
-        "source_citation": "Peacham Fire District 1, pilot submission",
-        "source_url": "https://peacham.org/peacham-fire-district/",
-        "source_text": "",
-        "derivation": "Partner shapefile; CRS inferred (no .prj supplied).",
+        "name": "Peacham Fire District 1",
+        "towns": "Peacham",
+        "original_data_provider": ORCA,
+        "data_provider_type": "Academic",
+        "method": "Unknown",
+        "method_basis": "Unknown",
+        "method_details": "Pilot shapefile digitized by ORCA interns; CRS "
+                          "inferred (no .prj supplied).",
+        "legal_authority_type": "Unknown",
+        "legal_citation": "unknown",
         "district_website": "https://peacham.org/peacham-fire-district/",
+        # The file entered the project record when first committed (as
+        # pilotData/); the digitizing date itself wasn't recorded.
+        "submitted_by": ORCA,
+        "submission_date": "2026-02-09",
+        "notes": "Digitized for the pilot by ORCA student interns; the "
+                 "source they digitized from was not recorded. Submission "
+                 "date is the date the file was first committed to this "
+                 "repository.",
     },
     {
         "kind": "shapefile",
         "file": "South Alburgh Fire District 2/SAFD2 Boundary.shp",
-        "district_name": "South Alburgh Fire District 2",
-        "town": "Alburgh",
-        "source_type": "Partner-supplied shapefile",
-        "source_citation": "South Alburgh Fire District No. 2, "
-                           "partner-supplied boundary shapefile.",
-        "source_url": "",
-        "source_text": "",
-        "derivation": "Partner shapefile; CRS supplied via .prj "
-                      "(NAD83 / Vermont (ftUS), EPSG:5646) -- not inferred.",
+        "name": "South Alburgh Fire District 2",
+        "towns": "Alburgh",
+        # RCAP forwarded the file; the email doesn't say who drew it.
+        "original_data_provider": "unknown",
+        "data_provider_type": "Unknown",
+        "method": "Unknown",
+        "method_basis": "Unknown",
+        "method_details": "Partner shapefile; CRS supplied via .prj "
+                          "(NAD83 / Vermont (ftUS), EPSG:5646) -- not "
+                          "inferred. Arrived as a closed boundary line and "
+                          "was converted to the polygon it encloses.",
+        "legal_authority_type": "Unknown",
+        "legal_citation": "unknown",
         "district_website": "http://www.safd2.org/",
-        # Who sent this and when -- distinct from `source_citation` (what
-        # authorizes the polygon) so a submission can be traced even when
-        # there's no statute or citable document behind it, and so future
-        # submissions have a field to fill without overloading citation
-        # prose. See boundary_submissions/<district>/SOURCE.md for the
-        # full email.
+        # Who sent this and when -- distinct from `legal_citation` (what
+        # authorizes the polygon). See boundary_submissions/<district>/
+        # SOURCE.md for the full email.
         "submitted_by": "John Kiernan, RCAP Solutions "
                         "(jkiernan@rcapsolutions.org)",
         "submission_date": "2026-09-11",
     },
     {
         "kind": "town_polygon",
-        "district_name": "Williamstown Fire District",
-        "town": "Williamstown",
-        "source_type": "Statute — district declared coextensive with its town",
-        "source_citation": "24 V.S.A. App. ch. 505, § 2 "
-                           "(Williamstown Fire District Charter)",
+        "name": "Williamstown Fire District",
+        "towns": "Williamstown",
+        # Not in the VRWA roster (it runs no water system), so the roster
+        # can't supply these.
+        "district_type": "Fire District",
+        "services": "Unknown",
+        "original_data_provider": PROJECT,
+        "data_provider_type": "Academic",
+        "method": "GIS data",
+        "method_basis": "Statute",
+        "method_details": "Statute defines the corporate limits as the Town "
+                          "of Williamstown's boundary lines, so the VCGI town "
+                          "polygon IS the district boundary. Copied "
+                          "unmodified.",
         "source_url": "https://legislature.vermont.gov/statutes/section/"
                       "24APPENDIX/505/00002",
-        "source_text": "(a) The legal voters of the District shall be a body "
-                       "corporate. The corporate limits shall be the boundary "
-                       "lines of the Town of Williamstown, being bounded as "
-                       "follows: easterly by the line of Washington; southerly "
-                       "by the lines of Chelsea and Brookfield; westerly by "
-                       "the lines of Northfield and Berlin; and northerly by "
-                       "the lines of Berlin and Barre.",
-        "derivation": "Statute defines the corporate limits as the Town of "
-                      "Williamstown's boundary lines, so the VCGI town polygon "
-                      "IS the district boundary. Copied unmodified.",
+        "legal_authority_type": "Legislative charter",
+        "legal_citation": "24 V.S.A. App. ch. 505, § 2 "
+                          "(Williamstown Fire District Charter)",
+        "legal_text": "(a) The legal voters of the District shall be a body "
+                      "corporate. The corporate limits shall be the boundary "
+                      "lines of the Town of Williamstown, being bounded as "
+                      "follows: easterly by the line of Washington; southerly "
+                      "by the lines of Chelsea and Brookfield; westerly by "
+                      "the lines of Northfield and Berlin; and northerly by "
+                      "the lines of Berlin and Barre.",
+        "date_created": "2026-08-14",
+        "submitted_by": f"{PROJECT} (derived from statute, not submitted)",
+        "submission_date": "2026-08-14",
         "district_website": "",
     },
     {
         "kind": "road_bounded",
-        "district_name": "Fairfax Fire District 1",
-        "town": "Fairfax",
+        "name": "Fairfax Fire District 1",
+        "towns": "Fairfax",
         "roads": ["BESSETTE RD", "HIGHLAND RD", "BRICK CHURCH RD"],
         "route_numbers": ["104"],
-        "source_type": "Statute — bounding roads named (approximate extent)",
-        "source_citation": "24 V.S.A. App. ch. 511, § 2 "
-                           "(Fairfax Fire District No. 1)",
+        "original_data_provider": PROJECT,
+        "data_provider_type": "Academic",
+        "method": "Other",
+        "method_basis": "Feature-bounded",
+        "method_details": "Convex hull of the four named VT E911 road "
+                          "centerlines within Fairfax. APPROXIMATE: the four "
+                          "roads do not form a closed ring (gaps of 163-1072 "
+                          "m), so the hull is a bounding estimate, not the "
+                          "recorded boundary. The statute itself defers to "
+                          "the plat 'recorded with the Town of Fairfax' -- "
+                          "obtain that for the true geometry.",
         "source_url": "https://legislature.vermont.gov/statutes/section/"
                       "24APPENDIX/511/00002",
-        "source_text": "The boundaries of Fairfax Fire District No. 1, as "
-                       "recorded with the Town of Fairfax, are bounded on the "
-                       "north by Bessette Road, the west by Highland Road, the "
-                       "south by Brick Church Road, and the east by VT Route "
-                       "104.",
-        "derivation": "Convex hull of the four named VT E911 road centerlines "
-                      "within Fairfax. APPROXIMATE: the four roads do not form "
-                      "a closed ring (gaps of 163-1072 m), so the hull is a "
-                      "bounding estimate, not the recorded boundary. The "
-                      "statute itself defers to the plat 'recorded with the "
-                      "Town of Fairfax' -- obtain that for the true geometry.",
+        "legal_authority_type": "Legislative charter",
+        "legal_citation": "24 V.S.A. App. ch. 511, § 2 "
+                          "(Fairfax Fire District No. 1)",
+        "legal_text": "The boundaries of Fairfax Fire District No. 1, as "
+                      "recorded with the Town of Fairfax, are bounded on the "
+                      "north by Bessette Road, the west by Highland Road, the "
+                      "south by Brick Church Road, and the east by VT Route "
+                      "104.",
+        "recorded_document": "Boundary recorded with the Town of Fairfax "
+                             "(book/page not yet identified)",
+        "date_created": "2026-08-14",
+        "submitted_by": f"{PROJECT} (derived from statute, not submitted)",
+        "submission_date": "2026-08-14",
         "district_website": "",
     },
 ]
@@ -238,26 +311,105 @@ PENDING = [
 # the town rather than a village-scale district inside it.
 TOWNWIDE_IOU = 0.97
 
-# Districts confirmed town-wide by the project lead. Without this, a boundary
-# that equals its town looks like a mis-filed town outline; these are the cases
-# where it is genuinely the district's extent.
+# Districts the project lead confirmed are town-wide. Without this, a boundary
+# that equals its town looks like a mis-filed town outline. This is a project
+# QA check, NOT verification in the standard's sense (section 5: only the
+# district, its clerk, or the chartering body can verify), so it is recorded
+# in `notes` and `verification_status` stays `Not Verified`.
 TOWNWIDE_CONFIRMED = {
-    "Danville Fire District 1": "Project lead, 2026-08-14",
-    "East Hardwick Fire District 1": "Project lead, 2026-08-14",
+    "Danville Fire District 1": "2026-08-14",
+    "East Hardwick Fire District 1": "2026-08-14",
 }
 
+# Field order of the published layer: the standard's sections 3-6, then the
+# project's own extensions (roster join, town QA, clerk contact).
 ATTRS = [
-    "fd_id", "district_name", "town", "county", "district_type", "services",
-    "population", "pwsid", "pws_name", "match_score", "match_status",
+    # 3. core
+    "boundary_id", "boundary_type", "name", "state", "towns", "county",
+    "pwsid", "status", "area_sqkm",
+    # 4. provenance
+    "original_data_provider", "data_provider_type", "method", "method_basis",
+    "method_details", "source_document", "source_url", "source_date",
+    "date_created", "date_modified", "publisher", "submitted_by",
+    "submission_date", "source_crs", "crs_inferred",
+    # 5. verification
+    "verification_status", "verification_date", "verification_process",
+    "verifier_type", "verifier_name",
+    # 6. political district
+    "district_type", "services", "legal_authority_type", "legal_citation",
+    "legal_text", "recorded_document", "extent", "formation_date",
+    "effective_date", "district_website",
+    # project extensions (not in the standard)
+    "population", "pws_name", "match_score", "match_status",
     "districts_in_town", "single_district_town", "has_legal_charter",
-    "area_sqkm", "town_iou", "geometry_status", "extent", "verified",
-    "confirmed_by", "district_website",
-    # Provenance: why this polygon exists and what authorizes it.
-    "source_type", "source_citation", "source_url", "source_text",
-    "derivation", "source_file", "source_crs", "crs_inferred",
-    "submitted_by", "submission_date",
-    "clerk_name", "clerk_email", "notes",
+    "town_iou", "clerk_name", "clerk_email",
+    "notes",
 ]
+
+# Coded value lists from the standard's section 8. Blank is allowed (the field
+# doesn't apply, or a recommended field isn't filled); anything else must match.
+CODED = {
+    "boundary_type": {"service_area", "political_district"},
+    "status": {"Active", "Inactive", "Dissolved", "Merged"},
+    "data_provider_type": {
+        "Water system", "Federal agency", "Tribal", "State agency",
+        "Municipal agency", "Private", "Mixed", "Academic", "Other",
+        "Nonprofit", "District", "Unknown"},
+    "verifier_type": {
+        "Water system", "Federal agency", "Tribal", "State agency",
+        "Municipal agency", "Private", "Mixed", "Academic", "Other",
+        "Nonprofit", "District", "Unknown"},
+    "method": {"GIS data", "Heads-up digitization", "Manual digitization",
+               "Modeled", "Other", "Unknown"},
+    "method_basis": {
+        "Service area", "Service lines", "Written description",
+        "Verbal description", "Geocoded locations", "Parcel boundaries",
+        "Municipal boundary", "County boundary", "Census Place",
+        "Recorded plat", "Statute", "Feature-bounded", "Other", "Unknown"},
+    "verification_status": {"Verified", "Not Verified", "Pending", "Unknown"},
+    "district_type": {"Fire District", "Water District",
+                      "Consolidated Water District", "Other Special District"},
+    "legal_authority_type": {
+        "Legislative charter", "Municipal vote/order", "Ordinance",
+        "Resolution", "Court order", "Other", "Unknown"},
+    "extent": {"coextensive_with_town", "sub_town", "multi_town",
+               "approximate"},
+    "crs_inferred": {"Y", "N"},
+}
+SERVICES = {"Water", "Wastewater", "Water & Wastewater", "Fire", "Other",
+            "Unknown"}
+
+# Required in the standard for a political district (sections 3-6).
+REQUIRED = [
+    "boundary_id", "boundary_type", "name", "state", "towns", "status",
+    "original_data_provider", "data_provider_type", "method", "method_basis",
+    "date_created", "submitted_by", "submission_date", "source_crs",
+    "crs_inferred", "verification_status", "district_type",
+    "legal_authority_type", "legal_citation", "extent",
+]
+
+
+def validate(gdf):
+    """Fail the build on any value outside the standard's lists, and report
+    required fields that are still blank (those are gaps to chase, not build
+    errors -- see script/build_boundary_followup.py)."""
+    bad = []
+    for col, allowed in CODED.items():
+        for name, v in zip(gdf["name"], gdf[col]):
+            if v and v not in allowed:
+                bad.append(f"{name}: {col} = {v!r}")
+    for name, v in zip(gdf["name"], gdf["services"]):
+        for part in filter(None, (x.strip() for x in str(v).split(";"))):
+            if part not in SERVICES:
+                bad.append(f"{name}: services = {v!r}")
+    if bad:
+        sys.exit("Values outside docs/METADATA_STANDARD.md section 8:\n  "
+                 + "\n  ".join(bad))
+
+    for col in REQUIRED:
+        blank = gdf.loc[gdf[col].astype(str).str.strip() == "", "name"]
+        if len(blank):
+            print(f"  required `{col}` blank for: {', '.join(blank)}")
 
 
 def fetch_towns(names):
@@ -347,7 +499,7 @@ def road_bounded_extent(src):
     a bounding estimate a digitizer can start from, not the recorded boundary.
     Returns (geometry, note) or (None, reason).
     """
-    town = src["town"].upper().replace("'", "''")
+    town = src["towns"].upper().replace("'", "''")
     town_filter = f"(LTWN='{town}' OR RTWN='{town}')"
 
     names = ", ".join("'" + n.replace("'", "''") + "'" for n in src["roads"])
@@ -383,7 +535,7 @@ def road_bounded_extent(src):
 
 
 def main():
-    towns = fetch_towns([s["town"] for s in SOURCES])
+    towns = fetch_towns([s["towns"] for s in SOURCES])
 
     roster = pd.read_csv(CROSSWALK) if CROSSWALK.exists() else pd.DataFrame()
     clerks = (pd.read_csv(CLERKS, dtype=str).fillna("")
@@ -392,12 +544,13 @@ def main():
     rows, geoms = [], []
     for i, src in enumerate(SOURCES, start=1):
         kind = src.get("kind", "shapefile")
-        town_geom = towns.get(src["town"])
+        town = src["towns"]
+        town_geom = towns.get(town)
         if town_geom is None:
-            print(f"  no VCGI town for {src['town']}", file=sys.stderr)
+            print(f"  no VCGI town for {town}", file=sys.stderr)
             continue
 
-        epsg, source_file, crs_inferred = "", "", ""
+        epsg, source_document, crs_inferred = "", "", ""
         build_note = ""
 
         if kind == "shapefile":
@@ -412,7 +565,7 @@ def main():
                 continue
             geom = gdf.geometry.buffer(0).union_all()
             epsg = f"EPSG:{epsg_num}"
-            source_file = f"boundary_submissions/{src['file']}"
+            source_document = f"boundary_submissions/{src['file']}"
             crs_inferred = "N" if declared else "Y"
 
         elif kind == "town_polygon":
@@ -420,17 +573,17 @@ def main():
             # town polygon is the boundary -- copied, not approximated.
             geom = town_geom
             epsg = "EPSG:32145"
-            source_file = "VCGI VT Data - Town Boundaries"
+            source_document = "VCGI VT Data - Town Boundaries"
             crs_inferred = "N"
             build_note = "VCGI town polygon copied unmodified per statute."
 
         elif kind == "road_bounded":
             geom, build_note = road_bounded_extent(src)
             if geom is None:
-                print(f"  {src['district_name']}: {build_note}", file=sys.stderr)
+                print(f"  {src['name']}: {build_note}", file=sys.stderr)
                 continue
             epsg = "EPSG:32145"
-            source_file = "VT E911 Road Centerlines (VCGI)"
+            source_document = "VT E911 Road Centerlines (VCGI)"
             crs_inferred = "N"
 
         else:
@@ -443,73 +596,81 @@ def main():
         iou = geom.intersection(town_geom).area / union if union else 0.0
 
         # A boundary equal to its town is a town-wide district, provided someone
-        # has confirmed that is really the district's extent.
-        confirmed = TOWNWIDE_CONFIRMED.get(src["district_name"], "")
+        # has checked that is really the district's extent.
+        confirmed = TOWNWIDE_CONFIRMED.get(src["name"], "")
         if kind == "road_bounded":
             # Statute names bounding roads but defers to a recorded plat; the
             # hull is a starting estimate, never a verified boundary.
-            extent = "approximate_from_statute"
-            status, verified = "approximate", "N"
+            extent = "approximate"
             note = (f"Approximate extent from the roads named in statute. "
                     f"{build_note}. {area:.2f} km2, "
-                    f"{iou:.1%} of the Town of {src['town']}.")
+                    f"{iou:.1%} of the Town of {town}.")
         elif kind == "town_polygon":
             extent = "coextensive_with_town"
-            status, verified = "district", "Y"
-            confirmed = confirmed or src["source_citation"]
             note = (f"Statute defines the district's corporate limits as the "
-                    f"Town of {src['town']}'s boundary lines. {build_note} "
-                    f"Area difference against the town is zero by definition; "
-                    f"compare against the water service area instead.")
+                    f"Town of {town}'s boundary lines. {build_note} "
+                    f"Not yet verified that the charter boundary is unchanged "
+                    f"by any later amendment or annexation.")
         elif iou >= TOWNWIDE_IOU:
             extent = "coextensive_with_town"
             if confirmed:
-                status, verified = "district", "Y"
-                note = (f"District is coextensive with the Town of "
-                        f"{src['town']} ({iou:.1%} IoU). Confirmed town-wide, "
-                        f"so area difference against the town is ~0 by "
-                        f"definition; compare against the water service area "
-                        f"instead.")
+                note = (f"District is coextensive with the Town of {town} "
+                        f"({iou:.1%} IoU); town-wide extent confirmed by the "
+                        f"project lead on {confirmed} (a project QA check, "
+                        f"not verification by the district).")
             else:
-                status, verified = "unconfirmed_townwide", "N"
-                note = (f"Equals the VCGI {src['town']} town boundary "
-                        f"({iou:.1%} IoU). Either a town-wide district or a "
-                        f"town outline filed under a district name -- confirm "
-                        f"with the district before use.")
+                note = (f"Equals the VCGI {town} town boundary ({iou:.1%} "
+                        f"IoU). Either a town-wide district or a town outline "
+                        f"filed under a district name -- confirm with the "
+                        f"district before use.")
         else:
             extent = "sub_town"
-            status, verified = "district", "Y" if confirmed else "N"
-            note = (f"Covers part of the Town of {src['town']} "
-                    f"({iou:.1%} IoU, {area:.1f} of "
-                    f"{town_geom.area / 1e6:.1f} km2 town).")
+            note = (f"Covers part of the Town of {town} ({iou:.1%} IoU, "
+                    f"{area:.1f} of {town_geom.area / 1e6:.1f} km2 town).")
+        if src.get("notes"):
+            note = f"{note} {src['notes']}"
 
         rec = {
-            "fd_id": f"VTFD-{i:04d}",
-            "district_name": src["district_name"],
-            "town": src["town"],
+            "boundary_id": f"VTFD-{i:04d}",
+            "boundary_type": "political_district",
+            "name": src["name"],
+            "state": "VT",
+            "towns": town,
+            # The roster only lists active districts, and every source here
+            # describes a district operating today.
+            "status": "Active",
             "area_sqkm": round(area, 4),
-            "town_iou": round(iou, 4),
-            "geometry_status": status,
-            "extent": extent,
-            "verified": verified,
-            "confirmed_by": confirmed,
-            "district_website": src.get("district_website", ""),
-            "source_type": src.get("source_type", ""),
-            "source_citation": src.get("source_citation", ""),
+            "original_data_provider": src["original_data_provider"],
+            "data_provider_type": src["data_provider_type"],
+            "method": src["method"],
+            "method_basis": src["method_basis"],
+            "method_details": src["method_details"],
+            "source_document": source_document,
             "source_url": src.get("source_url", ""),
-            "source_text": src.get("source_text", ""),
-            "derivation": src.get("derivation", ""),
-            "source_file": source_file,
-            "source_crs": epsg,
-            "crs_inferred": crs_inferred,
+            "date_created": src.get("date_created", ""),
+            "publisher": PROJECT,
             "submitted_by": src.get("submitted_by", ""),
             "submission_date": src.get("submission_date", ""),
+            "source_crs": epsg,
+            "crs_inferred": crs_inferred,
+            # Nothing here has been checked by the district, its clerk, or the
+            # chartering body yet (see TOWNWIDE_CONFIRMED).
+            "verification_status": "Not Verified",
+            "district_type": src.get("district_type", ""),
+            "services": src.get("services", ""),
+            "legal_authority_type": src["legal_authority_type"],
+            "legal_citation": src["legal_citation"],
+            "legal_text": src.get("legal_text", ""),
+            "recorded_document": src.get("recorded_document", ""),
+            "extent": extent,
+            "district_website": src.get("district_website", ""),
+            "town_iou": round(iou, 4),
             "notes": note,
         }
 
         # Roster attributes, including the PWSID that joins to the water data.
         if not roster.empty:
-            m = roster[roster["district_name"] == src["district_name"]]
+            m = roster[roster["district_name"] == src["name"]]
             if len(m):
                 r = m.iloc[0]
                 rec.update({
@@ -531,12 +692,12 @@ def main():
                                 "80-district roster: that roster lists "
                                 "water-providing districts, and this district "
                                 "has no public water system in SDWIS.").strip()
-                print(f"  no roster row for {src['district_name']} "
+                print(f"  no roster row for {src['name']} "
                       f"(not a water provider)", file=sys.stderr)
 
         if not clerks.empty:
             c = clerks[clerks["town"].str.strip().str.lower()
-                       == src["town"].strip().lower()]
+                       == town.strip().lower()]
             if len(c):
                 rec["county"] = c.iloc[0].get("county", "")
                 rec["clerk_name"] = c.iloc[0].get("clerk_name", "")
@@ -544,8 +705,8 @@ def main():
 
         rows.append(rec)
         geoms.append(geom)
-        print(f"  {src['district_name']:32} {rec['source_crs']:11} "
-              f"IoU={iou:6.1%}  {extent:22} {status}")
+        print(f"  {src['name']:32} {rec['source_crs']:11} "
+              f"IoU={iou:6.1%}  {extent}")
 
     if not rows:
         sys.exit("No boundaries could be built.")
@@ -555,6 +716,11 @@ def main():
         if col not in gdf.columns:
             gdf[col] = ""
     gdf = gdf[ATTRS + ["geometry"]]
+    text_cols = [c for c in ATTRS if c not in
+                 ("area_sqkm", "town_iou", "population", "match_score",
+                  "districts_in_town")]
+    gdf[text_cols] = gdf[text_cols].fillna("").astype(str)
+    validate(gdf)
 
     OUT_GPKG.parent.mkdir(parents=True, exist_ok=True)
     if OUT_GPKG.exists():
@@ -577,16 +743,14 @@ def main():
               f"{', '.join(pend['district_name'])}")
         print(f"  -> {OUT_PENDING.relative_to(ROOT)}")
 
-    usable = int((gdf["geometry_status"] == "district").sum())
+    approx = int((gdf["extent"] == "approximate").sum())
     townwide = int((gdf["extent"] == "coextensive_with_town").sum())
-    approx = int((gdf["geometry_status"] == "approximate").sum())
+    verified = int((gdf["verification_status"] == "Verified").sum())
     print(f"\nWrote {OUT_GPKG.relative_to(ROOT)} (layer '{LAYER}') and "
           f"{OUT_CSV.relative_to(ROOT)}")
-    print(f"{len(gdf)} boundaries: {usable} confirmed "
-          f"({townwide} town-wide, {usable - townwide} sub-town), "
-          f"{approx} approximate, {len(gdf) - usable - approx} unconfirmed.")
-    print(f"Coverage: {usable} of 80 districts have a confirmed political "
-          f"boundary ({usable + approx} have some geometry).")
+    print(f"{len(gdf)} boundaries: {len(gdf) - approx} district extents "
+          f"({townwide} town-wide), {approx} approximate; "
+          f"{verified} verified.")
 
 
 if __name__ == "__main__":

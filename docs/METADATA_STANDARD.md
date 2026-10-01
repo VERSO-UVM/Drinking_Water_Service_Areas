@@ -210,7 +210,7 @@ Use these values exactly. EPA's national layer has no enforced value lists, and 
 
 **`change_type`:** `Formation` · `Annexation` · `Detachment` · `Merger` · `Dissolution` · `Name Change` · `Correction`
 
-**Dates:** ISO 8601, `YYYY-MM-DD`. If only the year is known, use `YYYY` and say so in `notes`.
+**Dates:** ISO 8601, `YYYY-MM-DD`. If only the year is known, use `YYYY` and say so in `notes`. A date field can't hold the word `unknown`, so an unknown date stays blank; list it as an open gap rather than treating blank as "doesn't apply."
 
 ---
 
@@ -272,31 +272,27 @@ Your name, organization, email:
 
 ---
 
-## Appendix B. How this project's current layers map to this standard
+## Appendix B. How this project's layers map to this standard
 
-`data/vt_fire_districts.gpkg` predates this standard. It covers most of the same ground under different field names. Nothing has been renamed yet; this table shows how the layer would migrate.
+`data/vt_fire_districts.gpkg` was migrated to this standard in October 2026. The table maps its earlier field names, for anyone holding an older copy.
 
-| Current field | Standard field | Notes |
+| Earlier field | Standard field | Notes |
 | --- | --- | --- |
 | `fd_id` | `boundary_id` | |
 | `district_name` | `name` | |
-| `town` | `towns` | Single town today; multi-town districts need a list. |
-| `pwsid` | `pwsid` | |
-| `district_type`, `services` | `district_type`, `services` | |
-| `source_type` | `method` + `method_basis` | One free-text field currently stands in for two coded fields. |
-| `source_citation` | `legal_citation` | |
+| `town` | `towns` | |
+| `source_type` | `method` + `method_basis` | One free-text field split into two coded fields. |
+| `source_citation` | `legal_citation` | Pilot rows held a submission description, not a legal citation; now `unknown`. |
 | `source_text` | `legal_text` | |
-| `source_url` | `source_url` | |
 | `derivation` | `method_details` | |
 | `source_file` | `source_document` | |
-| `extent` | `extent` | Same values, plus `multi_town`. |
-| `geometry_status` | `method = Modeled` / `extent = approximate` | |
-| `verified`, `confirmed_by` | `verification_status`, `verifier_name` | Y/N becomes the coded list; add `verification_date`. |
-| `source_crs`, `crs_inferred` | same | |
-| `submitted_by`, `submission_date` | same | |
-| `area_sqkm` | `area_sqkm` | |
-| — | `boundary_type` | Always `political_district` in this layer. |
-| — | `legal_authority_type`, `formation_date`, `effective_date` | Not yet collected. |
+| `extent` | `extent` | `approximate_from_statute` became `approximate`. |
+| `geometry_status` | — | Dropped; use `extent = approximate`. |
+| `verified`, `confirmed_by` | `verification_status` | The project lead's checks were QA, not verification (§5); recorded in `notes`. |
+
+**Local extensions.** The layer also carries project fields that aren't in the standard: `population`, `pws_name`, `match_score`, `match_status`, `districts_in_town`, `single_district_town`, `has_legal_charter`, `town_iou`, `clerk_name`, `clerk_email`.
+
+**Open gaps.** `script/build_boundary_followup.py` lists every field still unknown, as questions for the district, its clerk, or the project team, in `data/boundary_followup.md`.
 
 The EPA service-area layer (`data/vt_water_boundaries.gpkg`) already uses EPA element names. In Vermont's copy, `Verification_Status` and `Method_Details` are blank on all 392 features.
 

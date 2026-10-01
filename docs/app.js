@@ -13,9 +13,8 @@ var COLORS = {
   auth: '#2563eb',
   modeled: '#d97706',
   town: '#475569',
-  fd: '#9333ea',           // fire district, confirmed boundary
-  fdApprox: '#0d9488',     // extent derived from a statute description
-  fdUnconfirmed: '#a1a1aa' // equals its town, not yet confirmed as town-wide
+  fd: '#9333ea',           // fire district boundary
+  fdApprox: '#0d9488'      // extent derived from a statute description
 };
 
 /* ---------- basemaps ---------- */
@@ -273,7 +272,7 @@ function waterStyle(feature) {
 }
 
 function isRealDistrict(props) {
-  return props.geometry_status === 'district';
+  return props.extent !== 'approximate';
 }
 
 function isTownwide(props) {
@@ -281,24 +280,47 @@ function isTownwide(props) {
 }
 
 function isApproximate(props) {
-  return props.geometry_status === 'approximate';
+  return props.extent === 'approximate';
 }
 
 function fireStyle(feature) {
   var p = feature.properties;
   var real = isRealDistrict(p);
-  var approx = isApproximate(p);
   return {
-    color: real ? COLORS.fd : approx ? COLORS.fdApprox : COLORS.fdUnconfirmed,
+    color: real ? COLORS.fd : COLORS.fdApprox,
     weight: real ? 2.4 : 1.8,
     opacity: 0.95,
     // Town-wide districts get a dashed edge so they read as "same line as the
     // town" rather than looking like a missing boundary; both are filled,
     // because both are real district extents. Approximate extents are dotted.
-    dashArray: real ? (isTownwide(p) ? '7 4' : null) : approx ? '3 5' : '2 4',
-    fillColor: real ? COLORS.fd : approx ? COLORS.fdApprox : COLORS.fdUnconfirmed,
+    dashArray: real ? (isTownwide(p) ? '7 4' : null) : '3 5',
+    fillColor: real ? COLORS.fd : COLORS.fdApprox,
     fillOpacity: real ? 0.16 : 0.09
   };
+}
+
+// The layer follows docs/METADATA_STANDARD.md, where "Unknown" is a value in
+// its own right (not a blank), so these say so in words.
+function methodText(p) {
+  if (!p.method || (p.method === 'Unknown' && p.method_basis === 'Unknown')) {
+    return 'Method not recorded';
+  }
+  return p.method + (p.method_basis && p.method_basis !== 'Unknown'
+    ? ' (' + p.method_basis + ')' : '');
+}
+
+function verificationText(p) {
+  if (!p.verification_status) return null;
+  return p.verification_status +
+    (p.verifier_name ? ' (' + p.verifier_name + ')' : '') +
+    (p.verification_date ? ', ' + p.verification_date : '');
+}
+
+function legalText(type, citation) {
+  if (!citation || citation === 'unknown') {
+    return 'Not yet identified — no charter, vote or recorded plat on file';
+  }
+  return (type && type !== 'Unknown' ? type + ': ' : '') + citation;
 }
 
 function bindFirePopup(feature, layer) {
@@ -313,21 +335,18 @@ function bindFirePopup(feature, layer) {
 }
 
 function firePopupHtml(p) {
-  var real = isRealDistrict(p);
   var townwide = isTownwide(p);
-
   var approx = isApproximate(p);
 
   var tag = approx ? 'Approximate extent'
-          : !real ? 'Unconfirmed'
           : townwide ? 'Town-wide district'
           : 'Sub-town district';
 
-  var tagClass = approx ? 'approx' : real ? 'district' : 'placeholder';
+  var tagClass = approx ? 'approx' : 'district';
 
   var html =
-    '<h3>' + esc(p.district_name) + '</h3>' +
-    '<p class="popup-id">' + esc(p.town) +
+    '<h3>' + esc(p.name) + '</h3>' +
+    '<p class="popup-id">' + esc(p.towns) +
     (p.county ? ', ' + esc(p.county) + ' County' : '') + ' &middot; ' +
     '<span class="popup-tag ' + tagClass + '">' + tag + '</span></p>';
 
@@ -335,11 +354,6 @@ function firePopupHtml(p) {
     html +=
       '<p class="popup-warn">Derived from the roads named in statute, not a ' +
       'surveyed boundary. Use as a starting estimate only.</p>';
-  } else if (!real) {
-    html +=
-      '<p class="popup-warn">This boundary equals the town outline at ' +
-      pct(p.town_iou) + '. It may be a town-wide district or a town outline ' +
-      'filed under a district name — confirm before use.</p>';
   } else if (townwide) {
     html +=
       '<p class="popup-note">This district is coextensive with its town, so ' +
@@ -353,7 +367,8 @@ function firePopupHtml(p) {
     ['Extent', townwide ? 'Coextensive with town' : 'Part of town (' + pct(p.town_iou) + ')'],
     ['PWSID', p.pwsid],
     ['Water system', p.pws_name ? titleCase(p.pws_name) : null],
-    ['Confirmed by', p.confirmed_by],
+    ['Drawn', methodText(p)],
+    ['Verification', verificationText(p)],
     ['Source CRS', p.source_crs + (p.crs_inferred === 'Y' ? ' (inferred)' : '')]
   ];
 
@@ -365,17 +380,18 @@ function firePopupHtml(p) {
   html += '</table>';
 
   // Provenance: what authorizes this polygon, quoted and linked.
-  if (p.source_citation) {
-    html += '<div class="popup-source"><h4>Source</h4>';
+  if (p.legal_citation || p.method_details) {
+    html += '<div class="popup-source"><h4>Legal authority</h4>';
+    var cite = legalText(p.legal_authority_type, p.legal_citation);
     html += p.source_url
       ? '<p><a href="' + esc(p.source_url) + '" target="_blank" ' +
-        'rel="noopener">' + esc(p.source_citation) + ' &rarr;</a></p>'
-      : '<p>' + esc(p.source_citation) + '</p>';
-    if (p.source_text) {
-      html += '<blockquote>' + esc(p.source_text) + '</blockquote>';
+        'rel="noopener">' + esc(cite) + ' &rarr;</a></p>'
+      : '<p>' + esc(cite) + '</p>';
+    if (p.legal_text) {
+      html += '<blockquote>' + esc(p.legal_text) + '</blockquote>';
     }
-    if (p.derivation) {
-      html += '<p class="derivation">' + esc(p.derivation) + '</p>';
+    if (p.method_details) {
+      html += '<p class="derivation">' + esc(p.method_details) + '</p>';
     }
     if (p.submitted_by) {
       html += '<p>Submitted by ' + esc(p.submitted_by) +
@@ -687,7 +703,7 @@ function renderDistricts() {
     if (d.pilot) tags += ' <span class="tag tag-pilot">pilot</span>';
     // Only districts with a real polygon get the jump-to-map badge; the
     // approximate extents are on the map too but are not a boundary.
-    if (d.geometry_status === 'district') {
+    if (d.fd_id && d.extent !== 'approximate') {
       tags += ' <button type="button" class="tag tag-mapped" data-fd="' +
         esc(d.fd_id) + '" title="Show this district on the map">mapped</button>';
     }
@@ -734,7 +750,7 @@ function zoomToDistrict(fdId) {
   }
   var target = null;
   LAYERS.fire.layer.eachLayer(function (l) {
-    if (l.feature && l.feature.properties.fd_id === fdId) target = l;
+    if (l.feature && l.feature.properties.boundary_id === fdId) target = l;
   });
   if (!target) return;
 
@@ -898,15 +914,16 @@ function detailsHtml(d) {
   h += '<h3>Boundary</h3>';
   var b = x.boundary || {};
   var brows = [];
-  if (b.status) brows.push(['Geometry', esc(b.status)]);
   if (b.extent) brows.push(['Extent', esc(b.extent)]);
+  if (b.method) brows.push(['Drawn', esc(methodText(b))]);
   if (b.derivation) brows.push(['How it was derived', esc(b.derivation)]);
   if (b.citation) {
-    brows.push(['Source', b.url
-      ? '<a href="' + esc(b.url) + '" target="_blank" rel="noopener">' + esc(b.citation) + '</a>'
-      : esc(b.citation)]);
+    var cite = legalText(b.legal_authority_type, b.citation);
+    brows.push(['Legal authority', b.url
+      ? '<a href="' + esc(b.url) + '" target="_blank" rel="noopener">' + esc(cite) + '</a>'
+      : esc(cite)]);
   }
-  if (b.verified) brows.push(['Verified', esc(b.verified) + (b.confirmed_by ? ' by ' + esc(b.confirmed_by) : '')]);
+  if (b.verification_status) brows.push(['Verification', esc(verificationText(b))]);
   if (b.submitted_by) brows.push(['Submitted by', esc(b.submitted_by) + (b.submission_date ? ' on ' + esc(b.submission_date) : '')]);
   h += brows.length ? ddTable(brows) : pending('no boundary mapped yet');
   if (b.text) h += '<blockquote>' + esc(b.text) + '</blockquote>';
