@@ -59,6 +59,9 @@ def questions(r):
     """(ask, field(s), question) for every gap in one district's record."""
     q = []
     statute = r["legal_authority_type"] == "Legislative charter"
+    # Boundaries the project itself drew (the ORCA pilot files): questions
+    # about how the file was made go to the project team, not the district.
+    ours = "VERSO" in r["original_data_provider"]
     townwide_statute = statute and r["extent"] == "coextensive_with_town"
 
     if unknown(r["legal_citation"]) or unknown(r["legal_authority_type"]):
@@ -92,14 +95,22 @@ def questions(r):
 
     if unknown(r["method"]) or unknown(r["method_basis"]) \
             or unknown(r["original_data_provider"]) or blank(r["date_created"]):
-        sent = (f"the boundary file {r['submitted_by'].split(',')[0]} "
-                f"sent us" if not blank(r["submitted_by"])
-                else "the boundary file you sent")
-        q.append((DISTRICT, "original_data_provider; method; method_basis; "
-                            "source_date; date_created",
-                  f"Who drew {sent}, roughly when, and from what (a recorded "
-                  f"plat, tax parcels, a paper map, a written description, "
-                  f"the town line)?"))
+        fields = ("original_data_provider; method; method_basis; "
+                  "source_date; date_created")
+        if ours:
+            q.append((PROJECT, fields,
+                      "Check the ORCA internship records for what the "
+                      "interns digitized this boundary from (a recorded plat, "
+                      "tax parcels, a paper map from the district, the town "
+                      "line), how, and when."))
+        else:
+            sent = (f"the boundary file {r['submitted_by'].split(',')[0]} "
+                    f"sent us" if not blank(r["submitted_by"])
+                    else "the boundary file you sent")
+            q.append((DISTRICT, fields,
+                      f"Who drew {sent}, roughly when, and from what (a "
+                      f"recorded plat, tax parcels, a paper map, a written "
+                      f"description, the town line)?"))
 
     if r["verification_status"] != "Verified":
         who = CLERK if statute else DISTRICT
@@ -109,7 +120,12 @@ def questions(r):
                   "confirm it matches the district's records, or mark what's "
                   "wrong. Who reviewed it (name and role), and on what date?"))
 
-    if r["crs_inferred"] == "Y":
+    if r["crs_inferred"] == "Y" and ours:
+        q.append((PROJECT, "source_crs",
+                  "Look for the interns' original project files (with the "
+                  ".prj and .dbf) in the VERSO / ORCA records; the copy in "
+                  "this repository has no coordinate system or attributes."))
+    elif r["crs_inferred"] == "Y":
         q.append((DISTRICT, "source_crs",
                   "If you still have the original GIS file, please resend it "
                   "as a complete zipped shapefile (.shp, .shx, .dbf, .prj) or "
@@ -124,7 +140,7 @@ def questions(r):
     if blank(r["submitted_by"]) or blank(r["submission_date"]):
         q.append((PROJECT, "submitted_by; submission_date",
                   "Record who sent this file and when (check the original "
-                  "email). Only the repo commit date is known."))
+                  "email)."))
 
     if r["source_document"].startswith("boundary_submissions/"):
         folder = BOUNDARY_DIR / Path(r["source_document"]).relative_to(
@@ -132,8 +148,7 @@ def questions(r):
         if not (folder / "SOURCE.md").exists():
             q.append((PROJECT, "SOURCE.md",
                       f"Write boundary_submissions/{folder.name}/SOURCE.md "
-                      f"(copy South Alburgh's) once the sender and date are "
-                      f"known."))
+                      f"(copy South Alburgh's)."))
     return q
 
 

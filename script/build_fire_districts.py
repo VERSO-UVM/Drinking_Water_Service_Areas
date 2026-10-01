@@ -117,57 +117,80 @@ ROADS_URL = (
 # unknown date stays blank and the gap is listed by build_boundary_followup.py.
 PROJECT = "VERSO / UVM"
 
+# The three pilot shapefiles were digitized by student interns in the VERSO
+# Program Office's ORCA internship program, not by the districts. Credit the
+# program, not individual students.
+ORCA = "VERSO Program Office (ORCA student internship program)"
+
 SOURCES = [
     {
         "kind": "shapefile",
         "file": "Danville Fire District 1/Danville Fire District.shp",
         "name": "Danville Fire District 1",
         "towns": "Danville",
-        "original_data_provider": "Danville Fire District 1",
-        "data_provider_type": "District",
+        "original_data_provider": ORCA,
+        "data_provider_type": "Academic",
         "method": "Unknown",
         "method_basis": "Unknown",
-        "method_details": "Partner shapefile; CRS inferred (no .prj supplied).",
+        "method_details": "Pilot shapefile digitized by ORCA interns; CRS "
+                          "inferred (no .prj supplied).",
         "legal_authority_type": "Unknown",
         "legal_citation": "unknown",
         "district_website": "",
-        "notes": "Shapefile first committed to this repository 2025-10-20 "
-                 "(as pilotData/); the actual submission date and sender "
-                 "were not recorded.",
+        # The file entered the project record when first committed (as
+        # pilotData/); the digitizing date itself wasn't recorded.
+        "submitted_by": ORCA,
+        "submission_date": "2025-10-20",
+        "notes": "Digitized for the pilot by ORCA student interns; the "
+                 "source they digitized from was not recorded. Submission "
+                 "date is the date the file was first committed to this "
+                 "repository.",
     },
     {
         "kind": "shapefile",
         "file": "East Hardwick Fire District 1/HardwickFD.shp",
         "name": "East Hardwick Fire District 1",
         "towns": "Hardwick",
-        "original_data_provider": "East Hardwick Fire District 1",
-        "data_provider_type": "District",
+        "original_data_provider": ORCA,
+        "data_provider_type": "Academic",
         "method": "Unknown",
         "method_basis": "Unknown",
-        "method_details": "Partner shapefile; CRS inferred (no .prj supplied).",
+        "method_details": "Pilot shapefile digitized by ORCA interns; CRS "
+                          "inferred (no .prj supplied).",
         "legal_authority_type": "Unknown",
         "legal_citation": "unknown",
         "district_website": "https://ehfd.mystrikingly.com/",
-        "notes": "Shapefile first committed to this repository 2025-10-20 "
-                 "(as pilotData/); the actual submission date and sender "
-                 "were not recorded.",
+        # The file entered the project record when first committed (as
+        # pilotData/); the digitizing date itself wasn't recorded.
+        "submitted_by": ORCA,
+        "submission_date": "2025-10-20",
+        "notes": "Digitized for the pilot by ORCA student interns; the "
+                 "source they digitized from was not recorded. Submission "
+                 "date is the date the file was first committed to this "
+                 "repository.",
     },
     {
         "kind": "shapefile",
         "file": "Peacham Fire District 1/Peacham_FD1.shp",
         "name": "Peacham Fire District 1",
         "towns": "Peacham",
-        "original_data_provider": "Peacham Fire District 1",
-        "data_provider_type": "District",
+        "original_data_provider": ORCA,
+        "data_provider_type": "Academic",
         "method": "Unknown",
         "method_basis": "Unknown",
-        "method_details": "Partner shapefile; CRS inferred (no .prj supplied).",
+        "method_details": "Pilot shapefile digitized by ORCA interns; CRS "
+                          "inferred (no .prj supplied).",
         "legal_authority_type": "Unknown",
         "legal_citation": "unknown",
         "district_website": "https://peacham.org/peacham-fire-district/",
-        "notes": "Shapefile first committed to this repository 2026-02-09 "
-                 "(as pilotData/); the actual submission date and sender "
-                 "were not recorded.",
+        # The file entered the project record when first committed (as
+        # pilotData/); the digitizing date itself wasn't recorded.
+        "submitted_by": ORCA,
+        "submission_date": "2026-02-09",
+        "notes": "Digitized for the pilot by ORCA student interns; the "
+                 "source they digitized from was not recorded. Submission "
+                 "date is the date the file was first committed to this "
+                 "repository.",
     },
     {
         "kind": "shapefile",
