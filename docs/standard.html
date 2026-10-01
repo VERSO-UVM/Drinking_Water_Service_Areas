@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Data Standard — VT District Boundaries</title>
+<meta name="description" content="A metadata and attribute standard for drinking water service area and water/fire district boundary GIS data, informed by EPA and state practice.">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<nav class="site-nav">
+  <div class="wrap nav-inner">
+    <a class="nav-brand" href="index.html">VT District Boundaries</a>
+    <ul>
+      <li><a href="index.html">Map</a></li>
+      <li><a href="caveats.html">Data caveats</a></li>
+      <li><a href="standard.html" aria-current="page">Data standard</a></li>
+      <li><a href="contacts.html">Town clerks</a></li>
+    </ul>
+  </div>
+</nav>
+
+<header class="site-header">
+  <div class="wrap">
+    <p class="eyebrow">Prepared for the Vermont Bond Bank boundaries project &middot; VERSO / UVM</p>
+    <h1>Service Area &amp; District Boundary Data Standard</h1>
+    <p class="lede">
+      What to include when you create or share a drinking water service area or a
+      water/fire district boundary, so it can be combined with everyone else's and traced
+      back to where it came from.
+    </p>
+    <p class="stamp">
+      Also available as Markdown:
+      <a href="METADATA_STANDARD.md">METADATA_STANDARD.md</a>
+    </p>
+  </div>
+</header>
+
+<!-- The standard lives in METADATA_STANDARD.md, the single copy to edit; this page
+     renders it so the two never drift apart. -->
+<main class="prose standard" id="standard">
+  <p class="dim">Loading the standard&hellip;</p>
+</main>
+
+<footer class="site-footer">
+  <div class="wrap">
+    <p>
+      Source and data on
+      <a href="https://github.com/VERSO-UVM/Drinking_Water_Service_Areas">GitHub</a>.
+      This page renders <code>docs/METADATA_STANDARD.md</code> in the repository.
+    </p>
+  </div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/marked@12.0.2/marked.min.js"></script>
+<script>
+(function () {
+  var main = document.getElementById('standard');
+
+  fetch('METADATA_STANDARD.md')
+    .then(function (r) {
+      if (!r.ok) throw new Error(r.status);
+      return r.text();
+    })
+    .then(function (md) {
+      main.innerHTML = marked.parse(md);
+
+      // The Markdown's own title repeats the page header above.
+      var h1 = main.querySelector('h1');
+      if (h1) h1.remove();
+
+      // Wide field tables scroll in their own box, matching the other pages.
+      main.querySelectorAll('table').forEach(function (t) {
+        t.classList.add('matrix');
+        var box = document.createElement('div');
+        box.className = 'table-scroll';
+        t.parentNode.insertBefore(box, t);
+        box.appendChild(t);
+      });
+
+      // marked doesn't emit heading ids, so in-page links and shared #anchors need them.
+      main.querySelectorAll('h2, h3').forEach(function (h) {
+        h.id = h.textContent.toLowerCase().trim()
+          .replace(/[^\w\s-]/g, '').replace(/\s+/g, '-');
+      });
+      if (location.hash) {
+        var target = document.getElementById(location.hash.slice(1));
+        if (target) target.scrollIntoView();
+      }
+    })
+    .catch(function () {
+      main.innerHTML =
+        '<p>The standard could not be loaded here. Read it directly: ' +
+        '<a href="https://github.com/VERSO-UVM/Drinking_Water_Service_Areas/blob/main/docs/METADATA_STANDARD.md">' +
+        'METADATA_STANDARD.md on GitHub</a>.</p>';
+    });
+})();
+</script>
+
+</body>
+</html>

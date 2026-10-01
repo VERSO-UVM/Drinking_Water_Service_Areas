@@ -1016,3 +1016,28 @@ code {
   .controls #clerk-search { width: 100%; }
   .result-count { margin-left: 0; }
 }
+
+/* ---------- data standard ---------- */
+
+/* Rendered from Markdown, so h3/h4 and blockquotes need the styling the
+   hand-written pages give their own classes. */
+.standard h3 { margin: 28px 0 8px; font-size: 17px; }
+.standard h4 { margin: 22px 0 6px; font-size: 15px; }
+.standard blockquote {
+  margin: 18px 0;
+  padding: 12px 16px;
+  background: #eef3fb;
+  border-left: 4px solid #6f9ada;
+  border-radius: var(--radius);
+  color: #24405f;
+}
+.standard blockquote p { margin: 0; }
+.standard pre {
+  overflow-x: auto;
+  padding: 12px 14px;
+  background: var(--bg-soft);
+  border-radius: var(--radius);
+  font-size: 13px;
+}
+.standard pre code { padding: 0; background: none; }
+.standard .matrix td code { white-space: nowrap; }
