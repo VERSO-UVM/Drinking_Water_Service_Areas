@@ -16,6 +16,7 @@
     <a class="nav-brand" href="index.html">VT District Boundaries</a>
     <ul>
       <li><a href="index.html" aria-current="page">Map</a></li>
+      <li><a href="tracker.html">District tracker</a></li>
       <li><a href="caveats.html">Data caveats</a></li>
       <li><a href="standard.html">Data standard</a></li>
       <li><a href="contacts.html">Town clerks</a></li>
@@ -64,7 +65,7 @@
             <span class="layer-name">Fire districts <em id="count-fire"></em></span>
           </label>
           <p class="pending">
-            <strong>5 district boundaries</strong> plus 1 approximate extent derived
+            <strong>8 district boundaries</strong> plus 1 approximate extent derived
             from statute; none yet verified by the district itself. Click any
             district for what authorizes its polygon and how it was drawn. <a href="caveats.html#c10">The rest &rarr;</a>
           </p>
@@ -186,40 +187,9 @@
 
   <h2>Fire and water districts</h2>
   <p>
-    Every district in the inventory, with the town it sits in. Click any column
-    heading to sort. <strong>Details</strong> opens what we hold on that
-    district &mdash; website, charter, EPA and permit links, ordinances and
-    research notes &mdash; and says <em>In progress</em> where we have nothing
-    yet. Districts marked <span class="tag tag-pilot">pilot</span> are the six
-    working with us on boundary mapping;
-    <span class="tag tag-mapped">mapped</span> means a polygon exists on the map
-    above, and the badge jumps to it.
-  </p>
-
-  <p class="district-count" id="district-count"></p>
-
-  <div class="table-scroll">
-    <table class="district-table" id="district-table">
-      <thead>
-        <tr>
-          <th scope="col"><button type="button" class="sort-btn" data-sort="town">Town</button></th>
-          <th scope="col"><button type="button" class="sort-btn" data-sort="name">District</button></th>
-          <th scope="col"><button type="button" class="sort-btn" data-sort="services">Serves</button></th>
-          <th scope="col" class="num"><button type="button" class="sort-btn" data-sort="population">Population</button></th>
-          <th scope="col"><span class="sr-only">Details</span></th>
-        </tr>
-      </thead>
-      <tbody id="district-rows">
-        <tr><td colspan="5" class="loading">Loading districts&hellip;</td></tr>
-      </tbody>
-    </table>
-  </div>
-  <p class="note">
-    Source: <a href="https://github.com/VERSO-UVM/Drinking_Water_Service_Areas/blob/main/data/vt_district_crosswalk.csv"><code>data/vt_district_crosswalk.csv</code></a>,
-    derived from the Vermont Rural Water Association's 2025 district list. Website
-    links are collected by hand in
-    <a href="https://github.com/VERSO-UVM/Drinking_Water_Service_Areas/blob/main/data/vt_district_websites.csv"><code>data/vt_district_websites.csv</code></a>
-    &mdash; corrections and additions welcome.
+    Every district we know of &mdash; where its boundary work stands, what we
+    have found so far, and the charter, website and EPA links behind it &mdash;
+    is on the <a href="tracker.html"><strong>District tracker</strong></a>.
   </p>
 
   <h2>Why it matters: the Lead &amp; Copper Rule</h2>
@@ -273,15 +243,6 @@
 </section>
 
 </main>
-
-<dialog id="district-dialog" aria-labelledby="dd-title">
-  <form method="dialog" class="dd-close-form">
-    <button value="close" class="dd-close" aria-label="Close">&times;</button>
-  </form>
-  <div id="dd-body"></div>
-</dialog>
-
-
 
 <footer class="site-footer">
   <div class="wrap">

@@ -1,0 +1,388 @@
+{
+ "fields": [
+  {
+   "field": "boundary_id",
+   "level": "Required",
+   "type": "text",
+   "description": "Stable, unique ID that never changes when the geometry is edited. Vermont districts use VTFD-0001; service areas may use the PWSID.",
+   "section": "3",
+   "section_title": "Core fields"
+  },
+  {
+   "field": "boundary_type",
+   "level": "Required",
+   "type": "coded",
+   "description": "service_area or political_district. See \u00a78.",
+   "section": "3",
+   "section_title": "Core fields"
+  },
+  {
+   "field": "name",
+   "level": "Required",
+   "type": "text",
+   "description": "Official name, e.g. *Danville Fire District 1*. For water systems, use the name as registered in SDWIS.",
+   "section": "3",
+   "section_title": "Core fields"
+  },
+  {
+   "field": "state",
+   "level": "Required",
+   "type": "text(2)",
+   "description": "Two-letter postal code.",
+   "section": "3",
+   "section_title": "Core fields"
+  },
+  {
+   "field": "towns",
+   "level": "Required",
+   "type": "text",
+   "description": "Town(s) the boundary falls in, separated by semicolons.",
+   "section": "3",
+   "section_title": "Core fields"
+  },
+  {
+   "field": "county",
+   "level": "Recommended",
+   "type": "text",
+   "description": "County or counties, separated by semicolons.",
+   "section": "3",
+   "section_title": "Core fields"
+  },
+  {
+   "field": "pwsid",
+   "level": "Required for service areas; Recommended for districts",
+   "type": "text(9)",
+   "description": "Public Water System ID: two letters plus seven digits, e.g. VT0005037. A district that runs several systems lists them all, separated by semicolons. One district is **not** always one system.",
+   "section": "3",
+   "section_title": "Core fields"
+  },
+  {
+   "field": "status",
+   "level": "Required",
+   "type": "coded",
+   "description": "Active, Inactive, Dissolved, Merged.",
+   "section": "3",
+   "section_title": "Core fields"
+  },
+  {
+   "field": "area_sqkm",
+   "level": "Recommended",
+   "type": "number",
+   "description": "Area computed in an equal-area or state-plane CRS, not in degrees.",
+   "section": "3",
+   "section_title": "Core fields"
+  },
+  {
+   "field": "notes",
+   "level": "Optional",
+   "type": "text",
+   "description": "Anything a user should know that fits nowhere else.",
+   "section": "3",
+   "section_title": "Core fields"
+  },
+  {
+   "field": "original_data_provider",
+   "level": "Required",
+   "type": "text",
+   "description": "Entity that created the boundary, e.g. *Danville Fire District*, *RCAP Solutions*, *VT ANR*.",
+   "section": "4",
+   "section_title": "Provenance fields"
+  },
+  {
+   "field": "data_provider_type",
+   "level": "Required",
+   "type": "coded",
+   "description": "Type of that entity.",
+   "section": "4",
+   "section_title": "Provenance fields"
+  },
+  {
+   "field": "method",
+   "level": "Required",
+   "type": "coded",
+   "description": "How the geometry was produced: GIS data, heads-up digitization, manual digitization, modeled, other.",
+   "section": "4",
+   "section_title": "Provenance fields"
+  },
+  {
+   "field": "method_basis",
+   "level": "Required",
+   "type": "coded",
+   "description": "What it was produced from: a plat, a legal description, parcels, a town boundary, water lines, and so on.",
+   "section": "4",
+   "section_title": "Provenance fields"
+  },
+  {
+   "field": "method_details",
+   "level": "Recommended",
+   "type": "text",
+   "description": "Plain-language account of the steps, e.g. *\"Traced from 1962 plat, Book 40 p. 112, georeferenced to VCGI parcels.\"*",
+   "section": "4",
+   "section_title": "Provenance fields"
+  },
+  {
+   "field": "source_document",
+   "level": "Recommended",
+   "type": "text",
+   "description": "The specific source used: map title, plat book and page, survey name, file name.",
+   "section": "4",
+   "section_title": "Provenance fields"
+  },
+  {
+   "field": "source_url",
+   "level": "Recommended",
+   "type": "URL",
+   "description": "Link to the source document or dataset.",
+   "section": "4",
+   "section_title": "Provenance fields"
+  },
+  {
+   "field": "source_date",
+   "level": "Recommended",
+   "type": "date",
+   "description": "Date of the **source material**, e.g. when the plat was drawn. This is often decades before the GIS file.",
+   "section": "4",
+   "section_title": "Provenance fields"
+  },
+  {
+   "field": "date_created",
+   "level": "Required",
+   "type": "date",
+   "description": "Date the GIS boundary was first created.",
+   "section": "4",
+   "section_title": "Provenance fields"
+  },
+  {
+   "field": "date_modified",
+   "level": "Recommended",
+   "type": "date",
+   "description": "Date the geometry or attributes last changed.",
+   "section": "4",
+   "section_title": "Provenance fields"
+  },
+  {
+   "field": "publisher",
+   "level": "Recommended",
+   "type": "text",
+   "description": "Who distributes the dataset, if different from the provider.",
+   "section": "4",
+   "section_title": "Provenance fields"
+  },
+  {
+   "field": "submitted_by",
+   "level": "Required",
+   "type": "text",
+   "description": "Person and organization who sent the file.",
+   "section": "4",
+   "section_title": "Provenance fields"
+  },
+  {
+   "field": "submission_date",
+   "level": "Required",
+   "type": "date",
+   "description": "Date it was received.",
+   "section": "4",
+   "section_title": "Provenance fields"
+  },
+  {
+   "field": "source_crs",
+   "level": "Required",
+   "type": "text",
+   "description": "CRS of the file as received, e.g. EPSG:5646.",
+   "section": "4",
+   "section_title": "Provenance fields"
+  },
+  {
+   "field": "crs_inferred",
+   "level": "Required",
+   "type": "Y/N",
+   "description": "Y if no CRS was declared and it had to be worked out.",
+   "section": "4",
+   "section_title": "Provenance fields"
+  },
+  {
+   "field": "verification_status",
+   "level": "Required",
+   "type": "coded",
+   "description": "Verified, Not Verified, Pending, Unknown.",
+   "section": "5",
+   "section_title": "Verification and accuracy fields"
+  },
+  {
+   "field": "verification_date",
+   "level": "Recommended",
+   "type": "date",
+   "description": "Date it was verified; blank if not verified.",
+   "section": "5",
+   "section_title": "Verification and accuracy fields"
+  },
+  {
+   "field": "verification_process",
+   "level": "Recommended",
+   "type": "text",
+   "description": "How it was verified, e.g. *\"Prudential committee reviewed printed map against district records.\"*",
+   "section": "5",
+   "section_title": "Verification and accuracy fields"
+  },
+  {
+   "field": "verifier_type",
+   "level": "Recommended",
+   "type": "coded",
+   "description": "Type of entity that verified it.",
+   "section": "5",
+   "section_title": "Verification and accuracy fields"
+  },
+  {
+   "field": "verifier_name",
+   "level": "Recommended",
+   "type": "text",
+   "description": "Person and role, e.g. *\"Jane Doe, district clerk.\"* (California records this.)",
+   "section": "5",
+   "section_title": "Verification and accuracy fields"
+  },
+  {
+   "field": "verification_schedule",
+   "level": "Optional",
+   "type": "text",
+   "description": "Planned re-check, e.g. *\"After each annexation\"*, *\"Every 5 years\"*.",
+   "section": "5",
+   "section_title": "Verification and accuracy fields"
+  },
+  {
+   "field": "positional_accuracy_m",
+   "level": "Optional",
+   "type": "number",
+   "description": "Estimated horizontal accuracy in meters; -1 means unknown. (Adapted from Oregon's admin-boundary standard.)",
+   "section": "5",
+   "section_title": "Verification and accuracy fields"
+  },
+  {
+   "field": "source_scale",
+   "level": "Optional",
+   "type": "integer",
+   "description": "Scale denominator of a paper source, e.g. 24000. (From Missouri.)",
+   "section": "5",
+   "section_title": "Verification and accuracy fields"
+  },
+  {
+   "field": "district_type",
+   "level": "Required",
+   "type": "coded",
+   "description": "Fire District, Water District, Consolidated Water District, Other Special District.",
+   "section": "6",
+   "section_title": "Political district fields"
+  },
+  {
+   "field": "services",
+   "level": "Recommended",
+   "type": "coded",
+   "description": "Water, Wastewater, Water & Wastewater, Fire, Other, separated by semicolons.",
+   "section": "6",
+   "section_title": "Political district fields"
+  },
+  {
+   "field": "legal_authority_type",
+   "level": "Required",
+   "type": "coded",
+   "description": "What legally establishes the boundary: legislative charter, municipal vote/order, ordinance, resolution, court order, other, unknown.",
+   "section": "6",
+   "section_title": "Political district fields"
+  },
+  {
+   "field": "legal_citation",
+   "level": "Required",
+   "type": "text",
+   "description": "Citation for that authority, e.g. 24 V.S.A. App. ch. 505, \u00a7 2, or *\"Town of Danville selectboard order, 1948\"*. Write unknown if none has been found.",
+   "section": "6",
+   "section_title": "Political district fields"
+  },
+  {
+   "field": "legal_text",
+   "level": "Recommended",
+   "type": "text",
+   "description": "**Verbatim** boundary language from the authority, if any, e.g. *\"The corporate limits shall be the boundary lines of the Town of Williamstown\u2026\"*",
+   "section": "6",
+   "section_title": "Political district fields"
+  },
+  {
+   "field": "recorded_document",
+   "level": "Recommended",
+   "type": "text",
+   "description": "Land-records reference for a recorded plat or description, e.g. *\"Book 111, page 184, Town of Wilmington land records.\"*",
+   "section": "6",
+   "section_title": "Political district fields"
+  },
+  {
+   "field": "extent",
+   "level": "Required",
+   "type": "coded",
+   "description": "Relation to the town: coextensive_with_town, sub_town, multi_town, approximate.",
+   "section": "6",
+   "section_title": "Political district fields"
+  },
+  {
+   "field": "formation_date",
+   "level": "Recommended",
+   "type": "date",
+   "description": "Date the district was legally formed. (Colorado and TCEQ record this.)",
+   "section": "6",
+   "section_title": "Political district fields"
+  },
+  {
+   "field": "effective_date",
+   "level": "Recommended",
+   "type": "date",
+   "description": "Date the **current** boundary took legal effect: the formation date, or the date of the most recent annexation. Not the GIS edit date. (Oregon's standard is explicit on this.)",
+   "section": "6",
+   "section_title": "Political district fields"
+  },
+  {
+   "field": "previous_names",
+   "level": "Optional",
+   "type": "text",
+   "description": "Earlier names, separated by semicolons. (From Colorado.)",
+   "section": "6",
+   "section_title": "Political district fields"
+  },
+  {
+   "field": "governing_body",
+   "level": "Optional",
+   "type": "text",
+   "description": "E.g. *Prudential Committee*, *Board of Water Commissioners*.",
+   "section": "6",
+   "section_title": "Political district fields"
+  },
+  {
+   "field": "district_website",
+   "level": "Optional",
+   "type": "URL",
+   "description": "The district's own site.",
+   "section": "6",
+   "section_title": "Political district fields"
+  },
+  {
+   "field": "census_govid",
+   "level": "Optional",
+   "type": "text",
+   "description": "Census of Governments ID, if the district appears there.",
+   "section": "6",
+   "section_title": "Political district fields"
+  },
+  {
+   "field": "recorded_area_sqkm",
+   "level": "Optional",
+   "type": "number",
+   "description": "Area stated in the legal record, if any. Compare with area_sqkm; a large gap signals a digitizing problem. (TCEQ and Ventura LAFCo record both.)",
+   "section": "6",
+   "section_title": "Political district fields"
+  }
+ ],
+ "ladder": [
+  "Not started",
+  "Researched, no source",
+  "Source identified",
+  "Approximate",
+  "Mapped, not verified",
+  "Verified"
+ ]
+}
