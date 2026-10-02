@@ -515,7 +515,9 @@ The sweep found **three wrong assignments**, all now corrected via `--apply`:
 
 The pattern is worth naming: **two of the three were wastewater-only districts handed drinking-water identifiers**, and both duplicate-PWSID pairs in the data were errors. A district that provides no water should hold no PWSID, and that single rule catches what fuzzy name matching cannot.
 
-After correction: **76 OK, 4 with no PWSID, zero WRONG.** Full per-district results, including the passing rows and their mailing-city notes, are in `data/vt_district_pwsid_check.csv`.
+After correction: **76 OK, 4 with no PWSID, zero WRONG.**
+
+**2026-10-02:** South Alburgh FD 2 now carries **`VT0020964`** (SDWIS: SOUTH ALBURGH FIRE DISTRICT 2, active, population 300, matching the roster exactly). Its earlier name-match to Alburgh FD 1 had been cleared, leaving it blank. EPA has no service-area polygon for it. Full per-district results, including the passing rows and their mailing-city notes, are in `data/vt_district_pwsid_check.csv`.
 
 ### Google Drive enumeration
 
@@ -634,7 +636,7 @@ This system would also contribute meaningfully to risk management and equity. Ma
 5. Point `spatial_match_districts.py`, `pull_charter_boundaries.py`, and `merge_clerk_contacts.py` at `data/` rather than the working directory.
 6. Reconcile the script's 10 charter chapters against the roster's 6 `has_legal_charter` rows.
 7. Fix the Title 24 charter-index regex in `build_district_crosswalk.py` (currently parses zero charters).
-8. Hand-verify the remaining flagged mismatches (Highgate, South Alburgh, and the 9 `name_vs_spatial_agree = N` rows).
+8. Hand-verify the remaining flagged mismatches (Highgate and the 9 `name_vs_spatial_agree = N` rows). South Alburgh was resolved 2026-10-02 (`VT0020964`).
 
 ### Data gathering
 

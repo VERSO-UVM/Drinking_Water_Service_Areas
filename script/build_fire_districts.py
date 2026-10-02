@@ -132,6 +132,10 @@ ROADS_URL = (
 # unknown date stays blank and the gap is listed by build_boundary_followup.py.
 PROJECT = "VERSO / UVM"
 
+# `date_modified` for every row unless its SOURCES entry says otherwise. Bump
+# it when you change a district's geometry or attributes here.
+LAST_EDITED = "2026-10-02"
+
 # The three pilot shapefiles were digitized by student interns in the VERSO
 # Program Office's ORCA internship program, not by the districts. Credit the
 # program, not individual students.
@@ -172,9 +176,28 @@ SOURCES = [
         "method_basis": "Unknown",
         "method_details": "Pilot shapefile digitized by ORCA interns; CRS "
                           "inferred (no .prj supplied).",
-        "legal_authority_type": "Unknown",
-        "legal_citation": "unknown",
         "district_website": "https://ehfd.mystrikingly.com/",
+        "conflict": "BOUNDARY CONFLICT: the polygon covers the whole town, "
+                    "but the 1912 order (legal_text, quoted from a c.1944 "
+                    "district history: https://drive.google.com/file/d/"
+                    "13LKYmo5YGNMiZ7Tf9ToYn6RmjZ5-vHoJ/view) and the 2023 "
+                    "bylaws describe only the Village of East Hardwick. "
+                    "Treat this polygon as suspect until it is redrawn.",
+        # The 1912 order describes the Village of East Hardwick, NOT the
+        # town-wide polygon below -- recorded so the conflict is visible.
+        "legal_authority_type": "Municipal vote/order",
+        "legal_citation": "Order of the Hardwick Selectmen, November 1912, "
+                          "on petition (district incorporated under 20 V.S.A. "
+                          "ch. 171 per its bylaws)",
+        "legal_text": "In November, 1912, the Selectmen of the Town of "
+                      "Hardwick, Vermont, C. A. Stanford, T. G. Bronson and "
+                      "C. L. French, in response to a petition signed by "
+                      "more than 20 legal voters, established the Hardwick "
+                      "Fire District, and fixed the boundaries comprising "
+                      "the entire Village of East Hardwick, Vermont.",
+        "formation_date": "1912-11",
+        "previous_names": "Hardwick Fire District No. 1",
+        "governing_body": "Prudential Committee",
         # The file entered the project record when first committed (as
         # pilotData/); the digitizing date itself wasn't recorded.
         "submitted_by": ORCA,
@@ -217,12 +240,15 @@ SOURCES = [
         "data_provider_type": "Unknown",
         "method": "Unknown",
         "method_basis": "Unknown",
+        "legal_authority_type": "Municipal vote/order",
+        "legal_citation": "Order of the Selectmen of the Town of Alburgh, "
+                          "2004-06-08 (cited in SAFD#2 By-Laws § 1.1)",
+        "formation_date": "2004-06-08",
+        "governing_body": "Prudential Committee",
         "method_details": "Partner shapefile; CRS supplied via .prj "
                           "(NAD83 / Vermont (ftUS), EPSG:5646) -- not "
                           "inferred. Arrived as a closed boundary line and "
                           "was converted to the polygon it encloses.",
-        "legal_authority_type": "Unknown",
-        "legal_citation": "unknown",
         "district_website": "http://www.safd2.org/",
         # Who sent this and when -- distinct from `legal_citation` (what
         # authorizes the polygon). See boundary_submissions/<district>/
@@ -259,6 +285,7 @@ SOURCES = [
                       "by the lines of Chelsea and Brookfield; westerly by "
                       "the lines of Northfield and Berlin; and northerly by "
                       "the lines of Berlin and Barre.",
+        "governing_body": "Prudential Committee",
         "date_created": "2026-08-14",
         "submitted_by": f"{PROJECT} (derived from statute, not submitted)",
         "submission_date": "2026-08-14",
@@ -293,6 +320,8 @@ SOURCES = [
                       "104.",
         "recorded_document": "Boundary recorded with the Town of Fairfax "
                              "(book/page not yet identified)",
+        # § 2: Added 2023, No. M-17 (Adj. Sess.), § 2, eff. February 1, 2024.
+        "source_date": "2024-02-01",
         "date_created": "2026-08-14",
         "submitted_by": f"{PROJECT} (derived from statute, not submitted)",
         "submission_date": "2026-08-14",
@@ -324,6 +353,7 @@ SOURCES = [
                       "the areas within the Town of Brandon except those "
                       "areas designated as National Forest lands.",
         "formation_date": "1887-04-11",
+        "governing_body": "Prudential Committee",
         "date_created": "2026-10-02",
         "submitted_by": f"{PROJECT} (derived from district bylaws, not "
                         f"submitted)",
@@ -362,6 +392,8 @@ SOURCES = [
                       "water district known as \"Vergennes-Panton Water "
                       "District\" on August 11, 1966.",
         "formation_date": "1966-08-11",
+        "previous_names": "Consolidated Water District #2",
+        "governing_body": "Board of Water Commissioners",
         "date_created": "2026-10-02",
         "submitted_by": f"{PROJECT} (derived from district charter, not "
                         f"submitted)",
@@ -398,6 +430,8 @@ SOURCES = [
                       "1972).",
         "recorded_document": "Dover Town Record Vol. 8 at 32 (1972-03-30)",
         "formation_date": "1972",
+        "governing_body": "Prudential Committee",
+        "source_date": "2022-01-12",
         "date_created": "2026-10-02",
         "submitted_by": f"{PROJECT} (derived from district ordinance, not "
                         f"submitted)",
@@ -443,11 +477,13 @@ ATTRS = [
     "submission_date", "source_crs", "crs_inferred",
     # 5. verification
     "verification_status", "verification_date", "verification_process",
-    "verifier_type", "verifier_name",
+    "verifier_type", "verifier_name", "verification_schedule",
+    "positional_accuracy_m", "source_scale",
     # 6. political district
     "district_type", "services", "legal_authority_type", "legal_citation",
     "legal_text", "recorded_document", "extent", "formation_date",
-    "effective_date", "district_website",
+    "effective_date", "previous_names", "governing_body", "district_website",
+    "census_govid", "recorded_area_sqkm",
     # project extensions (not in the standard)
     "population", "pws_name", "match_score", "match_status",
     "districts_in_town", "single_district_town", "has_legal_charter",
@@ -814,6 +850,8 @@ def main():
                     f"{area:.1f} of {town_geom.area / 1e6:.1f} km2 town).")
         if src.get("notes"):
             note = f"{note} {src['notes']}"
+        if src.get("conflict"):
+            note = f"{src['conflict']} {note}"
 
         rec = {
             "boundary_id": f"VTFD-{i:04d}",
@@ -834,6 +872,7 @@ def main():
             "source_url": src.get("source_url", ""),
             "source_date": src.get("source_date", ""),
             "date_created": src.get("date_created", ""),
+            "date_modified": src.get("date_modified", LAST_EDITED),
             "publisher": PROJECT,
             "submitted_by": src.get("submitted_by", ""),
             "submission_date": src.get("submission_date", ""),
@@ -849,6 +888,8 @@ def main():
             "legal_text": src.get("legal_text", ""),
             "recorded_document": src.get("recorded_document", ""),
             "formation_date": src.get("formation_date", ""),
+            "previous_names": src.get("previous_names", ""),
+            "governing_body": src.get("governing_body", ""),
             "extent": extent,
             "district_website": src.get("district_website", ""),
             "town_iou": round(iou, 4),
@@ -911,7 +952,8 @@ def main():
     gdf = gdf[ATTRS + ["geometry"]]
     text_cols = [c for c in ATTRS if c not in
                  ("area_sqkm", "town_iou", "population", "match_score",
-                  "districts_in_town")]
+                  "districts_in_town", "positional_accuracy_m",
+                  "source_scale", "recorded_area_sqkm")]
     gdf[text_cols] = gdf[text_cols].fillna("").astype(str)
     validate(gdf)
 
