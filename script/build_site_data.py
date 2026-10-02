@@ -7,12 +7,17 @@ Inputs:
                                            falls back to the unfilled skeleton)
   data/vt_district_crosswalk.csv          (the 80-district inventory)
   data/vt_district_websites.csv           (hand-maintained district URLs)
+  data/vt_district_status.csv             (hand-maintained tracker: status,
+                                           boundary path, summary, research)
+  data/vt_district_links.csv              (hand-maintained checked links)
+  docs/METADATA_STANDARD.md               (field list for the tracker's More view)
   VCGI "VT Data - Town Boundaries" feature service (fetched live)
 
 Outputs (GeoJSON in EPSG:4326, simplified + coordinate-rounded for the browser):
   docs/data/water_service_areas.geojson
   docs/data/town_boundaries.geojson
   docs/data/districts.json
+  docs/data/standard_fields.json
   docs/data/town_clerks.json
   docs/data/meta.json
 
@@ -40,6 +45,9 @@ CHARTER_SECTIONS = ROOT / "data" / "vt_charter_boundary_sections.csv"
 ORDINANCES = ROOT / "docs" / "data" / "ordinances.json"
 CLERKS_FILLED = ROOT / "data" / "vt_town_clerk_contacts_filled.csv"
 CLERKS_SKELETON = ROOT / "data" / "vt_town_clerk_contacts.csv"
+STATUS = ROOT / "data" / "vt_district_status.csv"
+LINKS = ROOT / "data" / "vt_district_links.csv"
+STANDARD = ROOT / "docs" / "METADATA_STANDARD.md"
 OUT_DIR = ROOT / "docs" / "data"
 
 # Simplification tolerances in meters (data is in EPSG:32145, VT State Plane meters).
@@ -391,9 +399,16 @@ def attach_details(records, fire):
         wn = notes_by_name.get(rec["name"], {})
         if wn.get("note"):
             notes.append(wn["note"])
-        if not rec["in_roster"]:
+        if not rec["in_roster"] and rec["fd_id"]:
             notes.append("Has a boundary polygon but does not appear in the "
                          "VRWA district list or the roster workbook.")
+        elif rec.get("unconfirmed"):
+            notes.append("Listed in the VRWA roster workbook as \"FD?\": VRWA "
+                         "itself is unsure this is a separate district.")
+        elif not rec["in_roster"]:
+            notes.append("Has a Title 24 Appendix charter but does not appear "
+                         "in the VRWA district list, which covers only "
+                         "water-providing districts.")
 
         epa = {}
         if rec["pwsid"]:
@@ -424,6 +439,164 @@ def attach_details(records, fire):
     print(f"  details: {charter_hits} with their own charter, "
           f"{permit_hits} with a wastewater permit, "
           f"{doc_total} documents across {doc_districts} districts")
+
+
+# Tracker status ladder, lowest to highest. The last three come from the
+# boundary layer itself; the first three are research states recorded by hand
+# in data/vt_district_status.csv. A polygon always outranks the CSV, so a
+# district can't read "Not started" once it is on the map.
+STATUS_LADDER = [
+    "Not started",
+    "Researched, no source",
+    "Source identified",
+    "Approximate",
+    "Mapped, not verified",
+    "Verified",
+]
+
+# Standard fields the research pass can fill for a district with no polygon.
+RESEARCH_FIELDS = [
+    "formation_date", "legal_authority_type", "legal_citation", "legal_text",
+    "recorded_document", "governing_body", "previous_names",
+]
+
+
+def load_status():
+    """district name -> its row in the hand-maintained tracker sheet."""
+    if not STATUS.exists():
+        print("  no vt_district_status.csv -- every district reads Not started")
+        return {}
+    df = pd.read_csv(STATUS, encoding="utf-8-sig", dtype=str).fillna("")
+    return {str(r["district_name"]).strip(): r.to_dict() for _, r in df.iterrows()}
+
+
+def load_links():
+    """district name -> checked links, in sheet order."""
+    if not LINKS.exists():
+        return {}
+    df = pd.read_csv(LINKS, encoding="utf-8-sig", dtype=str).fillna("")
+    out = {}
+    for _, r in df.iterrows():
+        out.setdefault(str(r["district_name"]).strip(), []).append({
+            "label": r["label"], "url": r["url"], "status": r["status"],
+            "finding": r["finding"], "checked_on": r["checked_on"],
+        })
+    return out
+
+
+def load_standard_fields():
+    """Field list for sections 3-6 of docs/METADATA_STANDARD.md.
+
+    Parsed from the standard itself so the tracker's More view can't drift
+    from it. Section 6.1 (change history) is a separate table, and section 7
+    applies to service areas, so both are left out.
+    """
+    section, fields = "", []
+    for line in STANDARD.read_text(encoding="utf-8").splitlines():
+        m = re.match(r"^##+ (\d+(?:\.\d+)?)\.? (.+)", line)
+        if m:
+            section = m.group(1) if m.group(1) in ("3", "4", "5", "6") else ""
+            title = re.sub(r"\s*\(.*\)$", "", m.group(2))
+            continue
+        if not section or not line.startswith("| `"):
+            continue
+        cells = [c.strip() for c in line.strip("|").split("|")]
+        desc = re.sub(r"\[([^\]]+)\]\([^)]*\)", r"\1", cells[3])
+        fields.append({
+            "field": cells[0].strip("`"),
+            "level": cells[1],
+            "type": cells[2],
+            "description": desc.replace("`", ""),
+            "section": section,
+            "section_title": title,
+        })
+    return fields
+
+
+def tracker_status(mapped_row, status_row):
+    if mapped_row is not None:
+        if mapped_row.get("verification_status") == "Verified":
+            return "Verified"
+        if mapped_row.get("extent") == "approximate":
+            return "Approximate"
+        return "Mapped, not verified"
+    s = (status_row or {}).get("research_status", "").strip()
+    return s if s in STATUS_LADDER else "Not started"
+
+
+def attach_tracker(records, fields):
+    """Hang `tracker` (status, summary, links) and `standard` (every field in
+    sections 3-6 of the data standard, with where its value came from) on
+    each district."""
+    status = load_status()
+    links = load_links()
+    county_by_town = {}
+    src = CLERKS_FILLED if CLERKS_FILLED.exists() else CLERKS_SKELETON
+    if src.exists():
+        for _, r in pd.read_csv(src, dtype=str).fillna("").iterrows():
+            county_by_town.setdefault(r["town"].strip().lower(), r.get("county", ""))
+
+    layer = {}
+    if FIRE_GPKG.exists():
+        full = gpd.read_file(FIRE_GPKG, layer="fire_districts")
+        for _, r in full.drop(columns="geometry").iterrows():
+            layer[str(r["name"]).strip()] = {
+                k: ("" if pd.isna(v) else str(v)) for k, v in r.items()}
+
+    names = [f["field"] for f in fields]
+    for rec in records:
+        row = layer.get(rec["name"])
+        st = status.get(rec["name"], {})
+
+        std = {}
+        if row is not None:
+            for f in names:
+                if row.get(f, "") != "":
+                    std[f] = {"v": row[f], "src": "boundary layer"}
+        # Constant for every row here, so they are labelled as derived.
+        for f, v in (("boundary_type", "political_district"), ("state", "VT")):
+            std.setdefault(f, {"v": v, "src": "derived"})
+        derived = {
+            "name": rec["name"],
+            "towns": rec["town"],
+            "county": county_by_town.get(rec["town"].lower(), ""),
+            "pwsid": rec["pwsid"],
+            "district_type": rec["type"],
+            "services": rec["services"],
+            "district_website": rec["website"],
+        }
+        for f, v in derived.items():
+            if v and f not in std:
+                std[f] = {"v": v, "src": "roster" if rec["in_roster"] else "project"}
+        if rec["in_roster"] and "status" not in std:
+            # VRWA lists districts operating today.
+            std["status"] = {"v": "Active", "src": "roster"}
+        # Research fills gaps but never overrides the boundary layer.
+        for f in RESEARCH_FIELDS:
+            v = st.get(f, "").strip()
+            if v and std.get(f, {}).get("v", "") in ("", "Unknown", "unknown"):
+                std[f] = {"v": v, "src": "research"}
+        hint = st.get("extent_hint", "").strip()
+        if hint and "extent" not in std:
+            std["extent"] = {"v": hint, "src": "research (expected, not mapped)"}
+
+        label = tracker_status(row, st)
+        rec["tracker"] = {
+            "status": label,
+            "status_rank": STATUS_LADDER.index(label),
+            "boundary_path": st.get("boundary_path", ""),
+            "summary": st.get("summary", ""),
+            "checked_on": st.get("checked_on", ""),
+            "open_questions": [q.strip() for q in
+                               st.get("open_questions", "").split(" | ") if q.strip()],
+            "links": links.get(rec["name"], []),
+        }
+        rec["standard"] = std
+
+    counts = {s: sum(1 for r in records if r["tracker"]["status"] == s)
+              for s in STATUS_LADDER}
+    print("  tracker: " + ", ".join(f"{v} {k}" for k, v in counts.items() if v))
+    return counts
 
 
 def build_district_list(fire):
@@ -496,8 +669,41 @@ def build_district_list(fire):
             "fd_id": geom.get("fd_id", ""),
             "extent": geom.get("extent", ""),
         })
+        seen.add(name)
+
+    # Districts known only from the tracker sheet: chartered districts VRWA
+    # doesn't list (Milton, Bolton, ...) and the roster workbook's unconfirmed
+    # Cold Brook Base Area.
+    roster = (pd.read_csv(ROSTER, encoding="utf-8-sig", dtype=str).fillna("")
+              if ROSTER.exists() else pd.DataFrame(columns=["district_name"]))
+    for name, st in load_status().items():
+        if name in seen:
+            continue
+        rr = roster[roster["district_name"] == name]
+        r0 = rr.iloc[0] if len(rr) else {}
+        records.append({
+            "name": name,
+            "town": st.get("town", ""),
+            "type": st.get("district_type", "") or r0.get("district_type", ""),
+            "services": st.get("services", "") or r0.get("services", ""),
+            "population": num_or_none(r0.get("population", "")),
+            "pwsid": r0.get("matched_pwsid", ""),
+            "website": websites.get(name, ""),
+            "pilot": name in PILOT,
+            "in_roster": st.get("in_vrwa_list", "") == "Y",
+            # In the roster workbook, but typed "FD?" -- VRWA itself is unsure.
+            "unconfirmed": st.get("in_vrwa_list", "") == "unconfirmed",
+            "fd_id": "",
+            "extent": "",
+        })
 
     attach_details(records, fire)
+    fields = load_standard_fields()
+    attach_tracker(records, fields)
+    (OUT_DIR / "standard_fields.json").write_text(
+        json.dumps({"fields": fields, "ladder": STATUS_LADDER}, indent=1),
+        encoding="utf-8")
+    print(f"  wrote docs/data/standard_fields.json ({len(fields)} fields)")
 
     records.sort(key=lambda d: (d["town"].lower(), d["name"].lower()))
     payload = {"districts": records}
@@ -633,6 +839,9 @@ def main():
                      int((fire["extent"] != "approximate").sum()),
         "fd_verified": 0 if fire is None else
                        int((fire["verification_status"] == "Verified").sum()),
+        "tracker": {s: sum(1 for d in districts
+                           if d.get("tracker", {}).get("status") == s)
+                    for s in STATUS_LADDER},
     }
     (OUT_DIR / "meta.json").write_text(json.dumps(meta, indent=2), encoding="utf-8")
     print("\nmeta.json:", json.dumps(meta))

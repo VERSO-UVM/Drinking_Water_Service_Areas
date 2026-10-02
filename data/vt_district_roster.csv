@@ -7,7 +7,7 @@ VTD-005,Tri Town Water District (Bridport),,Water District,Water Dist.,Water,,Y,
 VTD-006,Vergennes Panton Water District,,Water District,Water Dist.,Water,,Y,N,N,,,,,,,,,,,,VT0005010,VERGENNES PANTON WATER DISTRICT,auto_confident,1,TRUE,FALSE,service_area_proxy,Y
 VTD-007,Wilmington Water District,,Water District,Water Dist.,Water,,Y,N,N,,,,,,,,,,,,VT0005310,WILMINGTON WATER DIST,auto_confident,2,FALSE,FALSE,,Y
 VTD-008,Alburgh Fire District 1,Alburgh,Fire District,FD,Water,87,Y,N,N,,,,,,,,,,,,VT0005137,ALBURGH FIRE DISTRICT 1,auto_confident,2,FALSE,FALSE,,Y
-VTD-009,South Alburgh Fire District 2,Alburgh,Fire District,FD,Water,300,Y,N,N,,,,,,,,,,,,,,,2,FALSE,FALSE,,Y
+VTD-009,South Alburgh Fire District 2,Alburgh,Fire District,FD,Water,300,Y,N,N,,,,,,,,,,,,VT0020964,SOUTH ALBURGH FIRE DISTRICT 2,corrected_2026-10-02,2,FALSE,FALSE,,Y
 VTD-010,Bakersfield Fire District 1,Bakersfield,Fire District,FD,Water,446,Y,N,N,,,,,,,,,,,,VT0005114,BAKERSFIELD FIRE DISTRICT 1,auto_confident,1,TRUE,FALSE,service_area_proxy,Y
 VTD-011,Barnet Fire District 2,Barnet,Fire District,FD,Water,205,Y,N,N,,,,,,,,,,,,VT0005029,BARNET FIRE DISTRICT #2,auto_confident,3,FALSE,FALSE,,Y
 VTD-012,McIndoe Falls Fire District 3,Barnet,Fire District,FD,Water,176,Y,N,N,,,,,,,,,,,,VT0005441,MCINDOE FALLS FIRE DISTRICT 3,auto_confident,3,FALSE,FALSE,,Y

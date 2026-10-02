@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>District Tracker — VT District Boundaries</title>
+<meta name="description" content="Every Vermont fire and water district, where its political boundary work stands, what we have found so far, and the links behind it.">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<nav class="site-nav">
+  <div class="wrap nav-inner">
+    <a class="nav-brand" href="index.html">VT District Boundaries</a>
+    <ul>
+      <li><a href="index.html">Map</a></li>
+      <li><a href="tracker.html" aria-current="page">District tracker</a></li>
+      <li><a href="caveats.html">Data caveats</a></li>
+      <li><a href="standard.html">Data standard</a></li>
+      <li><a href="contacts.html">Town clerks</a></li>
+    </ul>
+  </div>
+</nav>
+
+<header class="site-header">
+  <div class="wrap">
+    <p class="eyebrow">Working list &middot; political boundaries</p>
+    <h1>District Tracker</h1>
+    <p class="lede">
+      Every fire and water district we know of, how far its political boundary
+      work has got, and what we have found so far. This tracks the legal,
+      taxing boundary of each district &mdash; not the area its water system
+      serves.
+    </p>
+    <p class="stamp" id="tracker-stamp">Loading&hellip;</p>
+  </div>
+</header>
+
+<main class="prose wide tracker">
+
+  <dl class="status-bar" id="status-bar"></dl>
+
+  <div class="callout callout-info">
+    <p>
+      <strong>Reading the status.</strong>
+      <em>Not started</em> means nobody has looked for a boundary source yet.
+      <em>Researched, no source</em> means we looked and found nothing that describes
+      the boundary. <em>Source identified</em> means a charter, plat, written
+      description or district map exists but hasn't been digitized.
+      <em>Approximate</em> and <em>Mapped, not verified</em> mean a polygon is on the
+      <a href="index.html">map</a>. Only <em>Verified</em> has been confirmed by the
+      district, its clerk or the chartering body
+      (<a href="standard.html">data standard &sect;5</a>).
+    </p>
+  </div>
+
+  <div class="controls">
+    <div class="control-field">
+      <label class="sr-only" for="tracker-search">Search districts or towns</label>
+      <input type="search" id="tracker-search" placeholder="Search a district or town&hellip;"
+             autocomplete="off">
+    </div>
+    <div class="control-field">
+      <label class="sr-only" for="status-filter">Filter by status</label>
+      <select id="status-filter"><option value="">All statuses</option></select>
+    </div>
+    <p class="result-count" id="result-count"></p>
+  </div>
+
+  <div class="table-scroll">
+    <table class="district-table tracker-table" id="tracker-table">
+      <thead>
+        <tr>
+          <th scope="col"><button type="button" class="sort-btn" data-sort="town">Town</button></th>
+          <th scope="col"><button type="button" class="sort-btn" data-sort="name">District</button></th>
+          <th scope="col"><button type="button" class="sort-btn" data-sort="status">Status</button></th>
+          <th scope="col"><button type="button" class="sort-btn" data-sort="path">Boundary source</button></th>
+          <th scope="col">What we know</th>
+          <th scope="col">Links</th>
+          <th scope="col"><span class="sr-only">More</span></th>
+        </tr>
+      </thead>
+      <tbody id="tracker-rows">
+        <tr><td colspan="7" class="loading">Loading districts&hellip;</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <p class="note">
+    Status, summaries and checked links are kept by hand in
+    <a href="https://github.com/VERSO-UVM/Drinking_Water_Service_Areas/blob/main/data/vt_district_status.csv"><code>data/vt_district_status.csv</code></a>
+    and
+    <a href="https://github.com/VERSO-UVM/Drinking_Water_Service_Areas/blob/main/data/vt_district_links.csv"><code>data/vt_district_links.csv</code></a>.
+    Mapped statuses come from the boundary layer itself. The district list is the
+    Vermont Rural Water Association's 2025 enumeration plus chartered districts
+    it doesn't cover &mdash; corrections and additions welcome.
+  </p>
+
+</main>
+
+<dialog id="district-dialog" aria-labelledby="dd-title">
+  <form method="dialog" class="dd-close-form">
+    <button value="close" class="dd-close" aria-label="Close">&times;</button>
+  </form>
+  <div id="dd-body"></div>
+</dialog>
+
+<footer class="site-footer">
+  <div class="wrap">
+    <p>
+      Source and data on
+      <a href="https://github.com/VERSO-UVM/Drinking_Water_Service_Areas">GitHub</a>.
+    </p>
+  </div>
+</footer>
+
+<script src="tracker.js"></script>
+</body>
+</html>

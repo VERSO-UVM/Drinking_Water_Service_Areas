@@ -1,6 +1,6 @@
 ﻿district_name,town,district_type,services,population,districts_in_town,single_district_town,has_legal_charter,matched_pwsid,matched_pws_name,match_score,match_status,has_service_polygon,political_bnd_proxy
 Alburgh Fire District 1,Alburgh,Fire District,Water,87,2,FALSE,FALSE,VT0005137,ALBURGH FIRE DISTRICT 1,100,auto_confident,Y,
-South Alburgh Fire District 2,Alburgh,Fire District,Water,300,2,FALSE,FALSE,,,,,,
+South Alburgh Fire District 2,Alburgh,Fire District,Water,300,2,FALSE,FALSE,VT0020964,SOUTH ALBURGH FIRE DISTRICT 2,100,corrected_2026-10-02,N,
 Bakersfield Fire District 1,Bakersfield,Fire District,Water,446,1,TRUE,FALSE,VT0005114,BAKERSFIELD FIRE DISTRICT 1,100,auto_confident,Y,service_area_proxy
 Barnet Fire District 2,Barnet,Fire District,Water,205,3,FALSE,FALSE,VT0005029,BARNET FIRE DISTRICT #2,100,auto_confident,Y,
 McIndoe Falls Fire District 3,Barnet,Fire District,Water,176,3,FALSE,FALSE,VT0005441,MCINDOE FALLS FIRE DISTRICT 3,100,auto_confident,Y,

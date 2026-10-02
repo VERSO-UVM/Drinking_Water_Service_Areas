@@ -94,6 +94,17 @@ TOWNS_URL = (
 # CRSs seen in partner submissions so far. Order is preference on a tie.
 CANDIDATE_CRS = [32145, 4326, 3857, 26918, 2852]
 
+# USFS land ownership, for districts that exclude National Forest land.
+USFS_OWNERSHIP_URL = (
+    "https://apps.fs.usda.gov/arcx/rest/services/EDW/"
+    "EDW_BasicOwnership_01/MapServer/0/query"
+)
+
+# USGS Watershed Boundary Dataset, HUC8 layer, for watershed-defined districts.
+WBD_HUC8_URL = (
+    "https://hydro.nationalmap.gov/arcgis/rest/services/wbd/MapServer/4/query"
+)
+
 # VT E911 road centerlines, used to build statute road-bounded extents.
 ROADS_URL = (
     "https://services1.arcgis.com/BkFxaEFNwHqX3tAw/arcgis/rest/services/"
@@ -109,6 +120,10 @@ ROADS_URL = (
 #   shapefile   -- partner-supplied .shp from boundary_submissions/
 #   town_polygon-- statute says the district equals its town; copy VCGI town
 #   road_bounded-- statute names bounding roads; hull of those centerlines
+#   town_union  -- authority says the district is several whole towns; their
+#                  VCGI polygons are unioned (`towns` lists them, "; "-separated)
+#   town_minus_national_forest -- the town polygon less USFS-owned land
+#   watershed_in_town -- the town polygon clipped to a USGS WBD HUC8 watershed
 #
 # `name` must match `district_name` in data/vt_district_crosswalk.csv exactly.
 #
@@ -116,6 +131,10 @@ ROADS_URL = (
 # yet is `Unknown`, a free-text one `unknown`. Dates can't hold text, so an
 # unknown date stays blank and the gap is listed by build_boundary_followup.py.
 PROJECT = "VERSO / UVM"
+
+# `date_modified` for every row unless its SOURCES entry says otherwise. Bump
+# it when you change a district's geometry or attributes here.
+LAST_EDITED = "2026-10-02"
 
 # The three pilot shapefiles were digitized by student interns in the VERSO
 # Program Office's ORCA internship program, not by the districts. Credit the
@@ -157,9 +176,28 @@ SOURCES = [
         "method_basis": "Unknown",
         "method_details": "Pilot shapefile digitized by ORCA interns; CRS "
                           "inferred (no .prj supplied).",
-        "legal_authority_type": "Unknown",
-        "legal_citation": "unknown",
         "district_website": "https://ehfd.mystrikingly.com/",
+        "conflict": "BOUNDARY CONFLICT: the polygon covers the whole town, "
+                    "but the 1912 order (legal_text, quoted from a c.1944 "
+                    "district history: https://drive.google.com/file/d/"
+                    "13LKYmo5YGNMiZ7Tf9ToYn6RmjZ5-vHoJ/view) and the 2023 "
+                    "bylaws describe only the Village of East Hardwick. "
+                    "Treat this polygon as suspect until it is redrawn.",
+        # The 1912 order describes the Village of East Hardwick, NOT the
+        # town-wide polygon below -- recorded so the conflict is visible.
+        "legal_authority_type": "Municipal vote/order",
+        "legal_citation": "Order of the Hardwick Selectmen, November 1912, "
+                          "on petition (district incorporated under 20 V.S.A. "
+                          "ch. 171 per its bylaws)",
+        "legal_text": "In November, 1912, the Selectmen of the Town of "
+                      "Hardwick, Vermont, C. A. Stanford, T. G. Bronson and "
+                      "C. L. French, in response to a petition signed by "
+                      "more than 20 legal voters, established the Hardwick "
+                      "Fire District, and fixed the boundaries comprising "
+                      "the entire Village of East Hardwick, Vermont.",
+        "formation_date": "1912-11",
+        "previous_names": "Hardwick Fire District No. 1",
+        "governing_body": "Prudential Committee",
         # The file entered the project record when first committed (as
         # pilotData/); the digitizing date itself wasn't recorded.
         "submitted_by": ORCA,
@@ -202,12 +240,15 @@ SOURCES = [
         "data_provider_type": "Unknown",
         "method": "Unknown",
         "method_basis": "Unknown",
+        "legal_authority_type": "Municipal vote/order",
+        "legal_citation": "Order of the Selectmen of the Town of Alburgh, "
+                          "2004-06-08 (cited in SAFD#2 By-Laws § 1.1)",
+        "formation_date": "2004-06-08",
+        "governing_body": "Prudential Committee",
         "method_details": "Partner shapefile; CRS supplied via .prj "
                           "(NAD83 / Vermont (ftUS), EPSG:5646) -- not "
                           "inferred. Arrived as a closed boundary line and "
                           "was converted to the polygon it encloses.",
-        "legal_authority_type": "Unknown",
-        "legal_citation": "unknown",
         "district_website": "http://www.safd2.org/",
         # Who sent this and when -- distinct from `legal_citation` (what
         # authorizes the polygon). See boundary_submissions/<district>/
@@ -244,6 +285,7 @@ SOURCES = [
                       "by the lines of Chelsea and Brookfield; westerly by "
                       "the lines of Northfield and Berlin; and northerly by "
                       "the lines of Berlin and Barre.",
+        "governing_body": "Prudential Committee",
         "date_created": "2026-08-14",
         "submitted_by": f"{PROJECT} (derived from statute, not submitted)",
         "submission_date": "2026-08-14",
@@ -278,33 +320,134 @@ SOURCES = [
                       "104.",
         "recorded_document": "Boundary recorded with the Town of Fairfax "
                              "(book/page not yet identified)",
+        # § 2: Added 2023, No. M-17 (Adj. Sess.), § 2, eff. February 1, 2024.
+        "source_date": "2024-02-01",
         "date_created": "2026-08-14",
         "submitted_by": f"{PROJECT} (derived from statute, not submitted)",
         "submission_date": "2026-08-14",
         "district_website": "",
+    },
+    {
+        "kind": "town_minus_national_forest",
+        "name": "Brandon Fire District 1",
+        "towns": "Brandon",
+        "original_data_provider": PROJECT,
+        "data_provider_type": "Academic",
+        "method": "GIS data",
+        "method_basis": "Written description",
+        "method_details": "Bylaws define the district as the Town of Brandon "
+                          "less National Forest lands. Built as the VCGI town "
+                          "polygon minus land the USFS BasicOwnership layer "
+                          "classes as 'USDA FOREST SERVICE' (current federal "
+                          "ownership, not the forest's proclamation boundary). "
+                          "Ownership changes over time; the bylaws don't say "
+                          "as of what date.",
+        "source_url": "https://brandonfiredistrict.org/wp-content/uploads/"
+                      "2023/07/Fire-District-Bylaws-as-of-Jan092023-1.pdf",
+        "source_date": "2023-01-09",
+        "legal_authority_type": "Other",
+        "legal_citation": "Brandon Fire District No. 1 By-Laws (amended "
+                          "2023-01-09); district incorporated under 20 V.S.A. "
+                          "ch. 171",
+        "legal_text": "The Fire District No.1, of Brandon, shall include all "
+                      "the areas within the Town of Brandon except those "
+                      "areas designated as National Forest lands.",
+        "formation_date": "1887-04-11",
+        "governing_body": "Prudential Committee",
+        "date_created": "2026-10-02",
+        "submitted_by": f"{PROJECT} (derived from district bylaws, not "
+                        f"submitted)",
+        "submission_date": "2026-10-02",
+        "district_website": "https://brandonfiredistrict.org/",
+        "notes": "1887-04-11 is the date the bylaws record their adoption; "
+                 "whether it is also the formation date is unconfirmed.",
+    },
+    {
+        "kind": "town_union",
+        "name": "Vergennes Panton Water District",
+        "towns": "Vergennes; Panton",
+        "original_data_provider": PROJECT,
+        "data_provider_type": "Academic",
+        "method": "GIS data",
+        "method_basis": "Municipal boundary",
+        "method_details": "District charter § 1 defines it as the area within "
+                          "the physical limits of the City of Vergennes and "
+                          "the Town of Panton, so the boundary is the union "
+                          "of their VCGI polygons. Assumes neither municipal "
+                          "boundary has moved since 1966.",
+        "source_url": "https://vergennespantonwatersdistrict.org/"
+                      "VPWD%20Charter.pdf",
+        "legal_authority_type": "Municipal vote/order",
+        "legal_citation": "Votes of the Town of Panton and the City of "
+                          "Vergennes under 24 V.S.A. § 3342; VPWD Charter § 1",
+        "legal_text": "The lawful voters of the Town of Panton and the City "
+                      "of Vergennes, respectively, having affirmatively voted "
+                      "pursuant to the provisions of 24 V.S.A. § 3342 to form "
+                      "a consolidated water district comprising the area "
+                      "within the physical limits of those municipalities, "
+                      "and the certification of those votes and of the "
+                      "conduct of the organizational meeting of the District "
+                      "held on August 11, 1966, having been submitted to the "
+                      "Secretary of State, there was created a consolidated "
+                      "water district known as \"Vergennes-Panton Water "
+                      "District\" on August 11, 1966.",
+        "formation_date": "1966-08-11",
+        "previous_names": "Consolidated Water District #2",
+        "governing_body": "Board of Water Commissioners",
+        "date_created": "2026-10-02",
+        "submitted_by": f"{PROJECT} (derived from district charter, not "
+                        f"submitted)",
+        "submission_date": "2026-10-02",
+        "district_website": "https://vergennespantonwatersdistrict.org/",
+        "notes": "The district website gives 1973 as a date; the charter "
+                 "says 1966.",
+    },
+    {
+        "kind": "watershed_in_town",
+        "name": "North Branch Fire District 1",
+        "towns": "Dover",
+        "huc8": "01080203",            # Deerfield River
+        "original_data_provider": PROJECT,
+        "data_provider_type": "Academic",
+        "method": "GIS data",
+        "method_basis": "Feature-bounded",
+        "method_details": "District Ordinances § 2.05 define the district as "
+                          "all land in the Deerfield River watershed within "
+                          "the Town of Dover. Built as the VCGI Dover polygon "
+                          "clipped to USGS WBD HUC8 01080203 (Deerfield "
+                          "River). WBD lines are mapped at 1:24,000, so the "
+                          "divide is approximate to tens of meters. Not yet "
+                          "checked against the district's 2022 boundary map.",
+        "source_url": "https://www.northbranchfiredistrict.com/_files/ugd/"
+                      "cb2b9b_1b4151e4659e4024a30f6187bab0d6fc.pdf",
+        "legal_authority_type": "Ordinance",
+        "legal_citation": "North Branch Fire District No. 1 Ordinances "
+                          "§ 2.05 (enacted 2022-01-12); charter 24 V.S.A. "
+                          "App. ch. 509, § 1",
+        "legal_text": "Section 2.05: Boundary Lines All land comprising the "
+                      "Deerfield River watershed which lies in the Town of "
+                      "Dover. See Dover Town Record Vol. 8 at 32 (March 30, "
+                      "1972).",
+        "recorded_document": "Dover Town Record Vol. 8 at 32 (1972-03-30)",
+        "formation_date": "1972",
+        "governing_body": "Prudential Committee",
+        "source_date": "2022-01-12",
+        "date_created": "2026-10-02",
+        "submitted_by": f"{PROJECT} (derived from district ordinance, not "
+                        f"submitted)",
+        "submission_date": "2026-10-02",
+        "district_website": "https://www.northbranchfiredistrict.com/",
+        "notes": "The district also publishes a boundary map image "
+                 "(northbranchfiredistrict.com/location, 'Fire District Map "
+                 "2022-1.jpg') to check this polygon against.",
     },
 ]
 
 # Districts whose boundary is known but has no usable digital source yet.
 # Tracked here so they are visible in the CSV rather than silently absent.
 PENDING = [
-    {
-        "district_name": "North Branch Fire District 1",
-        "town": "Dover",
-        "district_website": "https://www.northbranchfiredistrict.com/",
-        "source_type": "District website — raster map only",
-        "source_citation": "North Branch Fire District, district map "
-                           "(web page image)",
-        "source_url": "https://www.northbranchfiredistrict.com/",
-        "note": "The district publishes a boundary map, but as a raster image "
-                "on a Wix page -- no GeoJSON/KML/ArcGIS layer, and the site's "
-                "10 PDFs are ordinances and minutes, not georeferenced maps. "
-                "Tracing pixels would fabricate coordinates. Request the "
-                "source GIS file or a georeferenced PDF from the district. "
-                "Note 24 V.S.A. App. ch. 509, § 1 is circular ('within the "
-                "corporate limits presently established') and gives no "
-                "geometry.",
-    },
+    # North Branch FD 1 left this list on 2026-10-02: its ordinance defines
+    # the boundary by watershed, so it is now built in SOURCES.
 ]
 
 # At or above this IoU against its own town, the district is coextensive with
@@ -334,11 +477,13 @@ ATTRS = [
     "submission_date", "source_crs", "crs_inferred",
     # 5. verification
     "verification_status", "verification_date", "verification_process",
-    "verifier_type", "verifier_name",
+    "verifier_type", "verifier_name", "verification_schedule",
+    "positional_accuracy_m", "source_scale",
     # 6. political district
     "district_type", "services", "legal_authority_type", "legal_citation",
     "legal_text", "recorded_document", "extent", "formation_date",
-    "effective_date", "district_website",
+    "effective_date", "previous_names", "governing_body", "district_website",
+    "census_govid", "recorded_area_sqkm",
     # project extensions (not in the standard)
     "population", "pws_name", "match_score", "match_status",
     "districts_in_town", "single_district_town", "has_legal_charter",
@@ -376,6 +521,7 @@ CODED = {
                "approximate"},
     "crs_inferred": {"Y", "N"},
 }
+ROSTER_SERVICES = {"WW": "Wastewater", "Water & WW": "Water & Wastewater"}
 SERVICES = {"Water", "Wastewater", "Water & Wastewater", "Fire", "Other",
             "Unknown"}
 
@@ -387,6 +533,11 @@ REQUIRED = [
     "crs_inferred", "verification_status", "district_type",
     "legal_authority_type", "legal_citation", "extent",
 ]
+
+
+def split_towns(towns):
+    """`towns` is "; "-separated (standard section 3)."""
+    return [t.strip() for t in towns.split(";") if t.strip()]
 
 
 def validate(gdf):
@@ -484,6 +635,40 @@ def infer_crs(path, town_geom):
     return best + (False,)
 
 
+def fetch_query_geoms(url, where, town_geom, extra=None):
+    """Polygons from an ArcGIS query intersecting `town_geom`, in CRS."""
+    minx, miny, maxx, maxy = town_geom.bounds
+    params = {
+        "where": where, "geometry": f"{minx},{miny},{maxx},{maxy}",
+        "geometryType": "esriGeometryEnvelope", "inSR": 32145,
+        "spatialRel": "esriSpatialRelIntersects", "outFields": "*",
+        "returnGeometry": "true", "outSR": 32145, "f": "geojson"}
+    params.update(extra or {})
+    r = requests.get(url, params=params, timeout=300)
+    r.raise_for_status()
+    feats = r.json().get("features", [])
+    return unary_union([shape(f["geometry"]).buffer(0) for f in feats]
+                       ) if feats else None
+
+
+def town_minus_national_forest(town_geom):
+    forest = fetch_query_geoms(
+        USFS_OWNERSHIP_URL, "ownerclassification = 'USDA FOREST SERVICE'",
+        town_geom)
+    if forest is None:
+        return town_geom, "no USFS-owned land found in the town"
+    removed = town_geom.intersection(forest).area / 1e6
+    return town_geom.difference(forest), (
+        f"{removed:.2f} km2 of USFS-owned land removed")
+
+
+def watershed_in_town(town_geom, huc8):
+    shed = fetch_query_geoms(WBD_HUC8_URL, f"huc8 = '{huc8}'", town_geom)
+    if shed is None:
+        return None, f"HUC8 {huc8} not found"
+    return town_geom.intersection(shed), f"clipped to HUC8 {huc8}"
+
+
 def fetch_roads(where):
     r = requests.get(ROADS_URL, params={
         "where": where, "outFields": "PRIMARYNAME", "returnGeometry": "true",
@@ -535,7 +720,7 @@ def road_bounded_extent(src):
 
 
 def main():
-    towns = fetch_towns([s["towns"] for s in SOURCES])
+    towns = fetch_towns([t for s in SOURCES for t in split_towns(s["towns"])])
 
     roster = pd.read_csv(CROSSWALK) if CROSSWALK.exists() else pd.DataFrame()
     clerks = (pd.read_csv(CLERKS, dtype=str).fillna("")
@@ -544,11 +729,13 @@ def main():
     rows, geoms = [], []
     for i, src in enumerate(SOURCES, start=1):
         kind = src.get("kind", "shapefile")
-        town = src["towns"]
-        town_geom = towns.get(town)
-        if town_geom is None:
-            print(f"  no VCGI town for {town}", file=sys.stderr)
+        town_list = split_towns(src["towns"])
+        missing = [t for t in town_list if towns.get(t) is None]
+        if missing:
+            print(f"  no VCGI town for {', '.join(missing)}", file=sys.stderr)
             continue
+        town = " and ".join(town_list)
+        town_geom = unary_union([towns[t] for t in town_list])
 
         epsg, source_document, crs_inferred = "", "", ""
         build_note = ""
@@ -586,6 +773,32 @@ def main():
             source_document = "VT E911 Road Centerlines (VCGI)"
             crs_inferred = "N"
 
+        elif kind == "town_union":
+            # The authority names whole municipalities -- copied, unioned.
+            geom = town_geom
+            epsg = "EPSG:32145"
+            source_document = "VCGI VT Data - Town Boundaries"
+            crs_inferred = "N"
+            build_note = (f"Union of the VCGI polygons for {town}, copied "
+                          f"unmodified.")
+
+        elif kind == "town_minus_national_forest":
+            geom, build_note = town_minus_national_forest(town_geom)
+            epsg = "EPSG:32145"
+            source_document = ("VCGI VT Data - Town Boundaries; USFS "
+                               "BasicOwnership (EDW)")
+            crs_inferred = "N"
+
+        elif kind == "watershed_in_town":
+            geom, build_note = watershed_in_town(town_geom, src["huc8"])
+            if geom is None:
+                print(f"  {src['name']}: {build_note}", file=sys.stderr)
+                continue
+            epsg = "EPSG:32145"
+            source_document = ("VCGI VT Data - Town Boundaries; USGS "
+                               "Watershed Boundary Dataset (HUC8)")
+            crs_inferred = "N"
+
         else:
             print(f"  unknown source kind {kind!r}", file=sys.stderr)
             continue
@@ -605,6 +818,14 @@ def main():
             note = (f"Approximate extent from the roads named in statute. "
                     f"{build_note}. {area:.2f} km2, "
                     f"{iou:.1%} of the Town of {town}.")
+        elif kind == "town_union":
+            extent = "multi_town"
+            note = (f"Authority defines the district as the whole of {town}. "
+                    f"{build_note}")
+        elif kind in ("town_minus_national_forest", "watershed_in_town"):
+            extent = "sub_town"
+            note = (f"Built from its written definition: {build_note}. "
+                    f"{area:.2f} km2, {iou:.1%} of the Town of {town}.")
         elif kind == "town_polygon":
             extent = "coextensive_with_town"
             note = (f"Statute defines the district's corporate limits as the "
@@ -629,13 +850,15 @@ def main():
                     f"{area:.1f} of {town_geom.area / 1e6:.1f} km2 town).")
         if src.get("notes"):
             note = f"{note} {src['notes']}"
+        if src.get("conflict"):
+            note = f"{src['conflict']} {note}"
 
         rec = {
             "boundary_id": f"VTFD-{i:04d}",
             "boundary_type": "political_district",
             "name": src["name"],
             "state": "VT",
-            "towns": town,
+            "towns": "; ".join(town_list),
             # The roster only lists active districts, and every source here
             # describes a district operating today.
             "status": "Active",
@@ -647,7 +870,9 @@ def main():
             "method_details": src["method_details"],
             "source_document": source_document,
             "source_url": src.get("source_url", ""),
+            "source_date": src.get("source_date", ""),
             "date_created": src.get("date_created", ""),
+            "date_modified": src.get("date_modified", LAST_EDITED),
             "publisher": PROJECT,
             "submitted_by": src.get("submitted_by", ""),
             "submission_date": src.get("submission_date", ""),
@@ -662,6 +887,9 @@ def main():
             "legal_citation": src["legal_citation"],
             "legal_text": src.get("legal_text", ""),
             "recorded_document": src.get("recorded_document", ""),
+            "formation_date": src.get("formation_date", ""),
+            "previous_names": src.get("previous_names", ""),
+            "governing_body": src.get("governing_body", ""),
             "extent": extent,
             "district_website": src.get("district_website", ""),
             "town_iou": round(iou, 4),
@@ -675,7 +903,9 @@ def main():
                 r = m.iloc[0]
                 rec.update({
                     "district_type": r.get("district_type", ""),
-                    "services": r.get("services", ""),
+                    # The roster abbreviates wastewater; the standard spells it.
+                    "services": ROSTER_SERVICES.get(r.get("services", ""),
+                                                    r.get("services", "")),
                     "population": r.get("population", ""),
                     "pwsid": r.get("matched_pwsid", ""),
                     "pws_name": r.get("matched_pws_name", ""),
@@ -696,12 +926,16 @@ def main():
                       f"(not a water provider)", file=sys.stderr)
 
         if not clerks.empty:
-            c = clerks[clerks["town"].str.strip().str.lower()
-                       == town.strip().lower()]
-            if len(c):
-                rec["county"] = c.iloc[0].get("county", "")
-                rec["clerk_name"] = c.iloc[0].get("clerk_name", "")
-                rec["clerk_email"] = c.iloc[0].get("clerk_email", "")
+            found = [clerks[clerks["town"].str.strip().str.lower()
+                            == t.lower()] for t in town_list]
+            found = [c.iloc[0] for c in found if len(c)]
+            if found:
+                def joined(col):
+                    return "; ".join(dict.fromkeys(
+                        str(c.get(col, "")) for c in found if c.get(col, "")))
+                rec["county"] = joined("county")
+                rec["clerk_name"] = joined("clerk_name")
+                rec["clerk_email"] = joined("clerk_email")
 
         rows.append(rec)
         geoms.append(geom)
@@ -718,7 +952,8 @@ def main():
     gdf = gdf[ATTRS + ["geometry"]]
     text_cols = [c for c in ATTRS if c not in
                  ("area_sqkm", "town_iou", "population", "match_score",
-                  "districts_in_town")]
+                  "districts_in_town", "positional_accuracy_m",
+                  "source_scale", "recorded_area_sqkm")]
     gdf[text_cols] = gdf[text_cols].fillna("").astype(str)
     validate(gdf)
 
@@ -729,6 +964,9 @@ def main():
     gdf.drop(columns="geometry").to_csv(OUT_CSV, index=False)
 
     # Districts with a known boundary but no usable digital source yet.
+    pend_cols = ["district_name", "town", "district_website", "source_type",
+                 "source_citation", "source_url", "notes"]
+    pend = pd.DataFrame(columns=pend_cols)
     if PENDING:
         pend = pd.DataFrame([{
             "district_name": p["district_name"], "town": p["town"],
@@ -738,7 +976,8 @@ def main():
             "source_url": p.get("source_url", ""),
             "notes": p.get("note", ""),
         } for p in PENDING])
-        pend.to_csv(OUT_PENDING, index=False)
+    pend.to_csv(OUT_PENDING, index=False)
+    if PENDING:
         print(f"\n{len(pend)} pending (boundary known, no digital source): "
               f"{', '.join(pend['district_name'])}")
         print(f"  -> {OUT_PENDING.relative_to(ROOT)}")
